@@ -216,12 +216,19 @@ textarea:focus {
   gap: 8px;
 }
 
+.quality-control {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .template-gallery {
   display: grid;
   gap: 8px;
 }
 
 .segmented-control button,
+.quality-control button,
 .template-gallery button,
 .theme-option {
   min-width: 0;
@@ -240,6 +247,14 @@ textarea:focus {
   gap: 6px;
 }
 
+.quality-control button {
+  display: flex;
+  min-height: 66px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+}
+
 .template-gallery button {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -249,6 +264,7 @@ textarea:focus {
 }
 
 .segmented-control button span,
+.quality-control button span,
 .template-gallery button span,
 .theme-option span:last-child {
   overflow-wrap: anywhere;
@@ -268,6 +284,17 @@ textarea:focus {
   font-size: 0.74rem;
 }
 
+.quality-control small,
+.field-hint {
+  color: #667085;
+  font-size: 0.76rem;
+}
+
+.field-hint {
+  margin: -2px 0 0;
+  line-height: 1.35;
+}
+
 .template-gallery small {
   grid-column: 2;
   color: #667085;
@@ -276,6 +303,7 @@ textarea:focus {
 }
 
 .segmented-control button.active,
+.quality-control button.active,
 .template-gallery button.active,
 .theme-option.active {
   border-color: #2059e8;
@@ -585,6 +613,7 @@ textarea:focus {
   }
 
   .segmented-control,
+  .quality-control,
   .theme-grid {
     grid-template-columns: 1fr;
   }

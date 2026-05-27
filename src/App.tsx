@@ -13,12 +13,17 @@ import {
 } from 'lucide-react';
 import {
   cardThemes,
+  defaultExportScaleId,
+  exportScaleOptions,
+  getExportPixelSize,
+  getExportScaleOption,
   getMarkdownTemplate,
   getStarterMarkdown,
   markdownTemplates,
   platformPresets,
   sampleMarkdown,
   type CardTheme,
+  type ExportScaleId,
   type PlatformPreset,
   type TemplateId,
 } from './cardOptions';
@@ -74,6 +79,7 @@ function App() {
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [presetId, setPresetId] = useState<PlatformPreset['id']>('twitter');
   const [themeId, setThemeId] = useState<CardTheme['id']>('signal');
+  const [exportScaleId, setExportScaleId] = useState<ExportScaleId>(defaultExportScaleId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
   const [exportState, setExportState] = useState<ExportState>('idle');
   const [starterCopyState, setStarterCopyState] = useState<StarterCopyState>('idle');
@@ -85,6 +91,8 @@ function App() {
     [presetId],
   );
   const theme = useMemo(() => cardThemes.find((item) => item.id === themeId) ?? cardThemes[0], [themeId]);
+  const exportScale = useMemo(() => getExportScaleOption(exportScaleId), [exportScaleId]);
+  const exportPixelSize = useMemo(() => getExportPixelSize(preset, exportScale), [preset, exportScale]);
   const title = useMemo(() => firstMarkdownHeading(markdown), [markdown]);
 
   function applyTemplate(templateId: TemplateId) {
@@ -123,10 +131,10 @@ function App() {
 
     try {
       setExportState('copying');
-      setMessage('Rendering PNG for clipboard...');
-      await copyCard(cardRef.current, preset);
+      setMessage(`Rendering ${exportScale.label} PNG for clipboard...`);
+      await copyCard(cardRef.current, preset, exportScale);
       setExportState('copied');
-      setMessage('PNG copied to clipboard.');
+      setMessage(`${exportScale.label} PNG copied to clipboard.`);
       window.setTimeout(() => setExportState('idle'), 1800);
     } catch (error) {
       setExportState('error');
@@ -139,10 +147,10 @@ function App() {
 
     try {
       setExportState('downloading');
-      setMessage('Rendering PNG download...');
-      await downloadCard(cardRef.current, preset, title);
+      setMessage(`Rendering ${exportScale.label} PNG download...`);
+      await downloadCard(cardRef.current, preset, title, exportScale);
       setExportState('idle');
-      setMessage('PNG download started.');
+      setMessage(`${exportScale.label} PNG download started.`);
     } catch (error) {
       setExportState('error');
       setMessage(error instanceof Error ? error.message : 'Download failed.');
@@ -251,6 +259,32 @@ function App() {
               ))}
             </div>
           </div>
+
+          <div className="field-group">
+            <span className="field-label">Export Quality</span>
+            <div className="quality-control">
+              {exportScaleOptions.map((item) => (
+                <button
+                  key={item.id}
+                  className={item.id === exportScale.id ? 'active' : ''}
+                  type="button"
+                  onClick={() => {
+                    setExportScaleId(item.id);
+                    setExportState('idle');
+                    setMessage(`${item.label} selected. Copy PNG and Download will use ${item.shortLabel}.`);
+                  }}
+                >
+                  <span>{item.label}</span>
+                  <small>
+                    {item.shortLabel} · {item.id === 'fast' ? 'quick checks' : 'sharper posts'}
+                  </small>
+                </button>
+              ))}
+            </div>
+            <p className="field-hint">
+              {exportScale.description} Approx. {exportPixelSize.width} x {exportPixelSize.height}px PNG.
+            </p>
+          </div>
         </aside>
 
         <section className="preview-panel" aria-label="Live card preview">
@@ -287,7 +321,7 @@ function App() {
           <div className={`status-line ${exportState === 'error' ? 'error' : ''}`} role="status">
             <span>{message}</span>
             <span>
-              {theme.label} · {preset.sizeLabel}
+              {theme.label} · {preset.sizeLabel} · Export {exportPixelSize.width} x {exportPixelSize.height}px
             </span>
           </div>
         </section>

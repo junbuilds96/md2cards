@@ -1,5 +1,10 @@
 import { toBlob, toPng } from 'html-to-image';
-import type { PlatformPreset } from './cardOptions';
+import {
+  defaultExportScaleId,
+  getExportScaleOption,
+  type ExportScaleOption,
+  type PlatformPreset,
+} from './cardOptions';
 
 export function getExportFileName(preset: PlatformPreset, title: string): string {
   const baseName = title
@@ -13,14 +18,15 @@ export function getExportFileName(preset: PlatformPreset, title: string): string
   return `${baseName || 'md2cards'}-${preset.id}.png`;
 }
 
-function getExportOptions(preset: PlatformPreset) {
+export function getExportOptions(
+  preset: PlatformPreset,
+  exportScale: ExportScaleOption = getExportScaleOption(defaultExportScaleId),
+) {
   return {
     cacheBust: true,
-    pixelRatio: 1,
+    pixelRatio: exportScale.scale,
     width: preset.width,
     height: preset.height,
-    canvasWidth: preset.width,
-    canvasHeight: preset.height,
     style: {
       width: `${preset.width}px`,
       height: `${preset.height}px`,
@@ -32,20 +38,25 @@ export async function downloadCard(
   node: HTMLElement,
   preset: PlatformPreset,
   title: string,
+  exportScale?: ExportScaleOption,
 ): Promise<void> {
-  const dataUrl = await toPng(node, getExportOptions(preset));
+  const dataUrl = await toPng(node, getExportOptions(preset, exportScale));
   const link = document.createElement('a');
   link.download = getExportFileName(preset, title);
   link.href = dataUrl;
   link.click();
 }
 
-export async function copyCard(node: HTMLElement, preset: PlatformPreset): Promise<void> {
+export async function copyCard(
+  node: HTMLElement,
+  preset: PlatformPreset,
+  exportScale?: ExportScaleOption,
+): Promise<void> {
   if (!('ClipboardItem' in window) || !navigator.clipboard?.write) {
     throw new Error('Image clipboard support is not available in this browser.');
   }
 
-  const blob = await toBlob(node, getExportOptions(preset));
+  const blob = await toBlob(node, getExportOptions(preset, exportScale));
   if (!blob) {
     throw new Error('Unable to render the card image.');
   }

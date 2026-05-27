@@ -2,6 +2,8 @@ export type PresetId = 'twitter' | 'xiaohongshu' | 'launch';
 
 export type ThemeId = 'signal' | 'paper' | 'midnight' | 'editorial';
 
+export type ExportScaleId = 'fast' | 'crisp';
+
 export type PlatformPreset = {
   id: PresetId;
   label: string;
@@ -14,6 +16,14 @@ export type CardTheme = {
   id: ThemeId;
   label: string;
   className: string;
+  description: string;
+};
+
+export type ExportScaleOption = {
+  id: ExportScaleId;
+  label: string;
+  scale: number;
+  shortLabel: string;
   description: string;
 };
 
@@ -76,6 +86,25 @@ export const cardThemes: CardTheme[] = [
     label: 'Editorial',
     className: 'theme-editorial',
     description: 'Magazine-style color blocks for creator updates.',
+  },
+];
+
+export const defaultExportScaleId: ExportScaleId = 'crisp';
+
+export const exportScaleOptions: ExportScaleOption[] = [
+  {
+    id: 'fast',
+    label: 'Fast preview',
+    scale: 1,
+    shortLabel: '1x',
+    description: 'Quickest render for drafts and layout checks.',
+  },
+  {
+    id: 'crisp',
+    label: 'Crisp share',
+    scale: 2,
+    shortLabel: '2x',
+    description: 'Sharper PNG for posting and sharing.',
   },
 ];
 
@@ -158,4 +187,18 @@ export function getMarkdownTemplate(templateId: TemplateId): MarkdownTemplate {
 
 export function getStarterMarkdown(templateId: TemplateId): string {
   return getMarkdownTemplate(templateId).markdown;
+}
+
+export function getExportScaleOption(exportScaleId: ExportScaleId): ExportScaleOption {
+  return exportScaleOptions.find((option) => option.id === exportScaleId) ?? exportScaleOptions[1];
+}
+
+export function getExportPixelSize(
+  preset: PlatformPreset,
+  exportScale: ExportScaleOption,
+): { width: number; height: number } {
+  return {
+    width: Math.round(preset.width * exportScale.scale),
+    height: Math.round(preset.height * exportScale.scale),
+  };
 }
