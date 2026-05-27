@@ -1,0 +1,46 @@
+{
+  "name": "md2cards",
+  "version": "0.1.0",
+  "description": "Markdown in, polished social cards out.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/md2cards.git"
+  },
+  "keywords": [
+    "markdown",
+    "social-cards",
+    "creator-tools",
+    "png-export",
+    "react"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "html-to-image": "^1.11.13",
+    "lucide-react": "^0.556.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.14"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}

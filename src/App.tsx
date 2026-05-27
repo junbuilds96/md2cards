@@ -1,0 +1,265 @@
+import { useMemo, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import {
+  Check,
+  Clipboard,
+  Download,
+  ImageDown,
+  LayoutTemplate,
+  PanelRightOpen,
+  RotateCcw,
+  Sparkles,
+} from 'lucide-react';
+import {
+  cardThemes,
+  markdownTemplates,
+  platformPresets,
+  sampleMarkdown,
+  type CardTheme,
+  type PlatformPreset,
+  type TemplateId,
+} from './cardOptions';
+import { copyCard, downloadCard } from './exportImage';
+
+type ExportState = 'idle' | 'copying' | 'copied' | 'downloading' | 'error';
+
+function firstMarkdownHeading(markdown: string): string {
+  const heading = markdown
+    .split('\n')
+    .find((line) => /^#{1,3}\s+\S/.test(line))
+    ?.replace(/^#{1,3}\s+/, '');
+
+  return heading || 'MD2Cards';
+}
+
+function CardPreview({
+  markdown,
+  preset,
+  theme,
+  cardRef,
+}: {
+  markdown: string;
+  preset: PlatformPreset;
+  theme: CardTheme;
+  cardRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  return (
+    <div
+      ref={cardRef}
+      className={`social-card ${theme.className}`}
+      style={{
+        aspectRatio: `${preset.width} / ${preset.height}`,
+      }}
+    >
+      <div className="card-chrome">
+        <span>MD2Cards</span>
+        <span>{preset.label}</span>
+      </div>
+      <div className="markdown-card-body">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+      </div>
+      <div className="card-footer">
+        <span>Markdown to social PNG</span>
+        <span>{preset.sizeLabel}</span>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [markdown, setMarkdown] = useState(sampleMarkdown);
+  const [presetId, setPresetId] = useState<PlatformPreset['id']>('twitter');
+  const [themeId, setThemeId] = useState<CardTheme['id']>('signal');
+  const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
+  const [exportState, setExportState] = useState<ExportState>('idle');
+  const [message, setMessage] = useState('Ready to export.');
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const preset = useMemo(
+    () => platformPresets.find((item) => item.id === presetId) ?? platformPresets[0],
+    [presetId],
+  );
+  const theme = useMemo(() => cardThemes.find((item) => item.id === themeId) ?? cardThemes[0], [themeId]);
+  const title = useMemo(() => firstMarkdownHeading(markdown), [markdown]);
+
+  function applyTemplate(templateId: TemplateId) {
+    const template = markdownTemplates.find((item) => item.id === templateId);
+    if (!template) return;
+
+    setMarkdown(template.markdown);
+    setPresetId(template.presetId);
+    setThemeId(template.themeId);
+    setActiveTemplateId(template.id);
+    setMessage(`${template.label} loaded. Replace the text with your own Markdown when ready.`);
+    setExportState('idle');
+  }
+
+  async function handleCopy() {
+    if (!cardRef.current) return;
+
+    try {
+      setExportState('copying');
+      setMessage('Rendering PNG for clipboard...');
+      await copyCard(cardRef.current, preset);
+      setExportState('copied');
+      setMessage('PNG copied to clipboard.');
+      window.setTimeout(() => setExportState('idle'), 1800);
+    } catch (error) {
+      setExportState('error');
+      setMessage(error instanceof Error ? error.message : 'Copy failed.');
+    }
+  }
+
+  async function handleDownload() {
+    if (!cardRef.current) return;
+
+    try {
+      setExportState('downloading');
+      setMessage('Rendering PNG download...');
+      await downloadCard(cardRef.current, preset, title);
+      setExportState('idle');
+      setMessage('PNG download started.');
+    } catch (error) {
+      setExportState('error');
+      setMessage(error instanceof Error ? error.message : 'Download failed.');
+    }
+  }
+
+  return (
+    <main className="app-shell">
+      <section className="workspace">
+        <aside className="control-panel" aria-label="Markdown card controls">
+          <div className="brand-block">
+            <div className="brand-mark" aria-hidden="true">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <p className="eyebrow">MD2Cards</p>
+              <h1>Markdown in. Polished cards out.</h1>
+            </div>
+          </div>
+
+          <div className="onboarding-strip">
+            <PanelRightOpen size={18} />
+            <p>Pick a starter, replace the Markdown with your update, then copy or download a PNG.</p>
+          </div>
+
+          <div className="field-group">
+            <span className="field-label">Starter Templates</span>
+            <div className="template-gallery">
+              {markdownTemplates.map((item) => (
+                <button
+                  key={item.id}
+                  className={item.id === activeTemplateId ? 'active' : ''}
+                  type="button"
+                  onClick={() => applyTemplate(item.id)}
+                >
+                  <LayoutTemplate size={16} />
+                  <span>{item.label}</span>
+                  <small>{item.description}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="field-group">
+            <div className="group-header">
+              <label htmlFor="markdown-input">Markdown</label>
+              <button className="ghost-button" type="button" onClick={() => applyTemplate(activeTemplateId)}>
+                <RotateCcw size={16} />
+                Reset Starter
+              </button>
+            </div>
+            <textarea
+              id="markdown-input"
+              value={markdown}
+              onChange={(event) => {
+                setMarkdown(event.target.value);
+                setMessage('Editing Markdown. Preview updates live.');
+                setExportState('idle');
+              }}
+              spellCheck="false"
+            />
+          </div>
+
+          <div className="field-group">
+            <span className="field-label">Platform</span>
+            <div className="segmented-control">
+              {platformPresets.map((item) => (
+                <button
+                  key={item.id}
+                  className={item.id === preset.id ? 'active' : ''}
+                  type="button"
+                  onClick={() => setPresetId(item.id)}
+                >
+                  <span>{item.label}</span>
+                  <small>{item.sizeLabel}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="field-group">
+            <span className="field-label">Theme</span>
+            <div className="theme-grid">
+              {cardThemes.map((item) => (
+                <button
+                  key={item.id}
+                  className={`theme-option ${item.className} ${item.id === theme.id ? 'active' : ''}`}
+                  type="button"
+                  onClick={() => setThemeId(item.id)}
+                  title={item.description}
+                >
+                  <span className="swatch" aria-hidden="true" />
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        <section className="preview-panel" aria-label="Live card preview">
+          <div className="preview-toolbar">
+            <div>
+              <p className="eyebrow">Live Preview</p>
+              <h2>{title}</h2>
+            </div>
+            <div className="export-actions">
+              <button className="secondary-button" type="button" onClick={handleCopy}>
+                {exportState === 'copied' ? <Check size={18} /> : <Clipboard size={18} />}
+                {exportState === 'copying' ? 'Copying...' : exportState === 'copied' ? 'Copied' : 'Copy PNG'}
+              </button>
+              <button className="primary-button" type="button" onClick={handleDownload}>
+                {exportState === 'downloading' ? <ImageDown size={18} /> : <Download size={18} />}
+                {exportState === 'downloading' ? 'Exporting...' : 'Download'}
+              </button>
+            </div>
+          </div>
+
+          <div className="preview-stage">
+            <div
+              className="preview-scaler"
+              style={{
+                aspectRatio: `${preset.width} / ${preset.height}`,
+              }}
+            >
+              <div className="preview-zoom">
+                <CardPreview markdown={markdown} preset={preset} theme={theme} cardRef={cardRef} />
+              </div>
+            </div>
+          </div>
+
+          <div className={`status-line ${exportState === 'error' ? 'error' : ''}`} role="status">
+            <span>{message}</span>
+            <span>
+              {theme.label} · {preset.sizeLabel}
+            </span>
+          </div>
+        </section>
+      </section>
+    </main>
+  );
+}
+
+export default App;
