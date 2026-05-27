@@ -151,3 +151,11 @@ Try it with your next release note.`,
 ];
 
 export const sampleMarkdown = markdownTemplates[0].markdown;
+
+export function getMarkdownTemplate(templateId: TemplateId): MarkdownTemplate {
+  return markdownTemplates.find((template) => template.id === templateId) ?? markdownTemplates[0];
+}
+
+export function getStarterMarkdown(templateId: TemplateId): string {
+  return getMarkdownTemplate(templateId).markdown;
+}

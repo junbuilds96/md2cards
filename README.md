@@ -13,7 +13,7 @@ npm run dev
 
 Open the local Vite URL shown in your terminal.
 
-Choose a starter template, paste or edit your Markdown, then use Copy PNG or Download.
+Choose a starter template, copy its Markdown if you want a reusable starting point, paste or edit your own Markdown, then use Copy PNG or Download.
 
 ## Scripts
 

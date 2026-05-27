@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { cardThemes, markdownTemplates, platformPresets, sampleMarkdown } from './cardOptions';
+import {
+  cardThemes,
+  getMarkdownTemplate,
+  getStarterMarkdown,
+  markdownTemplates,
+  platformPresets,
+  sampleMarkdown,
+  type TemplateId,
+} from './cardOptions';
 
 describe('markdownTemplates', () => {
   it('exposes unique starter templates with valid preset and theme defaults', () => {
@@ -15,5 +23,13 @@ describe('markdownTemplates', () => {
 
   it('keeps the default sample aligned with the first starter', () => {
     expect(sampleMarkdown).toBe(markdownTemplates[0].markdown);
+  });
+
+  it('returns the active starter Markdown for clipboard helpers', () => {
+    expect(getStarterMarkdown('github-release')).toBe(markdownTemplates[2].markdown);
+  });
+
+  it('falls back to the default starter for an unknown template id', () => {
+    expect(getMarkdownTemplate('missing-template' as TemplateId)).toBe(markdownTemplates[0]);
   });
 });

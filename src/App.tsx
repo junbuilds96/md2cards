@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import {
   cardThemes,
+  getMarkdownTemplate,
+  getStarterMarkdown,
   markdownTemplates,
   platformPresets,
   sampleMarkdown,
@@ -23,6 +25,7 @@ import {
 import { copyCard, downloadCard } from './exportImage';
 
 type ExportState = 'idle' | 'copying' | 'copied' | 'downloading' | 'error';
+type StarterCopyState = 'idle' | 'copying' | 'copied' | 'error';
 
 function firstMarkdownHeading(markdown: string): string {
   const heading = markdown
@@ -73,6 +76,7 @@ function App() {
   const [themeId, setThemeId] = useState<CardTheme['id']>('signal');
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
   const [exportState, setExportState] = useState<ExportState>('idle');
+  const [starterCopyState, setStarterCopyState] = useState<StarterCopyState>('idle');
   const [message, setMessage] = useState('Ready to export.');
   const cardRef = useRef<HTMLDivElement | null>(null);
 
@@ -84,8 +88,7 @@ function App() {
   const title = useMemo(() => firstMarkdownHeading(markdown), [markdown]);
 
   function applyTemplate(templateId: TemplateId) {
-    const template = markdownTemplates.find((item) => item.id === templateId);
-    if (!template) return;
+    const template = getMarkdownTemplate(templateId);
 
     setMarkdown(template.markdown);
     setPresetId(template.presetId);
@@ -93,6 +96,26 @@ function App() {
     setActiveTemplateId(template.id);
     setMessage(`${template.label} loaded. Replace the text with your own Markdown when ready.`);
     setExportState('idle');
+    setStarterCopyState('idle');
+  }
+
+  async function handleCopyStarterMarkdown() {
+    if (!navigator.clipboard?.writeText) {
+      setStarterCopyState('error');
+      setMessage('Text clipboard support is not available. The starter is still editable below.');
+      return;
+    }
+
+    try {
+      setStarterCopyState('copying');
+      await navigator.clipboard.writeText(getStarterMarkdown(activeTemplateId));
+      setStarterCopyState('copied');
+      setMessage('Starter Markdown copied. Paste it anywhere, then replace it with your own text.');
+      window.setTimeout(() => setStarterCopyState('idle'), 1800);
+    } catch (error) {
+      setStarterCopyState('error');
+      setMessage(error instanceof Error ? error.message : 'Unable to copy starter Markdown.');
+    }
   }
 
   async function handleCopy() {
@@ -142,7 +165,17 @@ function App() {
 
           <div className="onboarding-strip">
             <PanelRightOpen size={18} />
-            <p>Pick a starter, replace the Markdown with your update, then copy or download a PNG.</p>
+            <div className="onboarding-content">
+              <p>Pick a starter, replace the Markdown with your update, then copy or download a PNG.</p>
+              <button className="ghost-button onboarding-action" type="button" onClick={handleCopyStarterMarkdown}>
+                {starterCopyState === 'copied' ? <Check size={16} /> : <Clipboard size={16} />}
+                {starterCopyState === 'copying'
+                  ? 'Copying...'
+                  : starterCopyState === 'copied'
+                    ? 'Starter Copied'
+                    : 'Copy Starter Markdown'}
+              </button>
+            </div>
           </div>
 
           <div className="field-group">
@@ -178,6 +211,7 @@ function App() {
                 setMarkdown(event.target.value);
                 setMessage('Editing Markdown. Preview updates live.');
                 setExportState('idle');
+                setStarterCopyState('idle');
               }}
               spellCheck="false"
             />

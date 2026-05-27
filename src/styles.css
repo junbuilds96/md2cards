@@ -115,9 +115,22 @@ h2 {
   border-radius: 8px;
 }
 
+.onboarding-content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .onboarding-strip p {
   margin: 0;
   font-size: 0.92rem;
+}
+
+.onboarding-action {
+  align-self: flex-start;
+  background: #ffffff;
 }
 
 .field-group {
