@@ -1,4 +1,4 @@
-import { toBlob, toPng } from 'html-to-image';
+import { toBlob, toPng, toSvg } from 'html-to-image';
 import {
   defaultExportScaleId,
   getExportScaleOption,
@@ -6,7 +6,13 @@ import {
   type PlatformPreset,
 } from './cardOptions';
 
-export function getExportFileName(preset: PlatformPreset, title: string): string {
+export type ExportFileFormat = 'png' | 'svg';
+
+export function getExportFileName(
+  preset: PlatformPreset,
+  title: string,
+  format: ExportFileFormat = 'png',
+): string {
   const baseName = title
     .replace(/^#+\s*/, '')
     .trim()
@@ -15,7 +21,7 @@ export function getExportFileName(preset: PlatformPreset, title: string): string
     .replace(/^-+|-+$/g, '')
     .slice(0, 64);
 
-  return `${baseName || 'md2cards'}-${preset.id}.png`;
+  return `${baseName || 'md2cards'}-${preset.id}.${format}`;
 }
 
 export function getExportOptions(
@@ -43,6 +49,19 @@ export async function downloadCard(
   const dataUrl = await toPng(node, getExportOptions(preset, exportScale));
   const link = document.createElement('a');
   link.download = getExportFileName(preset, title);
+  link.href = dataUrl;
+  link.click();
+}
+
+export async function downloadSvgCard(
+  node: HTMLElement,
+  preset: PlatformPreset,
+  title: string,
+  exportScale?: ExportScaleOption,
+): Promise<void> {
+  const dataUrl = await toSvg(node, getExportOptions(preset, exportScale));
+  const link = document.createElement('a');
+  link.download = getExportFileName(preset, title, 'svg');
   link.href = dataUrl;
   link.click();
 }

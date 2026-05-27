@@ -5,6 +5,7 @@ import {
   Check,
   Clipboard,
   Download,
+  FileCode2,
   ImageDown,
   LayoutTemplate,
   PanelRightOpen,
@@ -29,9 +30,9 @@ import {
   type PlatformPreset,
   type TemplateId,
 } from './cardOptions';
-import { copyCard, downloadCard } from './exportImage';
+import { copyCard, downloadCard, downloadSvgCard } from './exportImage';
 
-type ExportState = 'idle' | 'copying' | 'copied' | 'downloading' | 'error';
+type ExportState = 'idle' | 'copying' | 'copied' | 'downloading-png' | 'downloading-svg' | 'error';
 type StarterCopyState = 'idle' | 'copying' | 'copied' | 'error';
 
 function firstMarkdownHeading(markdown: string): string {
@@ -70,7 +71,7 @@ function CardPreview({
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
       </div>
       <div className="card-footer">
-        <span>Markdown to social PNG</span>
+        <span>Markdown to social card</span>
         <span>{preset.sizeLabel}</span>
       </div>
     </div>
@@ -177,7 +178,7 @@ function App() {
     if (!cardRef.current) return;
 
     try {
-      setExportState('downloading');
+      setExportState('downloading-png');
       setMessage(`Rendering ${exportScale.label} PNG download...`);
       await downloadCard(cardRef.current, preset, title, exportScale);
       setExportState('idle');
@@ -185,6 +186,21 @@ function App() {
     } catch (error) {
       setExportState('error');
       setMessage(error instanceof Error ? error.message : 'Download failed.');
+    }
+  }
+
+  async function handleDownloadSvg() {
+    if (!cardRef.current) return;
+
+    try {
+      setExportState('downloading-svg');
+      setMessage(`Rendering ${exportScale.label} SVG download...`);
+      await downloadSvgCard(cardRef.current, preset, title, exportScale);
+      setExportState('idle');
+      setMessage(`${exportScale.label} SVG download started.`);
+    } catch (error) {
+      setExportState('error');
+      setMessage(error instanceof Error ? error.message : 'SVG download failed.');
     }
   }
 
@@ -205,7 +221,7 @@ function App() {
           <div className="onboarding-strip">
             <PanelRightOpen size={18} />
             <div className="onboarding-content">
-              <p>Pick a starter, replace the Markdown with your update, then copy or download a PNG.</p>
+              <p>Pick a starter, replace the Markdown with your update, then copy PNG or download PNG/SVG.</p>
               <button className="ghost-button onboarding-action" type="button" onClick={handleCopyStarterMarkdown}>
                 {starterCopyState === 'copied' ? <Check size={16} /> : <Clipboard size={16} />}
                 {starterCopyState === 'copying'
@@ -302,7 +318,7 @@ function App() {
                   onClick={() => {
                     setExportScaleId(item.id);
                     setExportState('idle');
-                    setMessage(`${item.label} selected. Copy PNG and Download will use ${item.shortLabel}.`);
+                    setMessage(`${item.label} selected. PNG copy and download will use ${item.shortLabel}.`);
                   }}
                 >
                   <span>{item.label}</span>
@@ -313,7 +329,8 @@ function App() {
               ))}
             </div>
             <p className="field-hint">
-              {exportScale.description} Approx. {exportPixelSize.width} x {exportPixelSize.height}px PNG.
+              {exportScale.description} Approx. {exportPixelSize.width} x {exportPixelSize.height}px PNG;
+              SVG uses the selected preset dimensions.
             </p>
           </div>
         </aside>
@@ -352,8 +369,12 @@ function App() {
                   {exportState === 'copying' ? 'Copying...' : exportState === 'copied' ? 'Copied' : 'Copy PNG'}
                 </button>
                 <button className="primary-button" type="button" onClick={handleDownload}>
-                  {exportState === 'downloading' ? <ImageDown size={18} /> : <Download size={18} />}
-                  {exportState === 'downloading' ? 'Exporting...' : 'Download'}
+                  {exportState === 'downloading-png' ? <ImageDown size={18} /> : <Download size={18} />}
+                  {exportState === 'downloading-png' ? 'Exporting...' : 'Download PNG'}
+                </button>
+                <button className="secondary-button" type="button" onClick={handleDownloadSvg}>
+                  {exportState === 'downloading-svg' ? <FileCode2 size={18} /> : <Download size={18} />}
+                  {exportState === 'downloading-svg' ? 'Exporting...' : 'Download SVG'}
                 </button>
               </div>
             </div>

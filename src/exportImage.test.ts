@@ -21,6 +21,12 @@ describe('getExportFileName', () => {
     );
   });
 
+  it('creates an SVG filename from the same title and platform preset', () => {
+    expect(getExportFileName(platformPresets[1], '# Launch: MD2Cards v0.1!', 'svg')).toBe(
+      'launch-md2cards-v0-1-xiaohongshu.svg',
+    );
+  });
+
   it('falls back when the title has no usable characters', () => {
     expect(getExportFileName(platformPresets[2], '### ✨')).toBe('md2cards-launch.png');
   });

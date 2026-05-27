@@ -132,7 +132,7 @@ Turn a Markdown update into a polished card without opening a design tool.
 
 - Platform presets for launch posts
 - GitHub-flavored Markdown support
-- Browser-native PNG export
+- Browser-native PNG and SVG export
 
 | Output | Best for |
 | --- | --- |
@@ -181,7 +181,7 @@ Markdown cards now feel faster to draft and easier to share.
 | Area | Status |
 | --- | --- |
 | Templates | Added |
-| PNG export | Stable |
+| PNG/SVG export | Stable |
 | OSS setup | Ready |
 
 Try it with your next release note.`,
