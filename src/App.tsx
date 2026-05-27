@@ -9,6 +9,7 @@ import {
   LayoutTemplate,
   PanelRightOpen,
   RotateCcw,
+  ShieldCheck,
   Sparkles,
 } from 'lucide-react';
 import {
@@ -18,6 +19,7 @@ import {
   getExportPixelSize,
   getExportScaleOption,
   getMarkdownTemplate,
+  getSafeAreaGuide,
   getStarterMarkdown,
   markdownTemplates,
   platformPresets,
@@ -75,12 +77,40 @@ function CardPreview({
   );
 }
 
+function SafeAreaOverlay({
+  preset,
+  guide,
+}: {
+  preset: PlatformPreset;
+  guide: ReturnType<typeof getSafeAreaGuide>;
+}) {
+  return (
+    <div className="safe-area-overlay" aria-hidden="true">
+      <div
+        className="safe-area-frame"
+        style={{
+          inset: `${guide.marginPercent}%`,
+        }}
+      >
+        <div className="safe-area-label">
+          <ShieldCheck size={15} />
+          <span>Safe area</span>
+        </div>
+        <div className="safe-area-detail">
+          {preset.label}: {guide.marginLabel}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [presetId, setPresetId] = useState<PlatformPreset['id']>('twitter');
   const [themeId, setThemeId] = useState<CardTheme['id']>('signal');
   const [exportScaleId, setExportScaleId] = useState<ExportScaleId>(defaultExportScaleId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
+  const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
   const [exportState, setExportState] = useState<ExportState>('idle');
   const [starterCopyState, setStarterCopyState] = useState<StarterCopyState>('idle');
   const [message, setMessage] = useState('Ready to export.');
@@ -93,6 +123,7 @@ function App() {
   const theme = useMemo(() => cardThemes.find((item) => item.id === themeId) ?? cardThemes[0], [themeId]);
   const exportScale = useMemo(() => getExportScaleOption(exportScaleId), [exportScaleId]);
   const exportPixelSize = useMemo(() => getExportPixelSize(preset, exportScale), [preset, exportScale]);
+  const safeAreaGuide = useMemo(() => getSafeAreaGuide(preset), [preset]);
   const title = useMemo(() => firstMarkdownHeading(markdown), [markdown]);
 
   function applyTemplate(templateId: TemplateId) {
@@ -293,15 +324,38 @@ function App() {
               <p className="eyebrow">Live Preview</p>
               <h2>{title}</h2>
             </div>
-            <div className="export-actions">
-              <button className="secondary-button" type="button" onClick={handleCopy}>
-                {exportState === 'copied' ? <Check size={18} /> : <Clipboard size={18} />}
-                {exportState === 'copying' ? 'Copying...' : exportState === 'copied' ? 'Copied' : 'Copy PNG'}
-              </button>
-              <button className="primary-button" type="button" onClick={handleDownload}>
-                {exportState === 'downloading' ? <ImageDown size={18} /> : <Download size={18} />}
-                {exportState === 'downloading' ? 'Exporting...' : 'Download'}
-              </button>
+            <div className="preview-controls">
+              <label className="guide-toggle">
+                <input
+                  type="checkbox"
+                  checked={showSafeAreaGuide}
+                  onChange={(event) => {
+                    setShowSafeAreaGuide(event.target.checked);
+                    setMessage(
+                      event.target.checked
+                        ? `Safe area guide shown for ${preset.label}: ${safeAreaGuide.marginLabel}.`
+                        : 'Safe area guide hidden. Exports are unchanged.',
+                    );
+                  }}
+                />
+                <span className="toggle-box" aria-hidden="true">
+                  <ShieldCheck size={16} />
+                </span>
+                <span className="guide-toggle-copy">
+                  <strong>Safe area</strong>
+                  <small>Avoid cropped UI/platform overlays on X/Twitter, Xiaohongshu, and launch cards.</small>
+                </span>
+              </label>
+              <div className="export-actions">
+                <button className="secondary-button" type="button" onClick={handleCopy}>
+                  {exportState === 'copied' ? <Check size={18} /> : <Clipboard size={18} />}
+                  {exportState === 'copying' ? 'Copying...' : exportState === 'copied' ? 'Copied' : 'Copy PNG'}
+                </button>
+                <button className="primary-button" type="button" onClick={handleDownload}>
+                  {exportState === 'downloading' ? <ImageDown size={18} /> : <Download size={18} />}
+                  {exportState === 'downloading' ? 'Exporting...' : 'Download'}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -315,6 +369,7 @@ function App() {
               <div className="preview-zoom">
                 <CardPreview markdown={markdown} preset={preset} theme={theme} cardRef={cardRef} />
               </div>
+              {showSafeAreaGuide ? <SafeAreaOverlay preset={preset} guide={safeAreaGuide} /> : null}
             </div>
           </div>
 

@@ -13,7 +13,7 @@ npm run dev
 
 Open the local Vite URL shown in your terminal.
 
-Choose a starter template, copy its Markdown if you want a reusable starting point, paste or edit your own Markdown, pick Fast preview or Crisp share export quality, then use Copy PNG or Download.
+Choose a starter template, copy its Markdown if you want a reusable starting point, paste or edit your own Markdown, use the safe area guide to keep key content clear of platform crops and overlays, pick Fast preview or Crisp share export quality, then use Copy PNG or Download.
 
 ## Scripts
 
@@ -32,6 +32,7 @@ npm run preview  # Preview the production build
 - Starter templates for an X launch post, Xiaohongshu insight card, and GitHub release/update
 - Presets for X/Twitter landscape, Xiaohongshu portrait, and GitHub/launch square
 - Multiple visual themes with template-matched defaults
+- Preview-only safe area guides for checking approximate platform-safe margins before export
 - Export quality controls for fast 1x previews or crisp 2x share PNGs, with approximate output size shown before export
 
 ## Notes

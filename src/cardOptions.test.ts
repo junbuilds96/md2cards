@@ -6,6 +6,7 @@ import {
   getExportPixelSize,
   getExportScaleOption,
   getMarkdownTemplate,
+  getSafeAreaGuide,
   getStarterMarkdown,
   markdownTemplates,
   platformPresets,
@@ -35,6 +36,39 @@ describe('markdownTemplates', () => {
 
   it('falls back to the default starter for an unknown template id', () => {
     expect(getMarkdownTemplate('missing-template' as TemplateId)).toBe(markdownTemplates[0]);
+  });
+});
+
+describe('getSafeAreaGuide', () => {
+  it('calculates approximate platform-safe margins from preset dimensions', () => {
+    expect(getSafeAreaGuide(platformPresets[0])).toMatchObject({
+      marginPercent: 7,
+      horizontalMargin: 112,
+      verticalMargin: 63,
+      contentWidth: 1376,
+      contentHeight: 774,
+      marginLabel: '~112px sides / ~63px top-bottom',
+    });
+
+    expect(getSafeAreaGuide(platformPresets[1])).toMatchObject({
+      marginPercent: 8,
+      horizontalMargin: 86,
+      verticalMargin: 115,
+      contentWidth: 908,
+      contentHeight: 1210,
+      marginLabel: '~86px sides / ~115px top-bottom',
+    });
+  });
+
+  it('uses the selected preset shape instead of a duplicated platform lookup', () => {
+    expect(getSafeAreaGuide(platformPresets[2])).toMatchObject({
+      marginPercent: 7.5,
+      horizontalMargin: 90,
+      verticalMargin: 90,
+      contentWidth: 1020,
+      contentHeight: 1020,
+      marginLabel: '~90px sides / ~90px top-bottom',
+    });
   });
 });
 

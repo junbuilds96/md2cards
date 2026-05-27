@@ -12,6 +12,15 @@ export type PlatformPreset = {
   height: number;
 };
 
+export type SafeAreaGuide = {
+  marginPercent: number;
+  horizontalMargin: number;
+  verticalMargin: number;
+  contentWidth: number;
+  contentHeight: number;
+  marginLabel: string;
+};
+
 export type CardTheme = {
   id: ThemeId;
   label: string;
@@ -200,5 +209,32 @@ export function getExportPixelSize(
   return {
     width: Math.round(preset.width * exportScale.scale),
     height: Math.round(preset.height * exportScale.scale),
+  };
+}
+
+export function getSafeAreaMarginPercent(preset: PlatformPreset): number {
+  if (preset.height > preset.width) {
+    return 8;
+  }
+
+  if (preset.width === preset.height) {
+    return 7.5;
+  }
+
+  return 7;
+}
+
+export function getSafeAreaGuide(preset: PlatformPreset): SafeAreaGuide {
+  const marginPercent = getSafeAreaMarginPercent(preset);
+  const horizontalMargin = Math.round((preset.width * marginPercent) / 100);
+  const verticalMargin = Math.round((preset.height * marginPercent) / 100);
+
+  return {
+    marginPercent,
+    horizontalMargin,
+    verticalMargin,
+    contentWidth: preset.width - horizontalMargin * 2,
+    contentHeight: preset.height - verticalMargin * 2,
+    marginLabel: `~${horizontalMargin}px sides / ~${verticalMargin}px top-bottom`,
   };
 }
