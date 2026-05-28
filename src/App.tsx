@@ -5,6 +5,7 @@ import {
   AlertCircle,
   Check,
   Clipboard,
+  FolderOpen,
   Download,
   FileCode2,
   FileUp,
@@ -12,8 +13,10 @@ import {
   LayoutTemplate,
   PanelRightOpen,
   RotateCcw,
+  Save,
   ShieldCheck,
   Sparkles,
+  Trash2,
   Upload,
 } from 'lucide-react';
 import {
@@ -39,10 +42,17 @@ import {
 } from './cardOptions';
 import { copyCard, downloadCard, downloadSvgCard } from './exportImage';
 import { validateMarkdownImportFile } from './markdownFileImport';
+import {
+  deleteSavedPreset,
+  readSavedPresets,
+  saveSavedPreset,
+  type SavedCardPreset,
+} from './savedPresets';
 
 type ExportState = 'idle' | 'copying' | 'copied' | 'downloading-png' | 'downloading-svg' | 'error';
 type StarterCopyState = 'idle' | 'copying' | 'copied' | 'error';
 type ImportState = 'idle' | 'importing' | 'success' | 'error';
+type PresetSaveState = 'idle' | 'saved' | 'error';
 
 function firstMarkdownHeading(markdown: string): string {
   const heading = markdown
@@ -223,6 +233,85 @@ function MarkdownFileImporter({
   );
 }
 
+function SavedPresetsPanel({
+  presetName,
+  savedPresets,
+  saveState,
+  onPresetNameChange,
+  onSavePreset,
+  onLoadPreset,
+  onDeletePreset,
+}: {
+  presetName: string;
+  savedPresets: SavedCardPreset[];
+  saveState: PresetSaveState;
+  onPresetNameChange: (name: string) => void;
+  onSavePreset: () => void;
+  onLoadPreset: (preset: SavedCardPreset) => void;
+  onDeletePreset: (preset: SavedCardPreset) => void;
+}) {
+  function getPresetSummary(savedPreset: SavedCardPreset): string {
+    const platformLabel = platformPresets.find((item) => item.id === savedPreset.presetId)?.label ?? savedPreset.presetId;
+    const themeLabel = cardThemes.find((item) => item.id === savedPreset.themeId)?.label ?? savedPreset.themeId;
+    const scaleLabel =
+      exportScaleOptions.find((item) => item.id === savedPreset.exportScaleId)?.shortLabel ??
+      savedPreset.exportScaleId;
+
+    return `${platformLabel} · ${themeLabel} · ${scaleLabel}`;
+  }
+
+  return (
+    <div className="saved-presets-panel">
+      <div className="preset-save-row">
+        <label className="preset-name-field">
+          <span>Name</span>
+          <input
+            type="text"
+            value={presetName}
+            onChange={(event) => onPresetNameChange(event.target.value)}
+            placeholder="Launch post, weekly update..."
+            maxLength={60}
+          />
+        </label>
+        <button className="primary-button preset-save-button" type="button" onClick={onSavePreset}>
+          {saveState === 'saved' ? <Check size={16} /> : <Save size={16} />}
+          {saveState === 'saved' ? 'Saved' : 'Save'}
+        </button>
+      </div>
+
+      <div className="saved-preset-list" aria-live="polite">
+        {savedPresets.length === 0 ? (
+          <div className="empty-preset-list">
+            <strong>No saved presets yet</strong>
+            <span>Save one reusable setup for your next card.</span>
+          </div>
+        ) : (
+          savedPresets.map((preset) => (
+            <div className="saved-preset-item" key={preset.id}>
+              <button type="button" className="saved-preset-load" onClick={() => onLoadPreset(preset)}>
+                <FolderOpen size={16} />
+                <span>
+                  <strong>{preset.name}</strong>
+                  <small>{getPresetSummary(preset)}</small>
+                </span>
+              </button>
+              <button
+                className="icon-button"
+                type="button"
+                onClick={() => onDeletePreset(preset)}
+                title={`Delete ${preset.name}`}
+                aria-label={`Delete ${preset.name}`}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [presetId, setPresetId] = useState<PlatformPreset['id']>('twitter');
@@ -236,6 +325,9 @@ function App() {
   const [importMessage, setImportMessage] = useState('');
   const [isDraggingImport, setIsDraggingImport] = useState(false);
   const [fitMessage, setFitMessage] = useState('');
+  const [presetName, setPresetName] = useState('');
+  const [savedPresets, setSavedPresets] = useState<SavedCardPreset[]>(() => readSavedPresets());
+  const [presetSaveState, setPresetSaveState] = useState<PresetSaveState>('idle');
   const [message, setMessage] = useState('Ready to export.');
   const cardRef = useRef<HTMLDivElement | null>(null);
   const markdownInputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -258,6 +350,7 @@ function App() {
     setFitMessage('');
     setExportState('idle');
     setStarterCopyState('idle');
+    setPresetSaveState('idle');
   }
 
   function applyTemplate(templateId: TemplateId) {
@@ -280,6 +373,50 @@ function App() {
     setImportMessage('');
     resetEditorFeedback();
     window.setTimeout(() => markdownInputRef.current?.focus(), 0);
+  }
+
+  function handleSavePreset() {
+    try {
+      const result = saveSavedPreset({
+        name: presetName,
+        markdown,
+        presetId: preset.id,
+        themeId: theme.id,
+        exportScaleId: exportScale.id,
+      });
+
+      setSavedPresets(result.presets);
+      setPresetName(result.preset.name);
+      setPresetSaveState('saved');
+      setMessage(
+        result.created
+          ? `${result.preset.name} saved locally.`
+          : `${result.preset.name} updated locally.`,
+      );
+      window.setTimeout(() => setPresetSaveState('idle'), 1800);
+    } catch (error) {
+      setPresetSaveState('error');
+      setMessage(error instanceof Error ? error.message : 'Unable to save this preset.');
+    }
+  }
+
+  function handleLoadSavedPreset(savedPreset: SavedCardPreset) {
+    setMarkdown(savedPreset.markdown);
+    setPresetId(savedPreset.presetId);
+    setThemeId(savedPreset.themeId);
+    setExportScaleId(savedPreset.exportScaleId);
+    setPresetName(savedPreset.name);
+    setMessage(`${savedPreset.name} loaded. Preview updated from your local preset.`);
+    setImportState('idle');
+    setImportMessage('');
+    resetEditorFeedback();
+    window.setTimeout(() => markdownInputRef.current?.focus(), 0);
+  }
+
+  function handleDeleteSavedPreset(savedPreset: SavedCardPreset) {
+    setSavedPresets(deleteSavedPreset(savedPreset.id));
+    setMessage(`${savedPreset.name} deleted from local presets.`);
+    setPresetSaveState('idle');
   }
 
   function handleFitMarkdown() {
@@ -628,6 +765,22 @@ function App() {
               {exportScale.description} Approx. {exportPixelSize.width} x {exportPixelSize.height}px PNG;
               SVG uses the selected preset dimensions.
             </p>
+          </div>
+
+          <div className="field-group">
+            <span className="field-label">Saved Local Presets</span>
+            <SavedPresetsPanel
+              presetName={presetName}
+              savedPresets={savedPresets}
+              saveState={presetSaveState}
+              onPresetNameChange={(name) => {
+                setPresetName(name);
+                setPresetSaveState('idle');
+              }}
+              onSavePreset={handleSavePreset}
+              onLoadPreset={handleLoadSavedPreset}
+              onDeletePreset={handleDeleteSavedPreset}
+            />
           </div>
         </aside>
 

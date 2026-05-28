@@ -13,6 +13,7 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 - Write once in Markdown, paste text, or import a local `.md`, `.markdown`, or `.txt` file and preview the card live.
 - Start from paste-ready examples for launch posts, GitHub releases, and Xiaohongshu-style insight cards.
 - Export landscape, portrait, or square cards for common sharing surfaces.
+- Save named card presets locally in your browser and reload them for repeat posts.
 - Fit pasted Markdown to the selected platform with a local, deterministic compaction helper.
 - Check line count, character count, safe areas, and export size before downloading, including on narrow laptop and mobile screens.
 - Copy PNGs to the clipboard, download crisp PNGs, or keep reusable SVG output.
@@ -24,7 +25,7 @@ npm install
 npm run dev
 ```
 
-Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, or drop in a local `.md`/`.markdown`/`.txt` file. Pick a platform preset and theme, optionally click **Fit to X / Twitter**, **Fit to Xiaohongshu**, or **Fit to GitHub / Launch**, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
+Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, or drop in a local `.md`/`.markdown`/`.txt` file. Pick a platform preset and theme, optionally save the setup as a local preset, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
 
 ## Common Use Cases
 
@@ -39,7 +40,8 @@ Open the local Vite URL on desktop or a narrow screen, choose a starter, select 
 2. Paste, import, or edit Markdown while the preview updates.
 3. Use the fit guidance, one-click platform fitter, and safe-area overlay to keep the card readable.
 4. Choose a platform preset, visual theme, and PNG export quality.
-5. Copy or download the finished card.
+5. Save a named local preset for repeat card setups, or load one you saved earlier.
+6. Copy or download the finished card.
 
 ## Features
 
@@ -50,6 +52,7 @@ Open the local Vite URL on desktop or a narrow screen, choose a starter, select 
 - Local platform fitter that normalizes spacing, caps long lists, shortens dense paragraphs, and reports what changed.
 - Themes for crisp launch notes, editorial posts, paper-style notes, and dark technical updates.
 - Starter templates that map to sensible preset/theme defaults.
+- Browser-local saved presets for Markdown, platform, theme, and export quality.
 - Responsive controls and preview panels for narrow laptop and mobile widths.
 - Fast 1x preview export and crisp 2x share export.
 - Clipboard PNG support when the browser allows image clipboard writes.
@@ -87,7 +90,6 @@ Open `http://localhost:8080`. The image builds the Vite app with Node and serves
 ## Roadmap
 
 - More card templates for launches, docs, changelogs, and creator posts.
-- Saved local presets for repeatable team styles.
 - More precise platform guidance as sharing surfaces change.
 - Import/export of reusable card configurations.
 
