@@ -46,6 +46,22 @@ describe('social card CSS', () => {
     expect(spaciousRule).toContain('--card-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(8px, 0.9cqw, 14px)');
   });
 
+  it('defines background intensity classes that alter exported card visuals', () => {
+    const cardRule = getRule('.social-card');
+    const softRule = getRule('.social-card.background-soft');
+    const vividRule = getRule('.social-card.background-vivid');
+
+    expect(cardRule).toContain('linear-gradient(var(--card-intensity-overlay), var(--card-intensity-overlay))');
+    expect(cardRule).toContain('radial-gradient(circle at 88% 84%, var(--card-edge-glow)');
+    expect(cardRule).toContain('border: var(--card-border-width) solid var(--card-border)');
+    expect(cardRule).toContain('box-shadow: var(--card-shadow)');
+    expect(softRule).toContain('--card-intensity-overlay: var(--card-soft-overlay)');
+    expect(softRule).toContain('--card-glow-stop: 21%');
+    expect(vividRule).toContain('--card-intensity-overlay: var(--card-vivid-overlay)');
+    expect(vividRule).toContain('--card-border-width: 2px');
+    expect(vividRule).toContain('--card-edge-glow: var(--card-glow)');
+  });
+
   it('keeps the preview toolbar compact and grouped', () => {
     const toolbarRule = getRule('.preview-toolbar');
     const controlsRule = getRule('.preview-controls');

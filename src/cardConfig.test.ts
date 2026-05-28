@@ -22,6 +22,7 @@ describe('card config recipes', () => {
       cardDensityId: 'spacious',
       cardTypographyScaleId: 'large',
       cardAccentId: 'rose',
+      cardBackgroundIntensityId: 'vivid',
       showCardLabels: false,
     });
 
@@ -35,6 +36,7 @@ describe('card config recipes', () => {
       cardDensityId: 'spacious',
       cardTypographyScaleId: 'large',
       cardAccentId: 'rose',
+      cardBackgroundIntensityId: 'vivid',
       showCardLabels: false,
     });
     expect(json.endsWith('\n')).toBe(true);
@@ -52,6 +54,7 @@ describe('card config recipes', () => {
         cardDensityId: 'compact',
         cardTypographyScaleId: 'small',
         cardAccentId: 'emerald',
+        cardBackgroundIntensityId: 'soft',
         showCardLabels: true,
       }),
     );
@@ -68,6 +71,7 @@ describe('card config recipes', () => {
         cardDensityId: 'compact',
         cardTypographyScaleId: 'small',
         cardAccentId: 'emerald',
+        cardBackgroundIntensityId: 'soft',
         showCardLabels: true,
       },
     });
@@ -92,6 +96,7 @@ describe('card config recipes', () => {
         cardDensityId: 'balanced',
         cardTypographyScaleId: 'default',
         cardAccentId: 'blue',
+        cardBackgroundIntensityId: 'balanced',
       },
     });
   });
@@ -126,6 +131,7 @@ describe('card config recipes', () => {
       cardDensityId: 'balanced',
       cardTypographyScaleId: 'default',
       cardAccentId: 'blue',
+      cardBackgroundIntensityId: 'balanced',
       showCardLabels: true,
     };
 
@@ -152,6 +158,10 @@ describe('card config recipes', () => {
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardAccentId: 'missing' }))).toEqual({
       valid: false,
       message: 'This recipe uses an unknown accent color.',
+    });
+    expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardBackgroundIntensityId: 'missing' }))).toEqual({
+      valid: false,
+      message: 'This recipe uses an unknown background intensity.',
     });
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, showCardLabels: 'yes' }))).toEqual({
       valid: false,

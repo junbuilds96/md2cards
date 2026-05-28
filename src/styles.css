@@ -645,6 +645,12 @@ textarea:focus {
   gap: 8px;
 }
 
+.background-intensity-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .template-gallery {
   display: grid;
   gap: 8px;
@@ -661,6 +667,7 @@ textarea:focus {
 .density-control button,
 .typography-control button,
 .accent-control button,
+.background-intensity-control button,
 .recipe-preset-grid button,
 .template-gallery button,
 .theme-option {
@@ -690,7 +697,8 @@ textarea:focus {
 
 .density-control button,
 .typography-control button,
-.accent-control button {
+.accent-control button,
+.background-intensity-control button {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -720,6 +728,7 @@ textarea:focus {
 .density-control button span,
 .typography-control button span,
 .accent-control button span:last-child,
+.background-intensity-control button span,
 .recipe-preset-grid button span,
 .template-gallery button span,
 .theme-option span:last-child {
@@ -844,6 +853,7 @@ textarea:focus {
 .density-control button.active,
 .typography-control button.active,
 .accent-control button.active,
+.background-intensity-control button.active,
 .recipe-preset-grid button.active,
 .template-gallery button.active,
 .theme-option.active {
@@ -1086,10 +1096,18 @@ textarea:focus {
   overflow: hidden;
   color: var(--card-text);
   background:
-    radial-gradient(circle at 16% 18%, var(--card-glow), transparent 27%),
+    linear-gradient(var(--card-intensity-overlay), var(--card-intensity-overlay)),
+    radial-gradient(circle at 16% 18%, var(--card-glow), transparent var(--card-glow-stop)),
+    radial-gradient(circle at 88% 84%, var(--card-edge-glow), transparent var(--card-edge-glow-stop)),
     linear-gradient(135deg, var(--card-bg), var(--card-bg-2));
-  border: 1px solid var(--card-border);
-  box-shadow: 0 26px 70px rgba(22, 30, 44, 0.28);
+  border: var(--card-border-width) solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  --card-intensity-overlay: transparent;
+  --card-glow-stop: 27%;
+  --card-edge-glow: transparent;
+  --card-edge-glow-stop: 28%;
+  --card-border-width: 1px;
+  --card-shadow: 0 26px 70px rgba(22, 30, 44, 0.28);
   --card-chrome-padding-block: 44px;
   --card-chrome-padding-inline: 58px;
   --card-body-block-padding: 1cqh;
@@ -1112,6 +1130,22 @@ textarea:focus {
   --card-blockquote-margin: 20px 0;
   --card-blockquote-padding-left: 24px;
   --card-blockquote-border-width: 8px;
+}
+
+.social-card.background-soft {
+  --card-intensity-overlay: var(--card-soft-overlay);
+  --card-glow-stop: 21%;
+  --card-edge-glow-stop: 22%;
+  --card-shadow: 0 18px 48px rgba(22, 30, 44, 0.2);
+}
+
+.social-card.background-vivid {
+  --card-intensity-overlay: var(--card-vivid-overlay);
+  --card-glow-stop: 35%;
+  --card-edge-glow: var(--card-glow);
+  --card-edge-glow-stop: 42%;
+  --card-border-width: 2px;
+  --card-shadow: 0 30px 82px rgba(22, 30, 44, 0.34);
 }
 
 .social-card.density-compact {
@@ -1352,6 +1386,8 @@ textarea:focus {
   --card-accent: #1f6feb;
   --card-border: #bdd3f2;
   --card-glow: rgba(55, 144, 255, 0.22);
+  --card-soft-overlay: rgba(255, 255, 255, 0.38);
+  --card-vivid-overlay: rgba(31, 111, 235, 0.1);
   --code-bg: rgba(31, 111, 235, 0.12);
   --code-text: #123f8c;
   --table-rule: rgba(31, 111, 235, 0.18);
@@ -1366,6 +1402,8 @@ textarea:focus {
   --card-accent: #bd3b32;
   --card-border: #e0cdb1;
   --card-glow: rgba(189, 59, 50, 0.16);
+  --card-soft-overlay: rgba(255, 250, 242, 0.36);
+  --card-vivid-overlay: rgba(189, 59, 50, 0.08);
   --code-bg: rgba(51, 41, 31, 0.1);
   --code-text: #6d2b24;
   --table-rule: rgba(115, 94, 73, 0.22);
@@ -1380,6 +1418,8 @@ textarea:focus {
   --card-accent: #54d6a6;
   --card-border: #39465f;
   --card-glow: rgba(84, 214, 166, 0.18);
+  --card-soft-overlay: rgba(255, 255, 255, 0.06);
+  --card-vivid-overlay: rgba(84, 214, 166, 0.09);
   --code-bg: rgba(84, 214, 166, 0.12);
   --code-text: #99f0ce;
   --table-rule: rgba(159, 176, 202, 0.22);
@@ -1394,6 +1434,8 @@ textarea:focus {
   --card-accent: #e25579;
   --card-border: #eac4d4;
   --card-glow: rgba(226, 85, 121, 0.2);
+  --card-soft-overlay: rgba(255, 252, 248, 0.36);
+  --card-vivid-overlay: rgba(226, 85, 121, 0.1);
   --code-bg: rgba(28, 21, 51, 0.1);
   --code-text: #932d54;
   --table-rule: rgba(103, 93, 125, 0.22);
@@ -1540,6 +1582,7 @@ textarea:focus {
   .density-control,
   .typography-control,
   .accent-control,
+  .background-intensity-control,
   .recipe-preset-grid,
   .theme-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -1626,7 +1669,8 @@ textarea:focus {
   .quality-control button,
   .density-control button,
   .typography-control button,
-  .accent-control button {
+  .accent-control button,
+  .background-intensity-control button {
     min-height: auto;
   }
 

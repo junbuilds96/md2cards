@@ -1,8 +1,10 @@
 import {
   getCardAccentOption,
+  getCardBackgroundIntensityOption,
   getCardDensityOption,
   getCardTypographyScaleOption,
   type CardAccentId,
+  type CardBackgroundIntensityId,
   type CardDensityId,
   type CardTypographyScaleId,
 } from './cardOptions';
@@ -18,12 +20,14 @@ export function getCardClassName(
   showCardLabels: boolean,
   cardDensityId: CardDensityId,
   cardTypographyScaleId: CardTypographyScaleId,
+  cardBackgroundIntensityId: CardBackgroundIntensityId,
 ): string {
   return [
     'social-card',
     themeClassName,
     getCardDensityOption(cardDensityId).className,
     getCardTypographyScaleOption(cardTypographyScaleId).className,
+    getCardBackgroundIntensityOption(cardBackgroundIntensityId).className,
     showCardLabels ? '' : 'card-labels-hidden',
   ]
     .filter(Boolean)

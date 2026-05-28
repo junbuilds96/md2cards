@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   cardAccentOptions,
+  cardBackgroundIntensityOptions,
   cardDensityOptions,
   cardTypographyScaleOptions,
   cardThemes,
@@ -8,6 +9,7 @@ import {
   defaultExportScaleId,
   exportScaleOptions,
   fitMarkdownToPreset,
+  getCardBackgroundIntensityOption,
   getCardTypographyScaleOption,
   getExportPixelSize,
   getExportScaleOption,
@@ -86,6 +88,7 @@ describe('recipePresets', () => {
     const densityIds = new Set(cardDensityOptions.map((option) => option.id));
     const typographyIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
     const accentIds = new Set(cardAccentOptions.map((option) => option.id));
+    const backgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
 
     expect(recipeIds.size).toBe(recipePresets.length);
     expect(recipePresets.map((recipePreset) => recipePreset.id)).toEqual([
@@ -101,6 +104,9 @@ describe('recipePresets', () => {
     expect(recipePresets.every((recipePreset) => densityIds.has(recipePreset.cardDensityId))).toBe(true);
     expect(recipePresets.every((recipePreset) => typographyIds.has(recipePreset.cardTypographyScaleId))).toBe(true);
     expect(recipePresets.every((recipePreset) => accentIds.has(recipePreset.cardAccentId))).toBe(true);
+    expect(
+      recipePresets.every((recipePreset) => backgroundIntensityIds.has(recipePreset.cardBackgroundIntensityId)),
+    ).toBe(true);
     expect(recipePresets.every((recipePreset) => recipePreset.markdown.trim().startsWith('#'))).toBe(true);
   });
 
@@ -109,6 +115,7 @@ describe('recipePresets', () => {
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.themeId)).size).toBeGreaterThanOrEqual(4);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardDensityId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTypographyScaleId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardBackgroundIntensityId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.showCardLabels)).size).toBe(2);
     expect(getRecipePreset('code-snippet').markdown).toContain('```bash');
     expect(getRecipePreset('tutorial').markdown).toContain('1. Paste the Markdown draft');
@@ -117,6 +124,22 @@ describe('recipePresets', () => {
 
   it('falls back to the default recipe for an unknown recipe id', () => {
     expect(getRecipePreset('missing-recipe' as RecipePresetId)).toBe(recipePresets[0]);
+  });
+});
+
+describe('background intensity options', () => {
+  it('exposes three readable background intensity levels with CSS classes', () => {
+    expect(cardBackgroundIntensityOptions.map((option) => option.id)).toEqual(['soft', 'balanced', 'vivid']);
+    expect(cardBackgroundIntensityOptions.map((option) => option.label)).toEqual(['Soft', 'Balanced', 'Vivid']);
+    expect(cardBackgroundIntensityOptions.every((option) => option.className.startsWith('background-'))).toBe(true);
+  });
+
+  it('falls back to balanced background intensity for unknown ids', () => {
+    expect(getCardBackgroundIntensityOption('missing' as never)).toMatchObject({
+      id: 'balanced',
+      label: 'Balanced',
+      className: 'background-balanced',
+    });
   });
 });
 

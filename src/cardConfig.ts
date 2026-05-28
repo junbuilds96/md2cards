@@ -1,15 +1,18 @@
 import {
   cardThemes,
   cardAccentOptions,
+  cardBackgroundIntensityOptions,
   cardDensityOptions,
   cardTypographyScaleOptions,
   defaultCardAccentId,
+  defaultCardBackgroundIntensityId,
   defaultCardDensityId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
   platformPresets,
   type CardAccentId,
+  type CardBackgroundIntensityId,
   type CardDensityId,
   type CardTypographyScaleId,
   type ExportScaleId,
@@ -31,6 +34,7 @@ export type CardConfig = {
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
+  cardBackgroundIntensityId: CardBackgroundIntensityId;
   showCardLabels: boolean;
 };
 
@@ -42,6 +46,7 @@ export type CardConfigDraft = {
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
+  cardBackgroundIntensityId: CardBackgroundIntensityId;
   showCardLabels: boolean;
 };
 
@@ -70,6 +75,7 @@ const validExportScaleIds = new Set(exportScaleOptions.map((option) => option.id
 const validCardDensityIds = new Set(cardDensityOptions.map((option) => option.id));
 const validCardTypographyScaleIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
 const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
+const validCardBackgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -114,6 +120,9 @@ export function createCardConfig(draft: CardConfigDraft): CardConfig {
       ? draft.cardTypographyScaleId
       : defaultCardTypographyScaleId,
     cardAccentId: validCardAccentIds.has(draft.cardAccentId) ? draft.cardAccentId : defaultCardAccentId,
+    cardBackgroundIntensityId: validCardBackgroundIntensityIds.has(draft.cardBackgroundIntensityId)
+      ? draft.cardBackgroundIntensityId
+      : defaultCardBackgroundIntensityId,
     showCardLabels: draft.showCardLabels,
   };
 }
@@ -221,6 +230,17 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
     };
   }
 
+  const cardBackgroundIntensityId =
+    parsed.cardBackgroundIntensityId === undefined
+      ? defaultCardBackgroundIntensityId
+      : (parsed.cardBackgroundIntensityId as CardBackgroundIntensityId);
+  if (!validCardBackgroundIntensityIds.has(cardBackgroundIntensityId)) {
+    return {
+      valid: false,
+      message: 'This recipe uses an unknown background intensity.',
+    };
+  }
+
   if (typeof parsed.showCardLabels !== 'boolean') {
     return {
       valid: false,
@@ -240,6 +260,7 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
       cardDensityId,
       cardTypographyScaleId,
       cardAccentId,
+      cardBackgroundIntensityId,
       showCardLabels: parsed.showCardLabels,
     },
   };

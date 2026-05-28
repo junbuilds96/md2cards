@@ -10,6 +10,8 @@ export type CardTypographyScaleId = 'small' | 'default' | 'large';
 
 export type CardAccentId = 'blue' | 'emerald' | 'rose' | 'amber';
 
+export type CardBackgroundIntensityId = 'soft' | 'balanced' | 'vivid';
+
 export type PlatformPreset = {
   id: PresetId;
   label: string;
@@ -71,6 +73,13 @@ export type CardAccentOption = {
   glowColor: string;
 };
 
+export type CardBackgroundIntensityOption = {
+  id: CardBackgroundIntensityId;
+  label: string;
+  description: string;
+  className: string;
+};
+
 export type TemplateId = 'x-launch' | 'xiaohongshu-insight' | 'github-release';
 
 export type MarkdownTemplate = {
@@ -93,6 +102,7 @@ export type RecipePreset = {
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
+  cardBackgroundIntensityId: CardBackgroundIntensityId;
   showCardLabels: boolean;
   markdown: string;
 };
@@ -241,6 +251,8 @@ export const defaultCardTypographyScaleId: CardTypographyScaleId = 'default';
 
 export const defaultCardAccentId: CardAccentId = 'blue';
 
+export const defaultCardBackgroundIntensityId: CardBackgroundIntensityId = 'balanced';
+
 export const exportScaleOptions: ExportScaleOption[] = [
   {
     id: 'fast',
@@ -335,6 +347,27 @@ export const cardAccentOptions: CardAccentOption[] = [
   },
 ];
 
+export const cardBackgroundIntensityOptions: CardBackgroundIntensityOption[] = [
+  {
+    id: 'soft',
+    label: 'Soft',
+    description: 'Subtle gradients and lighter card glow.',
+    className: 'background-soft',
+  },
+  {
+    id: 'balanced',
+    label: 'Balanced',
+    description: 'Default background depth for readable cards.',
+    className: 'background-balanced',
+  },
+  {
+    id: 'vivid',
+    label: 'Vivid',
+    description: 'Stronger gradients, glow, and border emphasis.',
+    className: 'background-vivid',
+  },
+];
+
 export const markdownTemplates: MarkdownTemplate[] = [
   {
     id: 'x-launch',
@@ -418,6 +451,7 @@ export const recipePresets: RecipePreset[] = [
     cardDensityId: 'balanced',
     cardTypographyScaleId: 'default',
     cardAccentId: 'blue',
+    cardBackgroundIntensityId: 'balanced',
     showCardLabels: true,
     markdown: `# Launch faster with Markdown cards
 
@@ -436,6 +470,7 @@ Turn a product update into a share-ready visual in one pass.
     cardDensityId: 'compact',
     cardTypographyScaleId: 'small',
     cardAccentId: 'emerald',
+    cardBackgroundIntensityId: 'vivid',
     showCardLabels: true,
     markdown: `# v0.4.0 Changelog
 
@@ -460,6 +495,7 @@ Turn a product update into a share-ready visual in one pass.
     cardDensityId: 'balanced',
     cardTypographyScaleId: 'default',
     cardAccentId: 'amber',
+    cardBackgroundIntensityId: 'soft',
     showCardLabels: false,
     markdown: `# Turn notes into a card
 
@@ -480,6 +516,7 @@ Turn a product update into a share-ready visual in one pass.
     cardDensityId: 'spacious',
     cardTypographyScaleId: 'large',
     cardAccentId: 'rose',
+    cardBackgroundIntensityId: 'vivid',
     showCardLabels: false,
     markdown: `# The card is the hook
 
@@ -498,6 +535,7 @@ People decide whether to read the caption from the first two seconds.
     cardDensityId: 'spacious',
     cardTypographyScaleId: 'large',
     cardAccentId: 'rose',
+    cardBackgroundIntensityId: 'soft',
     showCardLabels: false,
     markdown: `# "Design tools should disappear when the idea is clear."
 
@@ -514,6 +552,7 @@ Use Markdown for structure. Use recipes for the visual rhythm.
     cardDensityId: 'compact',
     cardTypographyScaleId: 'small',
     cardAccentId: 'emerald',
+    cardBackgroundIntensityId: 'balanced',
     showCardLabels: true,
     markdown: `# Export a card from Markdown
 
@@ -970,6 +1009,15 @@ export function getCardTypographyScaleOption(
 
 export function getCardAccentOption(cardAccentId: CardAccentId): CardAccentOption {
   return cardAccentOptions.find((option) => option.id === cardAccentId) ?? cardAccentOptions[0];
+}
+
+export function getCardBackgroundIntensityOption(
+  cardBackgroundIntensityId: CardBackgroundIntensityId,
+): CardBackgroundIntensityOption {
+  return (
+    cardBackgroundIntensityOptions.find((option) => option.id === cardBackgroundIntensityId) ??
+    cardBackgroundIntensityOptions[1]
+  );
 }
 
 export function getExportPixelSize(

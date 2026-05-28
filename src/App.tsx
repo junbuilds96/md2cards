@@ -24,14 +24,17 @@ import {
 import {
   cardThemes,
   cardAccentOptions,
+  cardBackgroundIntensityOptions,
   cardDensityOptions,
   cardTypographyScaleOptions,
   defaultCardAccentId,
+  defaultCardBackgroundIntensityId,
   defaultCardDensityId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
   getCardAccentOption,
+  getCardBackgroundIntensityOption,
   getCardDensityOption,
   getCardTypographyScaleOption,
   fitMarkdownToPreset,
@@ -49,6 +52,7 @@ import {
   recipePresets,
   sampleMarkdown,
   type CardAccentId,
+  type CardBackgroundIntensityId,
   type CardDensityId,
   type CardTypographyScaleId,
   type CardTheme,
@@ -97,6 +101,7 @@ function CardPreview({
   cardDensityId,
   cardTypographyScaleId,
   cardAccentId,
+  cardBackgroundIntensityId,
 }: {
   markdown: string;
   preset: PlatformPreset;
@@ -107,13 +112,20 @@ function CardPreview({
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
+  cardBackgroundIntensityId: CardBackgroundIntensityId;
 }) {
   const labelsVisible = shouldShowCardLabels(showCardLabels);
 
   return (
     <div
       ref={cardRef}
-      className={getCardClassName(theme.className, showCardLabels, cardDensityId, cardTypographyScaleId)}
+      className={getCardClassName(
+        theme.className,
+        showCardLabels,
+        cardDensityId,
+        cardTypographyScaleId,
+        cardBackgroundIntensityId,
+      )}
       style={{
         ...getCardAppearanceStyle(cardAccentId),
         aspectRatio: `${preset.width} / ${preset.height}`,
@@ -300,8 +312,11 @@ function SavedPresetsPanel({
       savedPreset.cardTypographyScaleId;
     const accentLabel =
       cardAccentOptions.find((item) => item.id === savedPreset.cardAccentId)?.label ?? savedPreset.cardAccentId;
+    const backgroundIntensityLabel =
+      cardBackgroundIntensityOptions.find((item) => item.id === savedPreset.cardBackgroundIntensityId)?.label ??
+      savedPreset.cardBackgroundIntensityId;
 
-    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${accentLabel} · ${scaleLabel}`;
+    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${accentLabel} · ${backgroundIntensityLabel} · ${scaleLabel}`;
   }
 
   return (
@@ -408,16 +423,20 @@ function AppearanceControls({
   cardDensityId,
   cardTypographyScaleId,
   cardAccentId,
+  cardBackgroundIntensityId,
   onDensityChange,
   onTypographyScaleChange,
   onAccentChange,
+  onBackgroundIntensityChange,
 }: {
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
+  cardBackgroundIntensityId: CardBackgroundIntensityId;
   onDensityChange: (densityId: CardDensityId) => void;
   onTypographyScaleChange: (typographyScaleId: CardTypographyScaleId) => void;
   onAccentChange: (accentId: CardAccentId) => void;
+  onBackgroundIntensityChange: (backgroundIntensityId: CardBackgroundIntensityId) => void;
 }) {
   return (
     <div className="appearance-controls">
@@ -471,6 +490,22 @@ function AppearanceControls({
           ))}
         </div>
       </div>
+      <div className="appearance-control-block">
+        <span className="mini-label">Background Intensity</span>
+        <div className="background-intensity-control">
+          {cardBackgroundIntensityOptions.map((item) => (
+            <button
+              key={item.id}
+              className={item.id === cardBackgroundIntensityId ? 'active' : ''}
+              type="button"
+              onClick={() => onBackgroundIntensityChange(item.id)}
+              title={item.description}
+            >
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -509,6 +544,8 @@ function App() {
   const [cardTypographyScaleId, setCardTypographyScaleId] =
     useState<CardTypographyScaleId>(defaultCardTypographyScaleId);
   const [cardAccentId, setCardAccentId] = useState<CardAccentId>(defaultCardAccentId);
+  const [cardBackgroundIntensityId, setCardBackgroundIntensityId] =
+    useState<CardBackgroundIntensityId>(defaultCardBackgroundIntensityId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
   const [activeRecipeId, setActiveRecipeId] = useState<RecipePresetId | null>(null);
   const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
@@ -542,6 +579,10 @@ function App() {
     [cardTypographyScaleId],
   );
   const cardAccent = useMemo(() => getCardAccentOption(cardAccentId), [cardAccentId]);
+  const cardBackgroundIntensity = useMemo(
+    () => getCardBackgroundIntensityOption(cardBackgroundIntensityId),
+    [cardBackgroundIntensityId],
+  );
   const exportPixelSize = useMemo(() => getExportPixelSize(preset, exportScale), [preset, exportScale]);
   const safeAreaGuide = useMemo(() => getSafeAreaGuide(preset), [preset]);
   const platformFitHelper = useMemo(() => getPlatformFitHelper(preset), [preset]);
@@ -581,6 +622,7 @@ function App() {
     setCardDensityId(recipePreset.cardDensityId);
     setCardTypographyScaleId(recipePreset.cardTypographyScaleId);
     setCardAccentId(recipePreset.cardAccentId);
+    setCardBackgroundIntensityId(recipePreset.cardBackgroundIntensityId);
     setShowCardLabels(recipePreset.showCardLabels);
     setActiveRecipeId(recipePreset.id);
     setPresetName('');
@@ -611,6 +653,7 @@ function App() {
         cardDensityId: cardDensity.id,
         cardTypographyScaleId: cardTypographyScale.id,
         cardAccentId: cardAccent.id,
+        cardBackgroundIntensityId: cardBackgroundIntensity.id,
       });
 
       setSavedPresets(result.presets);
@@ -636,6 +679,7 @@ function App() {
     setCardDensityId(savedPreset.cardDensityId);
     setCardTypographyScaleId(savedPreset.cardTypographyScaleId);
     setCardAccentId(savedPreset.cardAccentId);
+    setCardBackgroundIntensityId(savedPreset.cardBackgroundIntensityId);
     setPresetName(savedPreset.name);
     setActiveRecipeId(null);
     setMessage(`${savedPreset.name} loaded. Preview updated from your local preset.`);
@@ -672,6 +716,7 @@ function App() {
         cardDensityId: cardDensity.id,
         cardTypographyScaleId: cardTypographyScale.id,
         cardAccentId: cardAccent.id,
+        cardBackgroundIntensityId: cardBackgroundIntensity.id,
         showCardLabels,
       });
       const blob = new Blob([recipeJson], { type: 'application/json' });
@@ -731,6 +776,7 @@ function App() {
       setCardDensityId(importedRecipe.config.cardDensityId);
       setCardTypographyScaleId(importedRecipe.config.cardTypographyScaleId);
       setCardAccentId(importedRecipe.config.cardAccentId);
+      setCardBackgroundIntensityId(importedRecipe.config.cardBackgroundIntensityId);
       setShowCardLabels(importedRecipe.config.showCardLabels);
       setActiveRecipeId(null);
       setImportState('idle');
@@ -1060,6 +1106,7 @@ function App() {
               cardDensityId={cardDensity.id}
               cardTypographyScaleId={cardTypographyScale.id}
               cardAccentId={cardAccent.id}
+              cardBackgroundIntensityId={cardBackgroundIntensity.id}
               onDensityChange={(densityId) => {
                 setCardDensityId(densityId);
                 setActiveRecipeId(null);
@@ -1076,6 +1123,13 @@ function App() {
                 setCardAccentId(accentId);
                 setActiveRecipeId(null);
                 setMessage(`${getCardAccentOption(accentId).label} accent selected. Preview and exports updated.`);
+              }}
+              onBackgroundIntensityChange={(backgroundIntensityId) => {
+                setCardBackgroundIntensityId(backgroundIntensityId);
+                setActiveRecipeId(null);
+                setMessage(
+                  `${getCardBackgroundIntensityOption(backgroundIntensityId).label} background intensity selected. Preview and exports updated.`,
+                );
               }}
             />
           </div>
@@ -1262,6 +1316,7 @@ function App() {
                   cardDensityId={cardDensity.id}
                   cardTypographyScaleId={cardTypographyScale.id}
                   cardAccentId={cardAccent.id}
+                  cardBackgroundIntensityId={cardBackgroundIntensity.id}
                 />
               </div>
               {showSafeAreaGuide ? <SafeAreaOverlay preset={preset} guide={safeAreaGuide} /> : null}
@@ -1277,7 +1332,8 @@ function App() {
             <span>{message}</span>
             <span>
               {theme.label} · {cardDensity.label} · {cardTypographyScale.label} type · {cardAccent.label} ·{' '}
-              {preset.sizeLabel} · Export {exportPixelSize.width} x {exportPixelSize.height}px
+              {cardBackgroundIntensity.label} · {preset.sizeLabel} · Export {exportPixelSize.width} x{' '}
+              {exportPixelSize.height}px
             </span>
           </div>
         </section>

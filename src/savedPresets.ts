@@ -1,15 +1,18 @@
 import {
   cardThemes,
   cardAccentOptions,
+  cardBackgroundIntensityOptions,
   cardDensityOptions,
   cardTypographyScaleOptions,
   defaultCardAccentId,
+  defaultCardBackgroundIntensityId,
   defaultCardDensityId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
   platformPresets,
   type CardAccentId,
+  type CardBackgroundIntensityId,
   type CardDensityId,
   type CardTypographyScaleId,
   type ExportScaleId,
@@ -30,6 +33,7 @@ export type SavedCardPreset = {
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
+  cardBackgroundIntensityId: CardBackgroundIntensityId;
   updatedAt: number;
 };
 
@@ -42,6 +46,7 @@ export type SavedCardPresetDraft = {
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
+  cardBackgroundIntensityId: CardBackgroundIntensityId;
 };
 
 export type SaveSavedPresetResult = {
@@ -58,6 +63,7 @@ const validExportScaleIds = new Set(exportScaleOptions.map((option) => option.id
 const validCardDensityIds = new Set(cardDensityOptions.map((option) => option.id));
 const validCardTypographyScaleIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
 const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
+const validCardBackgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -95,6 +101,10 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
   const cardTypographyScaleId =
     value.cardTypographyScaleId === undefined ? defaultCardTypographyScaleId : value.cardTypographyScaleId;
   const cardAccentId = value.cardAccentId === undefined ? defaultCardAccentId : value.cardAccentId;
+  const cardBackgroundIntensityId =
+    value.cardBackgroundIntensityId === undefined
+      ? defaultCardBackgroundIntensityId
+      : value.cardBackgroundIntensityId;
   const updatedAt = typeof value.updatedAt === 'number' && Number.isFinite(value.updatedAt) ? value.updatedAt : 0;
 
   if (
@@ -106,7 +116,8 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     !validExportScaleIds.has(exportScaleId as ExportScaleId) ||
     !validCardDensityIds.has(cardDensityId as CardDensityId) ||
     !validCardTypographyScaleIds.has(cardTypographyScaleId as CardTypographyScaleId) ||
-    !validCardAccentIds.has(cardAccentId as CardAccentId)
+    !validCardAccentIds.has(cardAccentId as CardAccentId) ||
+    !validCardBackgroundIntensityIds.has(cardBackgroundIntensityId as CardBackgroundIntensityId)
   ) {
     return null;
   }
@@ -121,6 +132,7 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     cardDensityId: cardDensityId as CardDensityId,
     cardTypographyScaleId: cardTypographyScaleId as CardTypographyScaleId,
     cardAccentId: cardAccentId as CardAccentId,
+    cardBackgroundIntensityId: cardBackgroundIntensityId as CardBackgroundIntensityId,
     updatedAt,
   };
 }
@@ -208,6 +220,9 @@ export function saveSavedPreset(
       ? draft.cardTypographyScaleId
       : defaultCardTypographyScaleId,
     cardAccentId: validCardAccentIds.has(draft.cardAccentId) ? draft.cardAccentId : defaultCardAccentId,
+    cardBackgroundIntensityId: validCardBackgroundIntensityIds.has(draft.cardBackgroundIntensityId)
+      ? draft.cardBackgroundIntensityId
+      : defaultCardBackgroundIntensityId,
     updatedAt,
   };
 
