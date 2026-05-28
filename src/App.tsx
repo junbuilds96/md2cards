@@ -16,6 +16,7 @@ import {
   Save,
   ShieldCheck,
   Sparkles,
+  Tags,
   Trash2,
   Upload,
 } from 'lucide-react';
@@ -40,6 +41,7 @@ import {
   type PlatformPreset,
   type TemplateId,
 } from './cardOptions';
+import { getCardClassName, shouldShowCardLabels } from './cardLayout';
 import { copyCard, downloadCard, downloadSvgCard } from './exportImage';
 import { validateMarkdownImportFile } from './markdownFileImport';
 import {
@@ -69,25 +71,31 @@ function CardPreview({
   theme,
   isBlank,
   cardRef,
+  showCardLabels,
 }: {
   markdown: string;
   preset: PlatformPreset;
   theme: CardTheme;
   isBlank: boolean;
   cardRef: React.RefObject<HTMLDivElement | null>;
+  showCardLabels: boolean;
 }) {
+  const renderLabels = shouldShowCardLabels(showCardLabels);
+
   return (
     <div
       ref={cardRef}
-      className={`social-card ${theme.className}`}
+      className={getCardClassName(theme.className, showCardLabels)}
       style={{
         aspectRatio: `${preset.width} / ${preset.height}`,
       }}
     >
-      <div className="card-chrome">
-        <span>MD2Cards</span>
-        <span>{preset.label}</span>
-      </div>
+      {renderLabels ? (
+        <div className="card-chrome">
+          <span>MD2Cards</span>
+          <span>{preset.label}</span>
+        </div>
+      ) : null}
       <div className="markdown-card-body">
         {isBlank ? (
           <div className="empty-card-state">
@@ -98,10 +106,12 @@ function CardPreview({
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
         )}
       </div>
-      <div className="card-footer">
-        <span>Markdown to social card</span>
-        <span>{preset.sizeLabel}</span>
-      </div>
+      {renderLabels ? (
+        <div className="card-footer">
+          <span>Markdown to social card</span>
+          <span>{preset.sizeLabel}</span>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -319,6 +329,7 @@ function App() {
   const [exportScaleId, setExportScaleId] = useState<ExportScaleId>(defaultExportScaleId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
   const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
+  const [showCardLabels, setShowCardLabels] = useState(true);
   const [exportState, setExportState] = useState<ExportState>('idle');
   const [starterCopyState, setStarterCopyState] = useState<StarterCopyState>('idle');
   const [importState, setImportState] = useState<ImportState>('idle');
@@ -812,6 +823,28 @@ function App() {
                   <small>Avoid cropped UI/platform overlays on X/Twitter, Xiaohongshu, and launch cards.</small>
                 </span>
               </label>
+              <label className="guide-toggle">
+                <input
+                  type="checkbox"
+                  checked={showCardLabels}
+                  onChange={(event) => {
+                    setShowCardLabels(event.target.checked);
+                    setExportState('idle');
+                    setMessage(
+                      event.target.checked
+                        ? 'Card labels shown. Exports include the header and footer metadata.'
+                        : 'Card labels hidden. Exports use the clean card only.',
+                    );
+                  }}
+                />
+                <span className="toggle-box" aria-hidden="true">
+                  <Tags size={16} />
+                </span>
+                <span className="guide-toggle-copy">
+                  <strong>Card labels</strong>
+                  <small>Show MD2Cards header and preset/footer metadata.</small>
+                </span>
+              </label>
               <div className="export-actions">
                 <button className="secondary-button" type="button" onClick={handleCopy}>
                   {exportState === 'copied' ? <Check size={18} /> : <Clipboard size={18} />}
@@ -843,6 +876,7 @@ function App() {
                   theme={theme}
                   isBlank={markdownGuidance.stats.isBlank}
                   cardRef={cardRef}
+                  showCardLabels={showCardLabels}
                 />
               </div>
               {showSafeAreaGuide ? <SafeAreaOverlay preset={preset} guide={safeAreaGuide} /> : null}

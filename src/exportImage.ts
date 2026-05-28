@@ -8,6 +8,11 @@ import {
 
 export type ExportFileFormat = 'png' | 'svg';
 
+type SizedExportNode = {
+  node: HTMLElement;
+  cleanup: () => void;
+};
+
 export function getExportFileName(
   preset: PlatformPreset,
   title: string,
@@ -24,6 +29,36 @@ export function getExportFileName(
   return `${baseName || 'md2cards'}-${preset.id}.${format}`;
 }
 
+export function getSizedExportNodeStyle(preset: PlatformPreset): Partial<CSSStyleDeclaration> {
+  const width = `${preset.width}px`;
+  const height = `${preset.height}px`;
+
+  return {
+    width,
+    height,
+    minWidth: width,
+    maxWidth: width,
+    minHeight: height,
+    maxHeight: height,
+    aspectRatio: `${preset.width} / ${preset.height}`,
+    margin: '0',
+    transform: 'none',
+  };
+}
+
+export function getExportHostStyle(preset: PlatformPreset): Partial<CSSStyleDeclaration> {
+  return {
+    position: 'fixed',
+    left: '-100000px',
+    top: '0',
+    width: `${preset.width}px`,
+    height: `${preset.height}px`,
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    zIndex: '-1',
+  };
+}
+
 export function getExportOptions(
   preset: PlatformPreset,
   exportScale: ExportScaleOption = getExportScaleOption(defaultExportScaleId),
@@ -33,11 +68,62 @@ export function getExportOptions(
     pixelRatio: exportScale.scale,
     width: preset.width,
     height: preset.height,
+    canvasWidth: preset.width,
+    canvasHeight: preset.height,
     style: {
       width: `${preset.width}px`,
       height: `${preset.height}px`,
+      minWidth: `${preset.width}px`,
+      maxWidth: `${preset.width}px`,
+      minHeight: `${preset.height}px`,
+      maxHeight: `${preset.height}px`,
+      margin: '0',
+      transform: 'none',
     },
   };
+}
+
+export function getSvgExportOptions(preset: PlatformPreset) {
+  return {
+    cacheBust: true,
+    width: preset.width,
+    height: preset.height,
+    style: getSizedExportNodeStyle(preset),
+  };
+}
+
+export function createSizedExportNode(sourceNode: HTMLElement, preset: PlatformPreset): SizedExportNode {
+  const ownerDocument = sourceNode.ownerDocument;
+  const host = ownerDocument.createElement('div');
+  const exportNode = sourceNode.cloneNode(true) as HTMLElement;
+
+  Object.assign(host.style, getExportHostStyle(preset));
+  Object.assign(exportNode.style, getSizedExportNodeStyle(preset));
+  exportNode.setAttribute('data-export-card', 'true');
+
+  host.appendChild(exportNode);
+  ownerDocument.body.appendChild(host);
+
+  return {
+    node: exportNode,
+    cleanup: () => {
+      host.remove();
+    },
+  };
+}
+
+async function withSizedExportNode<T>(
+  node: HTMLElement,
+  preset: PlatformPreset,
+  render: (exportNode: HTMLElement) => Promise<T>,
+): Promise<T> {
+  const exportNode = createSizedExportNode(node, preset);
+
+  try {
+    return await render(exportNode.node);
+  } finally {
+    exportNode.cleanup();
+  }
 }
 
 export async function downloadCard(
@@ -46,7 +132,9 @@ export async function downloadCard(
   title: string,
   exportScale?: ExportScaleOption,
 ): Promise<void> {
-  const dataUrl = await toPng(node, getExportOptions(preset, exportScale));
+  const dataUrl = await withSizedExportNode(node, preset, (exportNode) =>
+    toPng(exportNode, getExportOptions(preset, exportScale)),
+  );
   const link = document.createElement('a');
   link.download = getExportFileName(preset, title);
   link.href = dataUrl;
@@ -59,7 +147,10 @@ export async function downloadSvgCard(
   title: string,
   exportScale?: ExportScaleOption,
 ): Promise<void> {
-  const dataUrl = await toSvg(node, getExportOptions(preset, exportScale));
+  void exportScale;
+  const dataUrl = await withSizedExportNode(node, preset, (exportNode) =>
+    toSvg(exportNode, getSvgExportOptions(preset)),
+  );
   const link = document.createElement('a');
   link.download = getExportFileName(preset, title, 'svg');
   link.href = dataUrl;
@@ -75,7 +166,9 @@ export async function copyCard(
     throw new Error('Image clipboard support is not available in this browser.');
   }
 
-  const blob = await toBlob(node, getExportOptions(preset, exportScale));
+  const blob = await withSizedExportNode(node, preset, (exportNode) =>
+    toBlob(exportNode, getExportOptions(preset, exportScale)),
+  );
   if (!blob) {
     throw new Error('Unable to render the card image.');
   }

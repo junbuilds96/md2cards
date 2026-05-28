@@ -16,7 +16,7 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 - Save named card presets locally in your browser and reload them for repeat posts.
 - Fit pasted Markdown to the selected platform with a local, deterministic compaction helper.
 - Check line count, character count, safe areas, and export size before downloading, including on narrow laptop and mobile screens.
-- Copy PNGs to the clipboard, download crisp PNGs, or keep reusable SVG output.
+- Hide card labels for clean unbranded cards, then copy PNGs to the clipboard, download crisp PNGs, or keep reusable SVG output.
 
 ## Quickstart
 
@@ -29,7 +29,7 @@ npm install
 npm run dev
 ```
 
-Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, or drop in a local `.md`/`.markdown`/`.txt` file. Pick a platform preset and theme, optionally save the setup as a local preset, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
+Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, or drop in a local `.md`/`.markdown`/`.txt` file. Pick a platform preset and theme, hide **Card labels** if you want a clean card, optionally save the setup as a local preset, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
 
 ## Common Use Cases
 
@@ -52,6 +52,7 @@ Open the local Vite URL on desktop or a narrow screen, choose a starter, select 
 - GitHub-flavored Markdown rendering with `react-markdown` and `remark-gfm`.
 - Local Markdown file import for `.md`, `.markdown`, and `.txt` drafts.
 - Browser-based PNG and SVG export powered by `html-to-image`.
+- Exact-size PNG and SVG exports use the selected preset bounds without preview-stage padding or safe-area overlays.
 - Presets for X/Twitter landscape, Xiaohongshu portrait, and GitHub/launch square.
 - Local platform fitter that normalizes spacing, caps long lists, shortens dense paragraphs, and reports what changed.
 - Themes for crisp launch notes, editorial posts, paper-style notes, and dark technical updates.
@@ -59,6 +60,7 @@ Open the local Vite URL on desktop or a narrow screen, choose a starter, select 
 - Browser-local saved presets for Markdown, platform, theme, and export quality.
 - Responsive controls and preview panels for narrow laptop and mobile widths.
 - Fast 1x preview export and crisp 2x share export.
+- Optional card-label toggle for hiding the MD2Cards header and footer metadata in previews and exports.
 - Clipboard PNG support when the browser allows image clipboard writes.
 
 ## Tech Stack

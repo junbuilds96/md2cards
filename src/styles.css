@@ -886,6 +886,10 @@ textarea:focus {
   box-shadow: 0 26px 70px rgba(22, 30, 44, 0.28);
 }
 
+.social-card.card-labels-hidden {
+  grid-template-rows: minmax(0, 1fr);
+}
+
 .card-chrome,
 .card-footer {
   z-index: 1;
