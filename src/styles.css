@@ -1022,6 +1022,35 @@ textarea:focus {
   gap: 8px;
 }
 
+.github-star-link {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+  color: #1f344d;
+  background: #ffffff;
+  border: 1px solid #cfd7e4;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
+}
+
+.github-star-link:hover,
+.github-star-link:focus-visible {
+  color: #101828;
+  border-color: #9fb0c8;
+  box-shadow: 0 0 0 3px rgba(32, 89, 232, 0.1);
+}
+
+.github-star-link svg {
+  flex: 0 0 auto;
+}
+
 .export-actions .secondary-button,
 .export-actions .primary-button {
   min-height: 38px;
@@ -1643,6 +1672,7 @@ textarea:focus {
     width: 100%;
   }
 
+  .github-star-link,
   .export-actions button {
     width: 100%;
   }

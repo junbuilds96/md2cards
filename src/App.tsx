@@ -9,6 +9,7 @@ import {
   Download,
   FileCode2,
   FileUp,
+  Github,
   ImageDown,
   LayoutTemplate,
   Palette,
@@ -1282,6 +1283,16 @@ function App() {
                 </label>
               </div>
               <div className="export-actions">
+                <a
+                  className="github-star-link"
+                  href="https://github.com/junbuilds96/md2cards"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Star MD2Cards on GitHub"
+                >
+                  <Github size={18} />
+                  Star on GitHub
+                </a>
                 <button className="secondary-button" type="button" onClick={handleCopy}>
                   {exportState === 'copied' ? <Check size={18} /> : <Clipboard size={18} />}
                   {exportState === 'copying' ? 'Copying...' : exportState === 'copied' ? 'Copied' : 'Copy PNG'}

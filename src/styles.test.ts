@@ -69,6 +69,7 @@ describe('social card CSS', () => {
     const guideToggleRule = getRule('.guide-toggle');
     const toggleBoxRule = getRule('.toggle-box');
     const guideDetailRule = getRule('.guide-toggle-copy small');
+    const githubStarRule = getRule('.github-star-link');
 
     expect(toolbarRule).toContain('display: grid');
     expect(toolbarRule).toContain('grid-template-columns: minmax(180px, 1fr) minmax(360px, auto)');
@@ -81,6 +82,9 @@ describe('social card CSS', () => {
     expect(toggleBoxRule).toContain('height: 26px');
     expect(guideDetailRule).toContain('text-overflow: ellipsis');
     expect(guideDetailRule).toContain('white-space: nowrap');
+    expect(githubStarRule).toContain('display: inline-flex');
+    expect(githubStarRule).toContain('min-height: 38px');
+    expect(githubStarRule).toContain('text-decoration: none');
   });
 
   it('keeps the desktop workspace viewport-fixed with independent control scrolling', () => {
@@ -137,5 +141,6 @@ describe('social card CSS', () => {
     expect(styles).toContain('overflow: visible');
     expect(styles).toContain('overflow-y: visible');
     expect(styles).toContain('grid-template-rows: auto minmax(320px, 54dvh) auto');
+    expect(styles).toContain('.github-star-link,\n  .export-actions button');
   });
 });
