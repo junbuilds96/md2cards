@@ -981,12 +981,22 @@ textarea:focus {
   min-height: 0;
   flex-direction: column;
   justify-content: center;
+  justify-content: safe center;
   padding: 1cqh 5.5cqw;
   overflow: hidden;
 }
 
+.social-card.card-labels-hidden .markdown-card-body {
+  justify-content: flex-start;
+  padding-block: clamp(30px, 6cqh, 60px);
+}
+
 .markdown-card-body > * {
   max-width: 100%;
+}
+
+.social-card.card-labels-hidden .markdown-card-body > * {
+  flex-shrink: 0;
 }
 
 .markdown-card-body h1 {
@@ -1070,6 +1080,57 @@ textarea:focus {
   margin: 20px 0;
   padding-left: 24px;
   border-left: 8px solid var(--card-accent);
+}
+
+.social-card.card-labels-hidden .markdown-card-body h1 {
+  margin-bottom: clamp(16px, 2.2cqh, 22px);
+  font-size: clamp(32px, 6cqw, 96px);
+  line-height: 0.98;
+}
+
+/* Clean cards keep secondary headings visible; compact sizing prevents h2 from flex-collapsing into clipped fragments. */
+.social-card.card-labels-hidden .markdown-card-body h2 {
+  margin: clamp(8px, 1.2cqh, 12px) 0 clamp(6px, 1cqh, 10px);
+  font-size: clamp(20px, 2.5cqw, 40px);
+  line-height: 1.1;
+}
+
+.social-card.card-labels-hidden .markdown-card-body p,
+.social-card.card-labels-hidden .markdown-card-body li,
+.social-card.card-labels-hidden .markdown-card-body td,
+.social-card.card-labels-hidden .markdown-card-body th {
+  font-size: clamp(16px, 2.3cqw, 37px);
+  line-height: 1.2;
+}
+
+.social-card.card-labels-hidden .markdown-card-body p {
+  margin-bottom: clamp(8px, 1.3cqh, 12px);
+}
+
+.social-card.card-labels-hidden .markdown-card-body ul,
+.social-card.card-labels-hidden .markdown-card-body ol {
+  margin: clamp(6px, 1cqh, 10px) 0 clamp(8px, 1.3cqh, 12px);
+  padding-left: 1.05em;
+}
+
+.social-card.card-labels-hidden .markdown-card-body li + li {
+  margin-top: clamp(4px, 0.7cqh, 6px);
+}
+
+.social-card.card-labels-hidden .markdown-card-body table {
+  margin-top: clamp(8px, 1.2cqh, 12px);
+}
+
+.social-card.card-labels-hidden .markdown-card-body th,
+.social-card.card-labels-hidden .markdown-card-body td {
+  padding: clamp(6px, 1cqh, 9px) clamp(8px, 1cqw, 12px);
+  border-bottom-width: 1px;
+  font-size: clamp(14px, 2.05cqw, 33px);
+  line-height: 1.15;
+}
+
+.social-card.card-labels-hidden .markdown-card-body > :last-child {
+  margin-bottom: 0;
 }
 
 .empty-card-state {
