@@ -177,34 +177,36 @@ function OnboardingChecklist({
   onCopyStarterMarkdown: () => void;
 }) {
   return (
-    <section className="onboarding-checklist" aria-labelledby="workflow-title">
-      <div className="onboarding-heading">
+    <details className="onboarding-checklist">
+      <summary className="onboarding-heading">
         <PanelRightOpen size={18} />
         <div>
           <p className="eyebrow">Getting Started</p>
-          <h2 id="workflow-title">60-second workflow</h2>
+          <h2>60-second workflow</h2>
         </div>
+      </summary>
+      <div className="onboarding-content">
+        <ol className="workflow-steps">
+          {onboardingWorkflowSteps.map((step, index) => (
+            <li key={step.id}>
+              <span className="workflow-step-index">{index + 1}</span>
+              <span>
+                <strong>{step.label}</strong>
+                <small>{step.detail}</small>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <button className="ghost-button onboarding-action" type="button" onClick={onCopyStarterMarkdown}>
+          {starterCopyState === 'copied' ? <Check size={16} /> : <Clipboard size={16} />}
+          {starterCopyState === 'copying'
+            ? 'Copying...'
+            : starterCopyState === 'copied'
+              ? 'Starter Copied'
+              : 'Copy Starter Markdown'}
+        </button>
       </div>
-      <ol className="workflow-steps">
-        {onboardingWorkflowSteps.map((step, index) => (
-          <li key={step.id}>
-            <span className="workflow-step-index">{index + 1}</span>
-            <span>
-              <strong>{step.label}</strong>
-              <small>{step.detail}</small>
-            </span>
-          </li>
-        ))}
-      </ol>
-      <button className="ghost-button onboarding-action" type="button" onClick={onCopyStarterMarkdown}>
-        {starterCopyState === 'copied' ? <Check size={16} /> : <Clipboard size={16} />}
-        {starterCopyState === 'copying'
-          ? 'Copying...'
-          : starterCopyState === 'copied'
-            ? 'Starter Copied'
-            : 'Copy Starter Markdown'}
-      </button>
-    </section>
+    </details>
   );
 }
 
@@ -903,32 +905,12 @@ function App() {
 
           <div className="field-group">
             <div className="group-header">
-              <span className="field-label">Paste-Ready Examples</span>
-              <button className="ghost-button" type="button" onClick={startBlankMarkdown}>
-                <FileCode2 size={16} />
-                Start Blank
-              </button>
-            </div>
-            <div className="template-gallery">
-              {markdownTemplates.map((item) => (
-                <button
-                  key={item.id}
-                  className={item.id === activeTemplateId ? 'active' : ''}
-                  type="button"
-                  onClick={() => applyTemplate(item.id)}
-                >
-                  <LayoutTemplate size={16} />
-                  <span>{item.label}</span>
-                  <small>{item.description}</small>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="field-group">
-            <div className="group-header">
               <label htmlFor="markdown-input">Markdown</label>
               <div className="editor-actions">
+                <button className="ghost-button" type="button" onClick={startBlankMarkdown}>
+                  <FileCode2 size={16} />
+                  Start Blank
+                </button>
                 <button
                   className="ghost-button"
                   type="button"
@@ -944,17 +926,6 @@ function App() {
                 </button>
               </div>
             </div>
-            <MarkdownFileImporter
-              importState={importState}
-              importMessage={importMessage}
-              isDraggingImport={isDraggingImport}
-              fileInputRef={fileInputRef}
-              onChooseFile={handleChooseFile}
-              onFileInputChange={handleFileInputChange}
-              onImportDrop={handleImportDrop}
-              onImportDragOver={handleImportDragOver}
-              onImportDragLeave={handleImportDragLeave}
-            />
             <textarea
               id="markdown-input"
               ref={markdownInputRef}
@@ -1076,6 +1047,39 @@ function App() {
               {exportScale.description} Approx. {exportPixelSize.width} x {exportPixelSize.height}px PNG;
               SVG uses the selected preset dimensions.
             </p>
+          </div>
+
+          <div className="field-group">
+            <span className="field-label">Import Markdown</span>
+            <MarkdownFileImporter
+              importState={importState}
+              importMessage={importMessage}
+              isDraggingImport={isDraggingImport}
+              fileInputRef={fileInputRef}
+              onChooseFile={handleChooseFile}
+              onFileInputChange={handleFileInputChange}
+              onImportDrop={handleImportDrop}
+              onImportDragOver={handleImportDragOver}
+              onImportDragLeave={handleImportDragLeave}
+            />
+          </div>
+
+          <div className="field-group">
+            <span className="field-label">Paste-Ready Examples</span>
+            <div className="template-gallery">
+              {markdownTemplates.map((item) => (
+                <button
+                  key={item.id}
+                  className={item.id === activeTemplateId ? 'active' : ''}
+                  type="button"
+                  onClick={() => applyTemplate(item.id)}
+                >
+                  <LayoutTemplate size={16} />
+                  <span>{item.label}</span>
+                  <small>{item.description}</small>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="field-group">

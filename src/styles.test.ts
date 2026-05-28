@@ -12,11 +12,11 @@ function getRule(selector: string): string {
   return match?.[1] ?? '';
 }
 
-function expectStylesToContainRule(selector: string, declaration: string): void {
+function getRuleContaining(selector: string, declaration: string): string {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const escapedDeclaration = declaration.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const matches = [...styles.matchAll(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`, 'g'))];
 
-  expect(styles).toMatch(new RegExp(`${escapedSelector}\\s*\\{[^}]*${escapedDeclaration}`));
+  return matches.find((match) => match[1]?.includes(declaration))?.[1] ?? '';
 }
 
 describe('clean social card CSS', () => {
@@ -79,14 +79,41 @@ describe('clean social card CSS', () => {
     expect(guideDetailRule).toContain('white-space: nowrap');
   });
 
-  it('constrains the preview canvas footprint without changing export sizing', () => {
+  it('keeps the desktop workspace viewport-fixed with independent control scrolling', () => {
+    const appShellRule = getRule('.app-shell');
+    const workspaceRule = getRule('.workspace');
+    const controlPanelRule = getRule('.control-panel');
+
+    expect(appShellRule).toContain('height: 100dvh');
+    expect(appShellRule).toContain('min-height: 100dvh');
+    expect(appShellRule).toContain('overflow: hidden');
+    expect(workspaceRule).toContain('height: calc(100dvh - 40px)');
+    expect(workspaceRule).toContain('min-height: calc(100dvh - 40px)');
+    expect(controlPanelRule).toContain('min-height: 0');
+    expect(controlPanelRule).toContain('overflow-y: auto');
+  });
+
+  it('lets the preview fill the workspace without capping the stage to 58vh', () => {
+    const previewPanelRule = getRuleContaining('.preview-panel', 'display: grid');
     const stageRule = getRule('.preview-stage');
     const scalerRule = getRule('.preview-scaler');
 
-    expectStylesToContainRule('.preview-panel', 'grid-template-rows: auto minmax(340px, 58vh) auto');
-    expectStylesToContainRule('.preview-panel', 'max-height: calc(100vh - 40px)');
-    expect(stageRule).toContain('max-height: 58vh');
+    expect(previewPanelRule).toContain('grid-template-rows: auto minmax(0, 1fr) auto');
+    expect(previewPanelRule).toContain('height: 100%');
+    expect(previewPanelRule).toContain('min-height: 0');
+    expect(previewPanelRule).toContain('max-height: none');
+    expect(stageRule).toContain('min-height: 0');
+    expect(stageRule).toContain('max-height: none');
+    expect(stageRule).not.toContain('max-height: 58vh');
     expect(stageRule).toContain('padding: 18px');
     expect(scalerRule).toContain('width: min(100%, 720px)');
+  });
+
+  it('keeps mobile layout document-scrolled with a bounded preview row', () => {
+    expect(styles).toContain('@media (max-width: 1040px)');
+    expect(styles).toContain('height: auto');
+    expect(styles).toContain('overflow: visible');
+    expect(styles).toContain('overflow-y: visible');
+    expect(styles).toContain('grid-template-rows: auto minmax(320px, 54dvh) auto');
   });
 });
