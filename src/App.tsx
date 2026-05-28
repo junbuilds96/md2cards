@@ -25,12 +25,15 @@ import {
   cardThemes,
   cardAccentOptions,
   cardDensityOptions,
+  cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardDensityId,
+  defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
   getCardAccentOption,
   getCardDensityOption,
+  getCardTypographyScaleOption,
   fitMarkdownToPreset,
   getExportPixelSize,
   getExportScaleOption,
@@ -45,6 +48,7 @@ import {
   sampleMarkdown,
   type CardAccentId,
   type CardDensityId,
+  type CardTypographyScaleId,
   type CardTheme,
   type ExportScaleId,
   type PlatformPreset,
@@ -88,6 +92,7 @@ function CardPreview({
   cardRef,
   showCardLabels,
   cardDensityId,
+  cardTypographyScaleId,
   cardAccentId,
 }: {
   markdown: string;
@@ -97,6 +102,7 @@ function CardPreview({
   cardRef: React.RefObject<HTMLDivElement | null>;
   showCardLabels: boolean;
   cardDensityId: CardDensityId;
+  cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
 }) {
   const renderLabels = shouldShowCardLabels(showCardLabels);
@@ -104,7 +110,7 @@ function CardPreview({
   return (
     <div
       ref={cardRef}
-      className={getCardClassName(theme.className, showCardLabels, cardDensityId)}
+      className={getCardClassName(theme.className, showCardLabels, cardDensityId, cardTypographyScaleId)}
       style={{
         ...getCardAppearanceStyle(cardAccentId),
         aspectRatio: `${preset.width} / ${preset.height}`,
@@ -288,10 +294,13 @@ function SavedPresetsPanel({
       savedPreset.exportScaleId;
     const densityLabel =
       cardDensityOptions.find((item) => item.id === savedPreset.cardDensityId)?.label ?? savedPreset.cardDensityId;
+    const typographyLabel =
+      cardTypographyScaleOptions.find((item) => item.id === savedPreset.cardTypographyScaleId)?.label ??
+      savedPreset.cardTypographyScaleId;
     const accentLabel =
       cardAccentOptions.find((item) => item.id === savedPreset.cardAccentId)?.label ?? savedPreset.cardAccentId;
 
-    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${accentLabel} · ${scaleLabel}`;
+    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${accentLabel} · ${scaleLabel}`;
   }
 
   return (
@@ -396,13 +405,17 @@ function CardConfigTransferPanel({
 
 function AppearanceControls({
   cardDensityId,
+  cardTypographyScaleId,
   cardAccentId,
   onDensityChange,
+  onTypographyScaleChange,
   onAccentChange,
 }: {
   cardDensityId: CardDensityId;
+  cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
   onDensityChange: (densityId: CardDensityId) => void;
+  onTypographyScaleChange: (typographyScaleId: CardTypographyScaleId) => void;
   onAccentChange: (accentId: CardAccentId) => void;
 }) {
   return (
@@ -416,6 +429,22 @@ function AppearanceControls({
               className={item.id === cardDensityId ? 'active' : ''}
               type="button"
               onClick={() => onDensityChange(item.id)}
+              title={item.description}
+            >
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="appearance-control-block">
+        <span className="mini-label">Typography</span>
+        <div className="typography-control">
+          {cardTypographyScaleOptions.map((item) => (
+            <button
+              key={item.id}
+              className={item.id === cardTypographyScaleId ? 'active' : ''}
+              type="button"
+              onClick={() => onTypographyScaleChange(item.id)}
               title={item.description}
             >
               <span>{item.label}</span>
@@ -451,6 +480,8 @@ function App() {
   const [themeId, setThemeId] = useState<CardTheme['id']>('signal');
   const [exportScaleId, setExportScaleId] = useState<ExportScaleId>(defaultExportScaleId);
   const [cardDensityId, setCardDensityId] = useState<CardDensityId>(defaultCardDensityId);
+  const [cardTypographyScaleId, setCardTypographyScaleId] =
+    useState<CardTypographyScaleId>(defaultCardTypographyScaleId);
   const [cardAccentId, setCardAccentId] = useState<CardAccentId>(defaultCardAccentId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
   const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
@@ -479,6 +510,10 @@ function App() {
   const theme = useMemo(() => cardThemes.find((item) => item.id === themeId) ?? cardThemes[0], [themeId]);
   const exportScale = useMemo(() => getExportScaleOption(exportScaleId), [exportScaleId]);
   const cardDensity = useMemo(() => getCardDensityOption(cardDensityId), [cardDensityId]);
+  const cardTypographyScale = useMemo(
+    () => getCardTypographyScaleOption(cardTypographyScaleId),
+    [cardTypographyScaleId],
+  );
   const cardAccent = useMemo(() => getCardAccentOption(cardAccentId), [cardAccentId]);
   const exportPixelSize = useMemo(() => getExportPixelSize(preset, exportScale), [preset, exportScale]);
   const safeAreaGuide = useMemo(() => getSafeAreaGuide(preset), [preset]);
@@ -527,6 +562,7 @@ function App() {
         themeId: theme.id,
         exportScaleId: exportScale.id,
         cardDensityId: cardDensity.id,
+        cardTypographyScaleId: cardTypographyScale.id,
         cardAccentId: cardAccent.id,
       });
 
@@ -551,6 +587,7 @@ function App() {
     setThemeId(savedPreset.themeId);
     setExportScaleId(savedPreset.exportScaleId);
     setCardDensityId(savedPreset.cardDensityId);
+    setCardTypographyScaleId(savedPreset.cardTypographyScaleId);
     setCardAccentId(savedPreset.cardAccentId);
     setPresetName(savedPreset.name);
     setMessage(`${savedPreset.name} loaded. Preview updated from your local preset.`);
@@ -585,6 +622,7 @@ function App() {
         themeId: theme.id,
         exportScaleId: exportScale.id,
         cardDensityId: cardDensity.id,
+        cardTypographyScaleId: cardTypographyScale.id,
         cardAccentId: cardAccent.id,
         showCardLabels,
       });
@@ -643,6 +681,7 @@ function App() {
       setThemeId(importedRecipe.config.themeId);
       setExportScaleId(importedRecipe.config.exportScaleId);
       setCardDensityId(importedRecipe.config.cardDensityId);
+      setCardTypographyScaleId(importedRecipe.config.cardTypographyScaleId);
       setCardAccentId(importedRecipe.config.cardAccentId);
       setShowCardLabels(importedRecipe.config.showCardLabels);
       setImportState('idle');
@@ -993,10 +1032,17 @@ function App() {
             <span className="field-label">Appearance</span>
             <AppearanceControls
               cardDensityId={cardDensity.id}
+              cardTypographyScaleId={cardTypographyScale.id}
               cardAccentId={cardAccent.id}
               onDensityChange={(densityId) => {
                 setCardDensityId(densityId);
                 setMessage(`${getCardDensityOption(densityId).label} density selected. Preview and exports updated.`);
+              }}
+              onTypographyScaleChange={(typographyScaleId) => {
+                setCardTypographyScaleId(typographyScaleId);
+                setMessage(
+                  `${getCardTypographyScaleOption(typographyScaleId).label} typography selected. Preview and exports updated.`,
+                );
               }}
               onAccentChange={(accentId) => {
                 setCardAccentId(accentId);
@@ -1146,6 +1192,7 @@ function App() {
                   cardRef={cardRef}
                   showCardLabels={showCardLabels}
                   cardDensityId={cardDensity.id}
+                  cardTypographyScaleId={cardTypographyScale.id}
                   cardAccentId={cardAccent.id}
                 />
               </div>
@@ -1161,8 +1208,8 @@ function App() {
           >
             <span>{message}</span>
             <span>
-              {theme.label} · {cardDensity.label} · {cardAccent.label} · {preset.sizeLabel} · Export{' '}
-              {exportPixelSize.width} x {exportPixelSize.height}px
+              {theme.label} · {cardDensity.label} · {cardTypographyScale.label} type · {cardAccent.label} ·{' '}
+              {preset.sizeLabel} · Export {exportPixelSize.width} x {exportPixelSize.height}px
             </span>
           </div>
         </section>

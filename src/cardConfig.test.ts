@@ -20,6 +20,7 @@ describe('card config recipes', () => {
       themeId: 'editorial',
       exportScaleId: 'crisp',
       cardDensityId: 'spacious',
+      cardTypographyScaleId: 'large',
       cardAccentId: 'rose',
       showCardLabels: false,
     });
@@ -32,6 +33,7 @@ describe('card config recipes', () => {
       themeId: 'editorial',
       exportScaleId: 'crisp',
       cardDensityId: 'spacious',
+      cardTypographyScaleId: 'large',
       cardAccentId: 'rose',
       showCardLabels: false,
     });
@@ -48,6 +50,7 @@ describe('card config recipes', () => {
         themeId: 'midnight',
         exportScaleId: 'fast',
         cardDensityId: 'compact',
+        cardTypographyScaleId: 'small',
         cardAccentId: 'emerald',
         showCardLabels: true,
       }),
@@ -63,6 +66,7 @@ describe('card config recipes', () => {
         themeId: 'midnight',
         exportScaleId: 'fast',
         cardDensityId: 'compact',
+        cardTypographyScaleId: 'small',
         cardAccentId: 'emerald',
         showCardLabels: true,
       },
@@ -86,6 +90,7 @@ describe('card config recipes', () => {
       valid: true,
       config: {
         cardDensityId: 'balanced',
+        cardTypographyScaleId: 'default',
         cardAccentId: 'blue',
       },
     });
@@ -119,6 +124,7 @@ describe('card config recipes', () => {
       themeId: 'signal',
       exportScaleId: 'fast',
       cardDensityId: 'balanced',
+      cardTypographyScaleId: 'default',
       cardAccentId: 'blue',
       showCardLabels: true,
     };
@@ -138,6 +144,10 @@ describe('card config recipes', () => {
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardDensityId: 'missing' }))).toEqual({
       valid: false,
       message: 'This recipe uses an unknown density setting.',
+    });
+    expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardTypographyScaleId: 'missing' }))).toEqual({
+      valid: false,
+      message: 'This recipe uses an unknown typography scale.',
     });
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardAccentId: 'missing' }))).toEqual({
       valid: false,

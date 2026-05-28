@@ -6,6 +6,8 @@ export type ExportScaleId = 'fast' | 'crisp';
 
 export type CardDensityId = 'compact' | 'balanced' | 'spacious';
 
+export type CardTypographyScaleId = 'small' | 'default' | 'large';
+
 export type CardAccentId = 'blue' | 'emerald' | 'rose' | 'amber';
 
 export type PlatformPreset = {
@@ -48,6 +50,13 @@ export type ExportScaleOption = {
 
 export type CardDensityOption = {
   id: CardDensityId;
+  label: string;
+  description: string;
+  className: string;
+};
+
+export type CardTypographyScaleOption = {
+  id: CardTypographyScaleId;
   label: string;
   description: string;
   className: string;
@@ -213,6 +222,8 @@ export const defaultExportScaleId: ExportScaleId = 'crisp';
 
 export const defaultCardDensityId: CardDensityId = 'balanced';
 
+export const defaultCardTypographyScaleId: CardTypographyScaleId = 'default';
+
 export const defaultCardAccentId: CardAccentId = 'blue';
 
 export const exportScaleOptions: ExportScaleOption[] = [
@@ -250,6 +261,27 @@ export const cardDensityOptions: CardDensityOption[] = [
     label: 'Spacious',
     description: 'Airier padding for short, editorial cards.',
     className: 'density-spacious',
+  },
+];
+
+export const cardTypographyScaleOptions: CardTypographyScaleOption[] = [
+  {
+    id: 'small',
+    label: 'Small',
+    description: 'Smaller type for longer Markdown cards.',
+    className: 'type-small',
+  },
+  {
+    id: 'default',
+    label: 'Default',
+    description: 'Current MD2Cards type scale.',
+    className: 'type-default',
+  },
+  {
+    id: 'large',
+    label: 'Large',
+    description: 'Larger type for short, poster-like cards.',
+    className: 'type-large',
   },
 ];
 
@@ -788,6 +820,12 @@ export function getExportScaleOption(exportScaleId: ExportScaleId): ExportScaleO
 
 export function getCardDensityOption(cardDensityId: CardDensityId): CardDensityOption {
   return cardDensityOptions.find((option) => option.id === cardDensityId) ?? cardDensityOptions[1];
+}
+
+export function getCardTypographyScaleOption(
+  cardTypographyScaleId: CardTypographyScaleId,
+): CardTypographyScaleOption {
+  return cardTypographyScaleOptions.find((option) => option.id === cardTypographyScaleId) ?? cardTypographyScaleOptions[1];
 }
 
 export function getCardAccentOption(cardAccentId: CardAccentId): CardAccentOption {

@@ -2,13 +2,16 @@ import {
   cardThemes,
   cardAccentOptions,
   cardDensityOptions,
+  cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardDensityId,
+  defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
   platformPresets,
   type CardAccentId,
   type CardDensityId,
+  type CardTypographyScaleId,
   type ExportScaleId,
   type PresetId,
   type ThemeId,
@@ -26,6 +29,7 @@ export type CardConfig = {
   themeId: ThemeId;
   exportScaleId: ExportScaleId;
   cardDensityId: CardDensityId;
+  cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
   showCardLabels: boolean;
 };
@@ -36,6 +40,7 @@ export type CardConfigDraft = {
   themeId: ThemeId;
   exportScaleId: ExportScaleId;
   cardDensityId: CardDensityId;
+  cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
   showCardLabels: boolean;
 };
@@ -63,6 +68,7 @@ const validPresetIds = new Set(platformPresets.map((preset) => preset.id));
 const validThemeIds = new Set(cardThemes.map((theme) => theme.id));
 const validExportScaleIds = new Set(exportScaleOptions.map((option) => option.id));
 const validCardDensityIds = new Set(cardDensityOptions.map((option) => option.id));
+const validCardTypographyScaleIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
 const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -104,6 +110,9 @@ export function createCardConfig(draft: CardConfigDraft): CardConfig {
     themeId: validThemeIds.has(draft.themeId) ? draft.themeId : cardThemes[0].id,
     exportScaleId: validExportScaleIds.has(draft.exportScaleId) ? draft.exportScaleId : defaultExportScaleId,
     cardDensityId: validCardDensityIds.has(draft.cardDensityId) ? draft.cardDensityId : defaultCardDensityId,
+    cardTypographyScaleId: validCardTypographyScaleIds.has(draft.cardTypographyScaleId)
+      ? draft.cardTypographyScaleId
+      : defaultCardTypographyScaleId,
     cardAccentId: validCardAccentIds.has(draft.cardAccentId) ? draft.cardAccentId : defaultCardAccentId,
     showCardLabels: draft.showCardLabels,
   };
@@ -192,6 +201,17 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
     };
   }
 
+  const cardTypographyScaleId =
+    parsed.cardTypographyScaleId === undefined
+      ? defaultCardTypographyScaleId
+      : (parsed.cardTypographyScaleId as CardTypographyScaleId);
+  if (!validCardTypographyScaleIds.has(cardTypographyScaleId)) {
+    return {
+      valid: false,
+      message: 'This recipe uses an unknown typography scale.',
+    };
+  }
+
   const cardAccentId =
     parsed.cardAccentId === undefined ? defaultCardAccentId : (parsed.cardAccentId as CardAccentId);
   if (!validCardAccentIds.has(cardAccentId)) {
@@ -218,6 +238,7 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
       themeId: parsed.themeId as ThemeId,
       exportScaleId: parsed.exportScaleId as ExportScaleId,
       cardDensityId,
+      cardTypographyScaleId,
       cardAccentId,
       showCardLabels: parsed.showCardLabels,
     },

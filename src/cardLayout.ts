@@ -1,8 +1,10 @@
 import {
   getCardAccentOption,
   getCardDensityOption,
+  getCardTypographyScaleOption,
   type CardAccentId,
   type CardDensityId,
+  type CardTypographyScaleId,
 } from './cardOptions';
 
 export type CardAppearanceStyle = Record<`--${string}`, string>;
@@ -15,11 +17,13 @@ export function getCardClassName(
   themeClassName: string,
   showCardLabels: boolean,
   cardDensityId: CardDensityId,
+  cardTypographyScaleId: CardTypographyScaleId,
 ): string {
   return [
     'social-card',
     themeClassName,
     getCardDensityOption(cardDensityId).className,
+    getCardTypographyScaleOption(cardTypographyScaleId).className,
     showCardLabels ? '' : 'card-labels-hidden',
   ]
     .filter(Boolean)

@@ -23,8 +23,6 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 
 Live demo: https://junbuilds96.github.io/md2cards/
 
-Legacy/custom domain, if configured: https://md2cards.dg822.com
-
 ```bash
 npm install
 npm run dev
@@ -88,17 +86,6 @@ npm run preview  # Preview the production build
 ## Deployment
 
 Pushes to `main` deploy the production build to GitHub Pages at https://junbuilds96.github.io/md2cards/. The workflow builds with `npm ci` and `npm run build`, uploads `dist`, and deploys it with GitHub's official Pages actions.
-
-## Docker
-
-Build the static production image and run it locally:
-
-```bash
-docker build -t md2cards .
-docker run --rm -p 8080:80 md2cards
-```
-
-Open `http://localhost:8080`. The image builds the Vite app with Node and serves the generated `dist` directory with nginx.
 
 ## Roadmap
 

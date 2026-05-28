@@ -612,6 +612,12 @@ textarea:focus {
   gap: 8px;
 }
 
+.typography-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .accent-control {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -626,6 +632,7 @@ textarea:focus {
 .segmented-control button,
 .quality-control button,
 .density-control button,
+.typography-control button,
 .accent-control button,
 .template-gallery button,
 .theme-option {
@@ -654,6 +661,7 @@ textarea:focus {
 }
 
 .density-control button,
+.typography-control button,
 .accent-control button {
   display: inline-flex;
   min-height: 44px;
@@ -673,6 +681,7 @@ textarea:focus {
 .segmented-control button span,
 .quality-control button span,
 .density-control button span,
+.typography-control button span,
 .accent-control button span:last-child,
 .template-gallery button span,
 .theme-option span:last-child {
@@ -783,6 +792,7 @@ textarea:focus {
 .segmented-control button.active,
 .quality-control button.active,
 .density-control button.active,
+.typography-control button.active,
 .accent-control button.active,
 .template-gallery button.active,
 .theme-option.active {
@@ -1133,6 +1143,30 @@ textarea:focus {
   --card-clean-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(7px, 0.9cqw, 11px);
 }
 
+.social-card.type-small {
+  --card-h1-font-size: clamp(24px, 5.9cqw, 94px);
+  --card-h2-font-size: clamp(18px, 2.9cqw, 45px);
+  --card-body-font-size: clamp(14px, 2.25cqw, 36px);
+  --card-clean-h1-font-size: clamp(28px, 5.15cqw, 82px);
+  --card-clean-h2-font-size: clamp(18px, 2.15cqw, 34px);
+  --card-clean-body-font-size: clamp(14px, 1.95cqw, 31px);
+  --card-clean-table-cell-font-size: clamp(12px, 1.75cqw, 28px);
+  --card-empty-heading-font-size: clamp(24px, 5.5cqw, 82px);
+  --card-empty-body-font-size: clamp(14px, 2.3cqw, 35px);
+}
+
+.social-card.type-large {
+  --card-h1-font-size: clamp(32px, 8cqw, 128px);
+  --card-h2-font-size: clamp(24px, 4cqw, 62px);
+  --card-body-font-size: clamp(18px, 3.05cqw, 49px);
+  --card-clean-h1-font-size: clamp(36px, 6.75cqw, 108px);
+  --card-clean-h2-font-size: clamp(22px, 2.85cqw, 46px);
+  --card-clean-body-font-size: clamp(18px, 2.55cqw, 41px);
+  --card-clean-table-cell-font-size: clamp(15px, 2.25cqw, 36px);
+  --card-empty-heading-font-size: clamp(32px, 7.15cqw, 108px);
+  --card-empty-body-font-size: clamp(18px, 3.1cqw, 47px);
+}
+
 .social-card.card-labels-hidden {
   grid-template-rows: minmax(0, 1fr);
 }
@@ -1329,13 +1363,13 @@ textarea:focus {
 
 .empty-card-state strong {
   color: var(--card-heading);
-  font-size: clamp(28px, 6.4cqw, 96px);
+  font-size: var(--card-empty-heading-font-size, clamp(28px, 6.4cqw, 96px));
   line-height: 1;
 }
 
 .empty-card-state span {
   color: var(--card-muted);
-  font-size: clamp(16px, 2.8cqw, 42px);
+  font-size: var(--card-empty-body-font-size, clamp(16px, 2.8cqw, 42px));
   font-weight: 750;
   line-height: 1.2;
 }
@@ -1544,6 +1578,7 @@ textarea:focus {
   .segmented-control,
   .quality-control,
   .density-control,
+  .typography-control,
   .accent-control,
   .theme-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -1628,6 +1663,7 @@ textarea:focus {
   .segmented-control button,
   .quality-control button,
   .density-control button,
+  .typography-control button,
   .accent-control button {
     min-height: auto;
   }

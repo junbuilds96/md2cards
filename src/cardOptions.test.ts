@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  cardTypographyScaleOptions,
   cardThemes,
+  defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
   fitMarkdownToPreset,
+  getCardTypographyScaleOption,
   getExportPixelSize,
   getExportScaleOption,
   getMarkdownFitLimits,
@@ -265,5 +268,19 @@ describe('exportScaleOptions', () => {
       width: 2160,
       height: 2880,
     });
+  });
+});
+
+describe('cardTypographyScaleOptions', () => {
+  it('defaults to the current visual scale and exposes card classes', () => {
+    expect(getCardTypographyScaleOption(defaultCardTypographyScaleId)).toMatchObject({
+      id: 'default',
+      className: 'type-default',
+    });
+    expect(cardTypographyScaleOptions.map((option) => option.className)).toEqual([
+      'type-small',
+      'type-default',
+      'type-large',
+    ]);
   });
 });
