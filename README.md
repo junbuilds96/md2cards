@@ -6,7 +6,7 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 
 ![MD2Cards screenshot](docs/assets/md2cards-screenshot.png)
 
-<p align="center"><sub>Paste or import Markdown, choose a platform preset, preview safe areas, then export PNG/SVG cards locally.</sub></p>
+<p align="center"><sub>Paste or import Markdown, choose a platform preset, preview safe areas, share recipe JSON, then export PNG/SVG cards locally.</sub></p>
 
 ## Why MD2Cards
 
@@ -14,6 +14,7 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 - Start from paste-ready examples for launch posts, GitHub releases, and Xiaohongshu-style insight cards.
 - Export landscape, portrait, or square cards for common sharing surfaces.
 - Save named card presets locally in your browser and reload them for repeat posts.
+- Export/import reusable JSON card recipes to move a finished setup between browsers or share it with a teammate.
 - Fit pasted Markdown to the selected platform with a local, deterministic compaction helper.
 - Check line count, character count, safe areas, and export size before downloading, including on narrow laptop and mobile screens.
 - Hide card labels for clean unbranded cards, then copy PNGs to the clipboard, download crisp PNGs, or keep reusable SVG output.
@@ -29,7 +30,7 @@ npm install
 npm run dev
 ```
 
-Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, or drop in a local `.md`/`.markdown`/`.txt` file. Pick a platform preset and theme, hide **Card labels** if you want a clean card, optionally save the setup as a local preset, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
+Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, drop in a local `.md`/`.markdown`/`.txt` file, or import a recipe `.json`. Pick a platform preset and theme, hide **Card labels** if you want a clean card, optionally save the setup as a local preset or export the recipe JSON, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
 
 ## Common Use Cases
 
@@ -44,7 +45,7 @@ Open the local Vite URL on desktop or a narrow screen, choose a starter, select 
 2. Paste, import, or edit Markdown while the preview updates.
 3. Use the fit guidance, one-click platform fitter, and safe-area overlay to keep the card readable.
 4. Choose a platform preset, visual theme, and PNG export quality.
-5. Save a named local preset for repeat card setups, or load one you saved earlier.
+5. Save a named local preset for repeat card setups, or export/import a JSON recipe for sharing across browsers.
 6. Copy or download the finished card.
 
 ## Features
@@ -58,6 +59,7 @@ Open the local Vite URL on desktop or a narrow screen, choose a starter, select 
 - Themes for crisp launch notes, editorial posts, paper-style notes, and dark technical updates.
 - Starter templates that map to sensible preset/theme defaults.
 - Browser-local saved presets for Markdown, platform, theme, and export quality.
+- Portable JSON card recipes with schema/version metadata, Markdown, platform, theme, export quality, and card-label visibility.
 - Responsive controls and preview panels for narrow laptop and mobile widths.
 - Fast 1x preview export and crisp 2x share export.
 - Optional card-label toggle for hiding the MD2Cards header and footer metadata in previews and exports.
@@ -101,7 +103,6 @@ Open `http://localhost:8080`. The image builds the Vite app with Node and serves
 
 - More card templates for launches, docs, changelogs, and creator posts.
 - More precise platform guidance as sharing surfaces change.
-- Import/export of reusable card configurations.
 
 ## Contributing
 

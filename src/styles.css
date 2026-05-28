@@ -505,6 +505,77 @@ textarea:focus {
   line-height: 1.15;
 }
 
+.card-config-transfer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  color: #26364f;
+  background: #f8fbff;
+  border: 1px solid #d6deea;
+  border-radius: 8px;
+}
+
+.card-config-transfer.success {
+  background: #effaf4;
+  border-color: #9ed8b5;
+}
+
+.card-config-transfer.error {
+  background: #fff4f2;
+  border-color: #f5b5ae;
+}
+
+.card-config-transfer-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.card-config-transfer-copy strong,
+.card-config-transfer-copy span,
+.card-config-transfer-copy small {
+  overflow-wrap: anywhere;
+}
+
+.card-config-transfer-copy strong {
+  color: #182230;
+  font-size: 0.84rem;
+  line-height: 1.18;
+}
+
+.card-config-transfer-copy span {
+  color: #667085;
+  font-size: 0.76rem;
+  line-height: 1.25;
+}
+
+.card-config-transfer-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #1f5f3e;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.card-config-transfer.error .card-config-transfer-status {
+  color: #b42318;
+}
+
+.card-config-transfer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.card-config-transfer-actions .ghost-button {
+  background: #ffffff;
+}
+
 .segmented-control {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1216,6 +1287,15 @@ textarea:focus {
     justify-self: start;
   }
 
+  .card-config-transfer {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .card-config-transfer-actions {
+    justify-content: flex-start;
+  }
+
   .export-actions {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
@@ -1266,6 +1346,7 @@ textarea:focus {
 
   .onboarding-checklist,
   .markdown-import,
+  .card-config-transfer,
   .platform-fit-helper,
   .markdown-guidance,
   .fit-status {

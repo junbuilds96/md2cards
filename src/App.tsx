@@ -41,6 +41,11 @@ import {
   type PlatformPreset,
   type TemplateId,
 } from './cardOptions';
+import {
+  parseCardConfigJson,
+  serializeCardConfig,
+  validateCardConfigImportFile,
+} from './cardConfig';
 import { getCardClassName, shouldShowCardLabels } from './cardLayout';
 import { copyCard, downloadCard, downloadSvgCard } from './exportImage';
 import { validateMarkdownImportFile } from './markdownFileImport';
@@ -55,6 +60,7 @@ type ExportState = 'idle' | 'copying' | 'copied' | 'downloading-png' | 'download
 type StarterCopyState = 'idle' | 'copying' | 'copied' | 'error';
 type ImportState = 'idle' | 'importing' | 'success' | 'error';
 type PresetSaveState = 'idle' | 'saved' | 'error';
+type RecipeTransferState = 'idle' | 'importing' | 'success' | 'error';
 
 function firstMarkdownHeading(markdown: string): string {
   const heading = markdown
@@ -322,6 +328,54 @@ function SavedPresetsPanel({
   );
 }
 
+function CardConfigTransferPanel({
+  recipeState,
+  recipeMessage,
+  fileInputRef,
+  onExportRecipe,
+  onChooseRecipeFile,
+  onRecipeFileInputChange,
+}: {
+  recipeState: RecipeTransferState;
+  recipeMessage: string;
+  fileInputRef: RefObject<HTMLInputElement | null>;
+  onExportRecipe: () => void;
+  onChooseRecipeFile: () => void;
+  onRecipeFileInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <div className={`card-config-transfer ${recipeState}`}>
+      <div className="card-config-transfer-copy">
+        <strong>Share this card recipe</strong>
+        <span>Export or import Markdown, platform, theme, export quality, and label visibility.</span>
+        {recipeMessage ? (
+          <small className="card-config-transfer-status" aria-live="polite">
+            {recipeState === 'error' ? <AlertCircle size={14} /> : <Check size={14} />}
+            {recipeMessage}
+          </small>
+        ) : null}
+      </div>
+      <div className="card-config-transfer-actions">
+        <button className="ghost-button" type="button" onClick={onExportRecipe}>
+          <Download size={16} />
+          Export JSON
+        </button>
+        <button className="ghost-button" type="button" onClick={onChooseRecipeFile} disabled={recipeState === 'importing'}>
+          <Upload size={16} />
+          {recipeState === 'importing' ? 'Importing...' : 'Import JSON'}
+        </button>
+      </div>
+      <input
+        ref={fileInputRef}
+        className="file-input"
+        type="file"
+        accept=".json,application/json"
+        onChange={onRecipeFileInputChange}
+      />
+    </div>
+  );
+}
+
 function App() {
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [presetId, setPresetId] = useState<PlatformPreset['id']>('twitter');
@@ -339,10 +393,13 @@ function App() {
   const [presetName, setPresetName] = useState('');
   const [savedPresets, setSavedPresets] = useState<SavedCardPreset[]>(() => readSavedPresets());
   const [presetSaveState, setPresetSaveState] = useState<PresetSaveState>('idle');
+  const [recipeState, setRecipeState] = useState<RecipeTransferState>('idle');
+  const [recipeMessage, setRecipeMessage] = useState('');
   const [message, setMessage] = useState('Ready to export.');
   const cardRef = useRef<HTMLDivElement | null>(null);
   const markdownInputRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const recipeFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const preset = useMemo(
     () => platformPresets.find((item) => item.id === presetId) ?? platformPresets[0],
@@ -362,6 +419,8 @@ function App() {
     setExportState('idle');
     setStarterCopyState('idle');
     setPresetSaveState('idle');
+    setRecipeState('idle');
+    setRecipeMessage('');
   }
 
   function applyTemplate(templateId: TemplateId) {
@@ -428,6 +487,104 @@ function App() {
     setSavedPresets(deleteSavedPreset(savedPreset.id));
     setMessage(`${savedPreset.name} deleted from local presets.`);
     setPresetSaveState('idle');
+  }
+
+  function getCardConfigFileName(): string {
+    const baseName = title
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 64);
+
+    return `${baseName || 'md2cards'}-${preset.id}-recipe.json`;
+  }
+
+  function handleExportCardConfig() {
+    try {
+      const recipeJson = serializeCardConfig({
+        markdown,
+        presetId: preset.id,
+        themeId: theme.id,
+        exportScaleId: exportScale.id,
+        showCardLabels,
+      });
+      const blob = new Blob([recipeJson], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      link.download = getCardConfigFileName();
+      link.href = url;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+
+      setRecipeState('success');
+      setRecipeMessage('Recipe JSON exported.');
+      setMessage('Card recipe JSON download started.');
+      setExportState('idle');
+      setPresetSaveState('idle');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unable to export this card recipe.';
+      setRecipeState('error');
+      setRecipeMessage(errorMessage);
+      setMessage(errorMessage);
+    }
+  }
+
+  async function importCardConfigFile(file: File | undefined) {
+    resetEditorFeedback();
+
+    if (!file) {
+      return;
+    }
+
+    const validation = validateCardConfigImportFile(file);
+    if (!validation.valid) {
+      setRecipeState('error');
+      setRecipeMessage(validation.message);
+      setMessage(validation.message);
+      return;
+    }
+
+    try {
+      setRecipeState('importing');
+      setRecipeMessage(`Importing ${file.name}...`);
+      setMessage(`Reading ${file.name}...`);
+
+      const importedRecipe = parseCardConfigJson(await file.text());
+      if (!importedRecipe.valid) {
+        setRecipeState('error');
+        setRecipeMessage(importedRecipe.message);
+        setMessage(importedRecipe.message);
+        return;
+      }
+
+      setMarkdown(importedRecipe.config.markdown);
+      setPresetId(importedRecipe.config.presetId);
+      setThemeId(importedRecipe.config.themeId);
+      setExportScaleId(importedRecipe.config.exportScaleId);
+      setShowCardLabels(importedRecipe.config.showCardLabels);
+      setImportState('idle');
+      setImportMessage('');
+      setRecipeState('success');
+      setRecipeMessage(`Imported ${file.name}.`);
+      setMessage(`Imported ${file.name}. Card recipe loaded and preview updated.`);
+      window.setTimeout(() => markdownInputRef.current?.focus(), 0);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unable to read this recipe file.';
+      setRecipeState('error');
+      setRecipeMessage(errorMessage);
+      setMessage(errorMessage);
+    }
+  }
+
+  function handleChooseRecipeFile() {
+    recipeFileInputRef.current?.click();
+  }
+
+  function handleRecipeFileInputChange(event: ChangeEvent<HTMLInputElement>) {
+    void importCardConfigFile(event.target.files?.[0]);
+    event.target.value = '';
   }
 
   function handleFitMarkdown() {
@@ -793,6 +950,18 @@ function App() {
               onDeletePreset={handleDeleteSavedPreset}
             />
           </div>
+
+          <div className="field-group">
+            <span className="field-label">Recipe JSON</span>
+            <CardConfigTransferPanel
+              recipeState={recipeState}
+              recipeMessage={recipeMessage}
+              fileInputRef={recipeFileInputRef}
+              onExportRecipe={handleExportCardConfig}
+              onChooseRecipeFile={handleChooseRecipeFile}
+              onRecipeFileInputChange={handleRecipeFileInputChange}
+            />
+          </div>
         </aside>
 
         <section className="preview-panel" aria-label="Live card preview">
@@ -883,7 +1052,12 @@ function App() {
             </div>
           </div>
 
-          <div className={`status-line ${exportState === 'error' || importState === 'error' ? 'error' : ''}`} role="status">
+          <div
+            className={`status-line ${
+              exportState === 'error' || importState === 'error' || recipeState === 'error' ? 'error' : ''
+            }`}
+            role="status"
+          >
             <span>{message}</span>
             <span>
               {theme.label} · {preset.sizeLabel} · Export {exportPixelSize.width} x {exportPixelSize.height}px
