@@ -1177,14 +1177,22 @@ textarea:focus {
   --card-list-margin: 12px 0 18px;
   --card-list-padding-left: 1.15em;
   --card-li-gap: 8px;
+  --card-marker-size: 0.78em;
   --card-code-padding: 0.08em 0.28em;
+  --card-code-block-font-size: clamp(12px, 1.45cqw, 24px);
+  --card-code-line-height: 1.36;
   --card-pre-margin: 18px 0;
   --card-pre-padding: 20px;
   --card-table-margin-top: 18px;
   --card-table-cell-padding: 12px 14px;
   --card-blockquote-margin: 20px 0;
+  --card-blockquote-padding-block: 14px;
   --card-blockquote-padding-left: 24px;
   --card-blockquote-border-width: 8px;
+  --card-surface-bg: var(--code-bg);
+  --card-surface-border: var(--table-rule);
+  --card-surface-shine: rgba(255, 255, 255, 0.46);
+  --card-surface-shadow: inset 0 1px 0 var(--card-surface-shine);
 }
 
 .social-card.background-soft {
@@ -1233,11 +1241,13 @@ textarea:focus {
   --card-list-margin: 8px 0 12px;
   --card-list-padding-left: 1.05em;
   --card-li-gap: 5px;
+  --card-code-block-font-size: clamp(12px, 1.28cqw, 21px);
   --card-pre-margin: 12px 0;
   --card-pre-padding: 16px;
   --card-table-margin-top: 12px;
   --card-table-cell-padding: 8px 10px;
   --card-blockquote-margin: 14px 0;
+  --card-blockquote-padding-block: 10px;
   --card-blockquote-padding-left: 18px;
   --card-blockquote-border-width: 6px;
 }
@@ -1257,11 +1267,13 @@ textarea:focus {
   --card-list-margin: clamp(5px, 1cqh, 8px) 0 clamp(7px, 1.3cqh, 10px);
   --card-list-padding-left: 1.22em;
   --card-li-gap: clamp(3px, 0.8cqh, 5px);
+  --card-code-block-font-size: clamp(12px, 1.2cqw, 22px);
   --card-pre-margin: clamp(8px, 1.4cqh, 12px) 0;
   --card-pre-padding: 24px;
   --card-table-margin-top: clamp(7px, 1.3cqh, 10px);
   --card-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(8px, 0.9cqw, 14px);
   --card-blockquote-margin: clamp(10px, 1.8cqh, 14px) 0;
+  --card-blockquote-padding-block: clamp(8px, 1.4cqh, 12px);
   --card-blockquote-padding-left: 30px;
   --card-blockquote-border-width: 10px;
 }
@@ -1342,6 +1354,7 @@ textarea:focus {
 .markdown-card-body li,
 .markdown-card-body td,
 .markdown-card-body th {
+  overflow-wrap: anywhere;
   color: var(--card-text);
   font-size: var(--card-body-font-size);
   line-height: var(--card-body-line-height);
@@ -1355,6 +1368,7 @@ textarea:focus {
 .markdown-card-body ol {
   margin: var(--card-list-margin);
   padding-left: var(--card-list-padding-left);
+  list-style-position: outside;
 }
 
 .markdown-card-body li::marker,
@@ -1362,8 +1376,25 @@ textarea:focus {
   color: var(--card-accent);
 }
 
+.markdown-card-body li {
+  padding-left: 0.18em;
+}
+
+.markdown-card-body li::marker {
+  font-size: var(--card-marker-size);
+  font-weight: 850;
+}
+
 .markdown-card-body li + li {
   margin-top: var(--card-li-gap);
+}
+
+.markdown-card-body li > p {
+  margin-bottom: var(--card-li-gap);
+}
+
+.markdown-card-body li > p:last-child {
+  margin-bottom: 0;
 }
 
 .markdown-card-body code {
@@ -1373,27 +1404,54 @@ textarea:focus {
   border-radius: var(--card-inline-radius);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.85em;
+  line-height: 1;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .markdown-card-body pre {
+  position: relative;
   max-width: 100%;
   margin: var(--card-pre-margin);
   padding: var(--card-pre-padding);
   overflow: hidden;
   color: var(--code-text);
-  background: var(--code-bg);
+  background:
+    linear-gradient(180deg, var(--card-surface-shine), transparent 34%),
+    var(--card-surface-bg);
+  border: 1px solid var(--card-surface-border);
   border-radius: var(--card-surface-radius);
+  box-shadow: var(--card-surface-shadow);
+  font-size: var(--card-code-block-font-size);
+  line-height: var(--card-code-line-height);
 }
 
 .markdown-card-body pre code {
+  display: block;
   padding: 0;
+  overflow-wrap: anywhere;
   background: transparent;
+  border-radius: 0;
+  color: inherit;
+  font-size: 1em;
+  line-height: inherit;
+  white-space: pre-wrap;
 }
 
 .markdown-card-body table {
   width: 100%;
+  max-width: 100%;
   margin-top: var(--card-table-margin-top);
-  border-collapse: collapse;
+  overflow: hidden;
+  table-layout: fixed;
+  background:
+    linear-gradient(180deg, var(--card-surface-shine), transparent 42%),
+    var(--card-surface-bg);
+  border: 1px solid var(--card-surface-border);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--card-surface-radius);
+  box-shadow: var(--card-surface-shadow);
 }
 
 .markdown-card-body th,
@@ -1403,10 +1461,37 @@ textarea:focus {
   text-align: left;
 }
 
+.markdown-card-body th {
+  color: var(--card-heading);
+  background: var(--code-bg);
+  font-weight: 850;
+}
+
+.markdown-card-body th:not(:last-child),
+.markdown-card-body td:not(:last-child) {
+  border-right: 1px solid var(--table-rule);
+}
+
+.markdown-card-body tr:last-child td {
+  border-bottom: 0;
+}
+
 .markdown-card-body blockquote {
   margin: var(--card-blockquote-margin);
-  padding-left: var(--card-blockquote-padding-left);
+  padding: var(--card-blockquote-padding-block) var(--card-blockquote-padding-left);
+  background:
+    linear-gradient(90deg, var(--card-surface-bg), transparent 88%),
+    rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--card-surface-border);
   border-left: var(--card-blockquote-border-width) solid var(--card-accent);
+  border-radius: var(--card-surface-radius);
+  box-shadow: var(--card-surface-shadow);
+}
+
+.markdown-card-body blockquote p {
+  margin-bottom: 0;
+  color: var(--card-heading);
+  font-weight: 800;
 }
 
 .empty-card-state {

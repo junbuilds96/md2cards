@@ -82,6 +82,40 @@ describe('social card CSS', () => {
     expect(preRule).toContain('border-radius: var(--card-surface-radius)');
   });
 
+  it('gives Markdown code, tables, lists, and quotes designed constrained surfaces', () => {
+    const cardRule = getRule('.social-card');
+    const textRule = getRule(
+      '.markdown-card-body p,\n.markdown-card-body li,\n.markdown-card-body td,\n.markdown-card-body th',
+    );
+    const listRule = getRule('.markdown-card-body ul,\n.markdown-card-body ol');
+    const markerRule = getRule('.markdown-card-body li::marker');
+    const preRule = getRule('.markdown-card-body pre');
+    const preCodeRule = getRule('.markdown-card-body pre code');
+    const tableRule = getRule('.markdown-card-body table');
+    const tableHeaderRule = getRuleContaining('.markdown-card-body th', 'background: var(--code-bg)');
+    const quoteRule = getRule('.markdown-card-body blockquote');
+    const quoteParagraphRule = getRule('.markdown-card-body blockquote p');
+
+    expect(cardRule).toContain('--card-surface-bg: var(--code-bg)');
+    expect(cardRule).toContain('--card-surface-border: var(--table-rule)');
+    expect(cardRule).toContain('--card-code-block-font-size: clamp(12px, 1.45cqw, 24px)');
+    expect(textRule).toContain('overflow-wrap: anywhere');
+    expect(listRule).toContain('list-style-position: outside');
+    expect(markerRule).toContain('font-weight: 850');
+    expect(preRule).toContain('linear-gradient(180deg, var(--card-surface-shine), transparent 34%)');
+    expect(preRule).toContain('border: 1px solid var(--card-surface-border)');
+    expect(preRule).toContain('font-size: var(--card-code-block-font-size)');
+    expect(preCodeRule).toContain('white-space: pre-wrap');
+    expect(preCodeRule).toContain('overflow-wrap: anywhere');
+    expect(tableRule).toContain('table-layout: fixed');
+    expect(tableRule).toContain('border-collapse: separate');
+    expect(tableRule).toContain('border-radius: var(--card-surface-radius)');
+    expect(tableHeaderRule).toContain('background: var(--code-bg)');
+    expect(quoteRule).toContain('border-left: var(--card-blockquote-border-width) solid var(--card-accent)');
+    expect(quoteRule).toContain('background:');
+    expect(quoteParagraphRule).toContain('font-weight: 800');
+  });
+
   it('keeps the preview toolbar compact and grouped', () => {
     const toolbarRule = getRule('.preview-toolbar');
     const controlsRule = getRule('.preview-controls');
