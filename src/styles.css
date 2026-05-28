@@ -17,6 +17,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 button,
@@ -25,7 +26,12 @@ textarea {
 }
 
 button {
+  min-width: 0;
   cursor: pointer;
+}
+
+button svg {
+  flex: 0 0 auto;
 }
 
 button:disabled {
@@ -55,6 +61,7 @@ button:disabled {
 
 .control-panel {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: 18px;
   padding: 20px;
@@ -62,6 +69,7 @@ button:disabled {
 
 .brand-block {
   display: flex;
+  min-width: 0;
   gap: 14px;
   align-items: flex-start;
 }
@@ -339,6 +347,9 @@ textarea:focus {
   gap: 8px;
   border-radius: 8px;
   font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
 }
 
 .ghost-button {
@@ -577,9 +588,13 @@ textarea:focus {
   border-bottom: 1px solid rgba(23, 32, 42, 0.1);
 }
 
+.preview-toolbar > div:first-child {
+  min-width: 0;
+}
+
 .preview-controls {
   display: flex;
-  min-width: 280px;
+  min-width: min(100%, 280px);
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
@@ -591,6 +606,7 @@ textarea:focus {
   grid-template-columns: auto minmax(0, 220px);
   gap: 9px;
   align-items: center;
+  min-width: 0;
   min-height: 52px;
   padding: 8px 10px;
   color: #26364f;
@@ -652,6 +668,7 @@ textarea:focus {
 
 .export-actions {
   display: flex;
+  min-width: 0;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
@@ -879,6 +896,11 @@ textarea:focus {
   font-size: 0.9rem;
 }
 
+.status-line span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .status-line.error {
   color: #b42318;
 }
@@ -946,26 +968,63 @@ textarea:focus {
 
   .workspace {
     grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .preview-toolbar {
+    flex-wrap: wrap;
   }
 
   .preview-panel {
-    min-height: 720px;
+    min-height: min(760px, calc(100vh - 24px));
+  }
+
+  .preview-controls {
+    flex: 1 1 430px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .guide-toggle {
+    flex: 1 1 260px;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .export-actions {
+    flex: 999 1 360px;
+  }
+
+  .preview-stage {
+    min-height: 420px;
+    padding: 18px;
   }
 
 }
 
 @media (max-width: 700px) {
+  .app-shell {
+    padding: 0;
+  }
+
   .control-panel,
   .preview-panel {
+    border-right: 0;
+    border-left: 0;
     border-radius: 0;
   }
 
   .workspace {
-    gap: 12px;
+    gap: 0;
+  }
+
+  .control-panel {
+    gap: 16px;
+    padding: 16px;
   }
 
   h1 {
-    font-size: 1.72rem;
+    max-width: none;
+    font-size: 1.62rem;
   }
 
   .group-header {
@@ -990,6 +1049,14 @@ textarea:focus {
   .status-line {
     align-items: flex-start;
     flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .preview-toolbar h2 {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   .preview-controls {
@@ -1006,15 +1073,30 @@ textarea:focus {
   .segmented-control,
   .quality-control,
   .theme-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 
   .export-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
     width: 100%;
   }
 
   .export-actions button {
-    flex: 1 1 140px;
+    width: 100%;
+  }
+
+  textarea {
+    min-height: 260px;
+  }
+
+  .preview-panel {
+    min-height: 0;
+  }
+
+  .preview-stage {
+    min-height: 360px;
+    padding: 12px;
   }
 
   .safe-area-frame {
@@ -1025,5 +1107,39 @@ textarea:focus {
   .safe-area-detail {
     max-width: 48%;
     padding: 5px 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-block {
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  h1 {
+    font-size: 1.42rem;
+  }
+
+  .onboarding-checklist,
+  .markdown-import,
+  .platform-fit-helper,
+  .markdown-guidance,
+  .fit-status {
+    padding: 10px;
+  }
+
+  .template-gallery button,
+  .segmented-control button,
+  .quality-control button {
+    min-height: auto;
+  }
+
+  .safe-area-label,
+  .safe-area-detail {
+    font-size: 0.68rem;
   }
 }

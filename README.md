@@ -14,7 +14,7 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 - Start from paste-ready examples for launch posts, GitHub releases, and Xiaohongshu-style insight cards.
 - Export landscape, portrait, or square cards for common sharing surfaces.
 - Fit pasted Markdown to the selected platform with a local, deterministic compaction helper.
-- Check line count, character count, safe areas, and export size before downloading.
+- Check line count, character count, safe areas, and export size before downloading, including on narrow laptop and mobile screens.
 - Copy PNGs to the clipboard, download crisp PNGs, or keep reusable SVG output.
 
 ## Quickstart
@@ -24,7 +24,7 @@ npm install
 npm run dev
 ```
 
-Open the local Vite URL, choose a starter, select **Start Blank**, paste Markdown, or drop in a local `.md`/`.markdown`/`.txt` file. Pick a platform preset and theme, optionally click **Fit to X / Twitter**, **Fit to Xiaohongshu**, or **Fit to GitHub / Launch**, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
+Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, or drop in a local `.md`/`.markdown`/`.txt` file. Pick a platform preset and theme, optionally click **Fit to X / Twitter**, **Fit to Xiaohongshu**, or **Fit to GitHub / Launch**, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
 
 ## Common Use Cases
 
@@ -50,6 +50,7 @@ Open the local Vite URL, choose a starter, select **Start Blank**, paste Markdow
 - Local platform fitter that normalizes spacing, caps long lists, shortens dense paragraphs, and reports what changed.
 - Themes for crisp launch notes, editorial posts, paper-style notes, and dark technical updates.
 - Starter templates that map to sensible preset/theme defaults.
+- Responsive controls and preview panels for narrow laptop and mobile widths.
 - Fast 1x preview export and crisp 2x share export.
 - Clipboard PNG support when the browser allows image clipboard writes.
 
