@@ -579,18 +579,29 @@ function RecipePresetSelector({
 }) {
   return (
     <div className="recipe-preset-grid">
-      {recipePresets.map((item) => (
-        <button
-          key={item.id}
-          className={item.id === activeRecipeId ? 'active' : ''}
-          type="button"
-          onClick={() => onApplyRecipePreset(item.id)}
-        >
-          <Palette size={15} />
-          <span>{item.label}</span>
-          <small>{item.description}</small>
-        </button>
-      ))}
+      {recipePresets.map((item) => {
+        const platformLabel = platformPresets.find((preset) => preset.id === item.presetId)?.label ?? item.presetId;
+        const themeLabel = cardThemes.find((themeItem) => themeItem.id === item.themeId)?.label ?? item.themeId;
+        const accent = getCardAccentOption(item.cardAccentId);
+        const texture = getCardTextureOption(item.cardTextureId);
+
+        return (
+          <button
+            key={item.id}
+            className={item.id === activeRecipeId ? 'active' : ''}
+            type="button"
+            onClick={() => onApplyRecipePreset(item.id)}
+          >
+            <Palette size={15} />
+            <span>{item.label}</span>
+            <small>{item.description}</small>
+            <span className="recipe-setup">
+              <span className="recipe-accent-dot" style={{ background: accent.color }} aria-hidden="true" />
+              {platformLabel} · {themeLabel} · {accent.label} · {texture.label}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }

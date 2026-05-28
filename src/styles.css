@@ -747,7 +747,7 @@ textarea:focus {
   grid-template-columns: auto minmax(0, 1fr);
   gap: 3px 7px;
   align-items: start;
-  min-height: 64px;
+  min-height: 88px;
   padding: 9px;
 }
 
@@ -876,6 +876,32 @@ textarea:focus {
   line-height: 1.22;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.recipe-preset-grid .recipe-setup {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  padding-top: 6px;
+  overflow: hidden;
+  color: #475467;
+  border-top: 1px solid #eef2f7;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipe-preset-grid .recipe-accent-dot {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border: 1px solid rgba(23, 32, 42, 0.18);
+  border-radius: 50%;
 }
 
 .segmented-control button.active,

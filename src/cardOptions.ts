@@ -109,7 +109,16 @@ export type MarkdownTemplate = {
   markdown: string;
 };
 
-export type RecipePresetId = 'launch' | 'changelog' | 'tutorial' | 'insight' | 'quote' | 'code-snippet';
+export type RecipePresetId =
+  | 'launch'
+  | 'before-after'
+  | 'framework'
+  | 'bugfix'
+  | 'changelog'
+  | 'tutorial'
+  | 'insight'
+  | 'quote'
+  | 'code-snippet';
 
 export type RecipePreset = {
   id: RecipePresetId;
@@ -517,6 +526,77 @@ Turn a product update into a share-ready visual in one pass.
 - One hook for the feed
 - Three proof points for context
 - PNG or SVG export when it is ready`,
+  },
+  {
+    id: 'before-after',
+    label: 'Before / After',
+    description: 'Landscape proof card for a clear transformation or product upgrade.',
+    presetId: 'twitter',
+    themeId: 'editorial',
+    cardDensityId: 'balanced',
+    cardTypographyScaleId: 'large',
+    cardAccentId: 'emerald',
+    cardBackgroundIntensityId: 'vivid',
+    cardCornerRadiusId: 'subtle',
+    cardTextureId: 'rich',
+    showCardLabels: false,
+    markdown: `# Before -> after: onboarding cleanup
+
+| Before | After |
+| --- | --- |
+| 12 setup steps | 3 guided actions |
+| Docs-first flow | Inline checklist |
+| 18 min to first card | 4 min to export |
+
+Ship the contrast, not the changelog.`,
+  },
+  {
+    id: 'framework',
+    label: 'Framework',
+    description: 'Saveable portrait framework with warm texture and ordered steps.',
+    presetId: 'xiaohongshu',
+    themeId: 'paper',
+    cardDensityId: 'spacious',
+    cardTypographyScaleId: 'default',
+    cardAccentId: 'amber',
+    cardBackgroundIntensityId: 'soft',
+    cardCornerRadiusId: 'rounded',
+    cardTextureId: 'clean',
+    showCardLabels: false,
+    markdown: `# The 4-part launch card
+
+1. Outcome people want
+2. Proof the change is real
+3. Friction you removed
+4. One action to take next
+
+> If a detail needs a caption, keep it off the card.`,
+  },
+  {
+    id: 'bugfix',
+    label: 'Bugfix / Incident',
+    description: 'Square technical fix summary with dark chrome and status contrast.',
+    presetId: 'launch',
+    themeId: 'midnight',
+    cardDensityId: 'compact',
+    cardTypographyScaleId: 'small',
+    cardAccentId: 'rose',
+    cardBackgroundIntensityId: 'vivid',
+    cardCornerRadiusId: 'sharp',
+    cardTextureId: 'rich',
+    showCardLabels: true,
+    markdown: `# Incident resolved: export queue
+
+## Impact
+
+- PNG jobs delayed for 14 minutes
+- SVG export and editing stayed available
+- Retry worker deployed at 10:42 UTC
+
+| Metric | Result |
+| --- | --- |
+| Failed jobs | 0.8% |
+| Recovery | 7 min |`,
   },
   {
     id: 'changelog',

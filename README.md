@@ -18,7 +18,7 @@ MD2Cards turns Markdown snippets into exportable PNG and SVG cards for launches,
 
 1. Paste Markdown, import a `.md`/`.markdown`/`.txt` file, pick a paste-ready example, or start blank.
 2. Choose a platform preset for X/Twitter, Xiaohongshu, or GitHub/launch cards.
-3. Apply a recipe preset for launches, changelogs, tutorials, insights, quotes, or code snippets.
+3. Apply a recipe preset for launches, before/after proof, frameworks, bugfixes, changelogs, tutorials, insights, quotes, or code snippets.
 4. Tune theme, density, type scale, accent, background intensity, corner radius, texture depth, and export quality.
 5. Fit/check the card with line counts, character counts, safe-area guides, and exact export dimensions.
 6. Hide header/footer card labels when desired, then copy PNG, download PNG/SVG, or export/import recipe JSON.

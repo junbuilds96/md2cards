@@ -111,6 +111,9 @@ describe('recipePresets', () => {
     expect(recipeIds.size).toBe(recipePresets.length);
     expect(recipePresets.map((recipePreset) => recipePreset.id)).toEqual([
       'launch',
+      'before-after',
+      'framework',
+      'bugfix',
       'changelog',
       'tutorial',
       'insight',
@@ -131,6 +134,23 @@ describe('recipePresets', () => {
   });
 
   it('covers meaningfully different card setups, not just color swaps', () => {
+    const visualSignatures = new Set(
+      recipePresets.map((recipePreset) =>
+        [
+          recipePreset.presetId,
+          recipePreset.themeId,
+          recipePreset.cardDensityId,
+          recipePreset.cardTypographyScaleId,
+          recipePreset.cardAccentId,
+          recipePreset.cardBackgroundIntensityId,
+          recipePreset.cardCornerRadiusId,
+          recipePreset.cardTextureId,
+          recipePreset.showCardLabels,
+        ].join('/'),
+      ),
+    );
+
+    expect(visualSignatures.size).toBe(recipePresets.length);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.presetId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.themeId)).size).toBeGreaterThanOrEqual(4);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardDensityId)).size).toBeGreaterThanOrEqual(3);
@@ -139,6 +159,31 @@ describe('recipePresets', () => {
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardCornerRadiusId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTextureId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.showCardLabels)).size).toBe(2);
+    expect(getRecipePreset('before-after')).toMatchObject({
+      presetId: 'twitter',
+      themeId: 'editorial',
+      cardAccentId: 'emerald',
+      cardBackgroundIntensityId: 'vivid',
+      cardTextureId: 'rich',
+      showCardLabels: false,
+    });
+    expect(getRecipePreset('framework')).toMatchObject({
+      presetId: 'xiaohongshu',
+      themeId: 'paper',
+      cardCornerRadiusId: 'rounded',
+      cardTextureId: 'clean',
+      showCardLabels: false,
+    });
+    expect(getRecipePreset('bugfix')).toMatchObject({
+      presetId: 'launch',
+      themeId: 'midnight',
+      cardDensityId: 'compact',
+      cardAccentId: 'rose',
+      showCardLabels: true,
+    });
+    expect(getRecipePreset('before-after').markdown).toContain('| Before | After |');
+    expect(getRecipePreset('framework').markdown).toContain('1. Outcome people want');
+    expect(getRecipePreset('bugfix').markdown).toContain('Incident resolved');
     expect(getRecipePreset('code-snippet').markdown).toContain('```bash');
     expect(getRecipePreset('tutorial').markdown).toContain('1. Paste the Markdown draft');
     expect(getRecipePreset('quote').markdown).toContain('"Design tools');
