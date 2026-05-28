@@ -5,6 +5,8 @@ import {
   exportScaleOptions,
   getExportPixelSize,
   getExportScaleOption,
+  getMarkdownFitGuidance,
+  getMarkdownStats,
   getMarkdownTemplate,
   getSafeAreaGuide,
   getStarterMarkdown,
@@ -36,6 +38,49 @@ describe('markdownTemplates', () => {
 
   it('falls back to the default starter for an unknown template id', () => {
     expect(getMarkdownTemplate('missing-template' as TemplateId)).toBe(markdownTemplates[0]);
+  });
+});
+
+describe('markdown guidance', () => {
+  it('counts trimmed Markdown content without treating whitespace as a card', () => {
+    expect(getMarkdownStats('  \n\t ')).toEqual({
+      characterCount: 0,
+      lineCount: 0,
+      nonEmptyLineCount: 0,
+      headingCount: 0,
+      isBlank: true,
+    });
+
+    expect(getMarkdownStats('# Launch\r\n\r\n- Fast\r\n- Crisp')).toMatchObject({
+      characterCount: 24,
+      lineCount: 4,
+      nonEmptyLineCount: 3,
+      headingCount: 1,
+      isBlank: false,
+    });
+  });
+
+  it('uses preset shape to choose practical Markdown fit guidance', () => {
+    expect(getMarkdownFitGuidance('', platformPresets[0])).toMatchObject({
+      tone: 'empty',
+      lineLimit: 12,
+      characterLimit: 900,
+      summary: 'Paste your Markdown to start.',
+    });
+
+    expect(getMarkdownFitGuidance('# Short update\n\n- One\n- Two', platformPresets[1])).toMatchObject({
+      tone: 'ready',
+      lineLimit: 16,
+      characterLimit: 1100,
+      summary: 'Good length for this card.',
+    });
+
+    expect(getMarkdownFitGuidance(Array.from({ length: 14 }, (_, index) => `- Item ${index + 1}`).join('\n'), platformPresets[2])).toMatchObject({
+      tone: 'dense',
+      lineLimit: 13,
+      characterLimit: 950,
+      summary: 'This may feel crowded on export.',
+    });
   });
 });
 

@@ -295,6 +295,38 @@ textarea:focus {
   line-height: 1.35;
 }
 
+.markdown-guidance {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: -2px;
+  padding: 9px 10px;
+  color: #475467;
+  background: #f8fbff;
+  border: 1px solid #d6deea;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.markdown-guidance.ready {
+  color: #1f5f3e;
+  background: #effaf4;
+  border-color: #b9e4c9;
+}
+
+.markdown-guidance.dense {
+  color: #8a4b0f;
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.markdown-guidance.empty {
+  color: #667085;
+}
+
 .template-gallery small {
   grid-column: 2;
   color: #667085;
@@ -625,6 +657,27 @@ textarea:focus {
   margin: 20px 0;
   padding-left: 24px;
   border-left: 8px solid var(--card-accent);
+}
+
+.empty-card-state {
+  display: flex;
+  max-width: 72%;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--card-text);
+}
+
+.empty-card-state strong {
+  color: var(--card-heading);
+  font-size: clamp(28px, 6.4cqw, 96px);
+  line-height: 1;
+}
+
+.empty-card-state span {
+  color: var(--card-muted);
+  font-size: clamp(16px, 2.8cqw, 42px);
+  font-weight: 750;
+  line-height: 1.2;
 }
 
 .status-line {

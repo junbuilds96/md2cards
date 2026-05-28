@@ -47,6 +47,22 @@ export type MarkdownTemplate = {
   markdown: string;
 };
 
+export type MarkdownStats = {
+  characterCount: number;
+  lineCount: number;
+  nonEmptyLineCount: number;
+  headingCount: number;
+  isBlank: boolean;
+};
+
+export type MarkdownFitGuidance = {
+  stats: MarkdownStats;
+  characterLimit: number;
+  lineLimit: number;
+  tone: 'empty' | 'ready' | 'dense';
+  summary: string;
+};
+
 export const platformPresets: PlatformPreset[] = [
   {
     id: 'twitter',
@@ -196,6 +212,47 @@ export function getMarkdownTemplate(templateId: TemplateId): MarkdownTemplate {
 
 export function getStarterMarkdown(templateId: TemplateId): string {
   return getMarkdownTemplate(templateId).markdown;
+}
+
+export function getMarkdownStats(markdown: string): MarkdownStats {
+  const normalizedMarkdown = markdown.replace(/\r\n?/g, '\n');
+  const trimmedMarkdown = normalizedMarkdown.trim();
+  const lines = trimmedMarkdown.length > 0 ? normalizedMarkdown.split('\n') : [];
+
+  return {
+    characterCount: trimmedMarkdown.length,
+    lineCount: lines.length,
+    nonEmptyLineCount: lines.filter((line) => line.trim().length > 0).length,
+    headingCount: lines.filter((line) => /^#{1,3}\s+\S/.test(line.trim())).length,
+    isBlank: trimmedMarkdown.length === 0,
+  };
+}
+
+export function getMarkdownFitGuidance(markdown: string, preset: PlatformPreset): MarkdownFitGuidance {
+  const stats = getMarkdownStats(markdown);
+  const isPortrait = preset.height > preset.width;
+  const isSquare = preset.height === preset.width;
+  const lineLimit = isPortrait ? 16 : isSquare ? 13 : 12;
+  const characterLimit = isPortrait ? 1100 : isSquare ? 950 : 900;
+  const isDense = stats.nonEmptyLineCount > lineLimit || stats.characterCount > characterLimit;
+
+  if (stats.isBlank) {
+    return {
+      stats,
+      characterLimit,
+      lineLimit,
+      tone: 'empty',
+      summary: 'Paste your Markdown to start.',
+    };
+  }
+
+  return {
+    stats,
+    characterLimit,
+    lineLimit,
+    tone: isDense ? 'dense' : 'ready',
+    summary: isDense ? 'This may feel crowded on export.' : 'Good length for this card.',
+  };
 }
 
 export function getExportScaleOption(exportScaleId: ExportScaleId): ExportScaleOption {

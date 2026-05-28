@@ -19,6 +19,7 @@ import {
   exportScaleOptions,
   getExportPixelSize,
   getExportScaleOption,
+  getMarkdownFitGuidance,
   getMarkdownTemplate,
   getSafeAreaGuide,
   getStarterMarkdown,
@@ -48,11 +49,13 @@ function CardPreview({
   markdown,
   preset,
   theme,
+  isBlank,
   cardRef,
 }: {
   markdown: string;
   preset: PlatformPreset;
   theme: CardTheme;
+  isBlank: boolean;
   cardRef: React.RefObject<HTMLDivElement | null>;
 }) {
   return (
@@ -68,7 +71,14 @@ function CardPreview({
         <span>{preset.label}</span>
       </div>
       <div className="markdown-card-body">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+        {isBlank ? (
+          <div className="empty-card-state">
+            <strong>Paste Markdown to preview your card</strong>
+            <span>Headings, lists, tables, code, and quotes render here.</span>
+          </div>
+        ) : (
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+        )}
       </div>
       <div className="card-footer">
         <span>Markdown to social card</span>
@@ -116,6 +126,7 @@ function App() {
   const [starterCopyState, setStarterCopyState] = useState<StarterCopyState>('idle');
   const [message, setMessage] = useState('Ready to export.');
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const markdownInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const preset = useMemo(
     () => platformPresets.find((item) => item.id === presetId) ?? platformPresets[0],
@@ -125,7 +136,9 @@ function App() {
   const exportScale = useMemo(() => getExportScaleOption(exportScaleId), [exportScaleId]);
   const exportPixelSize = useMemo(() => getExportPixelSize(preset, exportScale), [preset, exportScale]);
   const safeAreaGuide = useMemo(() => getSafeAreaGuide(preset), [preset]);
+  const markdownGuidance = useMemo(() => getMarkdownFitGuidance(markdown, preset), [markdown, preset]);
   const title = useMemo(() => firstMarkdownHeading(markdown), [markdown]);
+  const canExport = !markdownGuidance.stats.isBlank;
 
   function applyTemplate(templateId: TemplateId) {
     const template = getMarkdownTemplate(templateId);
@@ -137,6 +150,14 @@ function App() {
     setMessage(`${template.label} loaded. Replace the text with your own Markdown when ready.`);
     setExportState('idle');
     setStarterCopyState('idle');
+  }
+
+  function startBlankMarkdown() {
+    setMarkdown('');
+    setMessage('Blank editor ready. Paste Markdown to create a card.');
+    setExportState('idle');
+    setStarterCopyState('idle');
+    window.setTimeout(() => markdownInputRef.current?.focus(), 0);
   }
 
   async function handleCopyStarterMarkdown() {
@@ -159,6 +180,13 @@ function App() {
   }
 
   async function handleCopy() {
+    if (!canExport) {
+      setExportState('error');
+      setMessage('Paste Markdown before copying an image.');
+      markdownInputRef.current?.focus();
+      return;
+    }
+
     if (!cardRef.current) return;
 
     try {
@@ -175,6 +203,13 @@ function App() {
   }
 
   async function handleDownload() {
+    if (!canExport) {
+      setExportState('error');
+      setMessage('Paste Markdown before downloading an image.');
+      markdownInputRef.current?.focus();
+      return;
+    }
+
     if (!cardRef.current) return;
 
     try {
@@ -190,6 +225,13 @@ function App() {
   }
 
   async function handleDownloadSvg() {
+    if (!canExport) {
+      setExportState('error');
+      setMessage('Paste Markdown before downloading an SVG.');
+      markdownInputRef.current?.focus();
+      return;
+    }
+
     if (!cardRef.current) return;
 
     try {
@@ -221,7 +263,7 @@ function App() {
           <div className="onboarding-strip">
             <PanelRightOpen size={18} />
             <div className="onboarding-content">
-              <p>Pick a starter, replace the Markdown with your update, then copy PNG or download PNG/SVG.</p>
+              <p>Quick start: choose a paste-ready example, start blank, or replace the Markdown below.</p>
               <button className="ghost-button onboarding-action" type="button" onClick={handleCopyStarterMarkdown}>
                 {starterCopyState === 'copied' ? <Check size={16} /> : <Clipboard size={16} />}
                 {starterCopyState === 'copying'
@@ -234,7 +276,13 @@ function App() {
           </div>
 
           <div className="field-group">
-            <span className="field-label">Starter Templates</span>
+            <div className="group-header">
+              <span className="field-label">Paste-Ready Examples</span>
+              <button className="ghost-button" type="button" onClick={startBlankMarkdown}>
+                <FileCode2 size={16} />
+                Start Blank
+              </button>
+            </div>
             <div className="template-gallery">
               {markdownTemplates.map((item) => (
                 <button
@@ -261,15 +309,28 @@ function App() {
             </div>
             <textarea
               id="markdown-input"
+              ref={markdownInputRef}
               value={markdown}
               onChange={(event) => {
                 setMarkdown(event.target.value);
-                setMessage('Editing Markdown. Preview updates live.');
+                setMessage(
+                  event.target.value.trim().length === 0
+                    ? 'Paste Markdown to preview and export a card.'
+                    : 'Editing Markdown. Preview updates live.',
+                );
                 setExportState('idle');
                 setStarterCopyState('idle');
               }}
+              placeholder={`# Paste your launch note\n\n- One clear update\n- A proof point or metric\n- A next step`}
               spellCheck="false"
             />
+            <div className={`markdown-guidance ${markdownGuidance.tone}`}>
+              <span>{markdownGuidance.summary}</span>
+              <span>
+                {markdownGuidance.stats.nonEmptyLineCount}/{markdownGuidance.lineLimit} content lines ·{' '}
+                {markdownGuidance.stats.characterCount}/{markdownGuidance.characterLimit} chars
+              </span>
+            </div>
           </div>
 
           <div className="field-group">
@@ -388,7 +449,13 @@ function App() {
               }}
             >
               <div className="preview-zoom">
-                <CardPreview markdown={markdown} preset={preset} theme={theme} cardRef={cardRef} />
+                <CardPreview
+                  markdown={markdown}
+                  preset={preset}
+                  theme={theme}
+                  isBlank={markdownGuidance.stats.isBlank}
+                  cardRef={cardRef}
+                />
               </div>
               {showSafeAreaGuide ? <SafeAreaOverlay preset={preset} guide={safeAreaGuide} /> : null}
             </div>
