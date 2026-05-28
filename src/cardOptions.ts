@@ -63,6 +63,40 @@ export type MarkdownFitGuidance = {
   summary: string;
 };
 
+export type OnboardingWorkflowStep = {
+  id: 'choose-start' | 'paste-markdown' | 'check-fit' | 'select-export' | 'export-card';
+  label: string;
+  detail: string;
+};
+
+export const onboardingWorkflowSteps: OnboardingWorkflowStep[] = [
+  {
+    id: 'choose-start',
+    label: 'Pick template or Start Blank',
+    detail: 'Use a paste-ready example, or clear the editor for your own card.',
+  },
+  {
+    id: 'paste-markdown',
+    label: 'Paste Markdown',
+    detail: 'Replace the starter with your launch note, release update, or product summary.',
+  },
+  {
+    id: 'check-fit',
+    label: 'Check length and safe area',
+    detail: 'Use the line/character counter and preview overlay before exporting.',
+  },
+  {
+    id: 'select-export',
+    label: 'Choose platform/export quality',
+    detail: 'Set the card size and pick Fast preview or Crisp share.',
+  },
+  {
+    id: 'export-card',
+    label: 'Export PNG/SVG',
+    detail: 'Copy a PNG, download a PNG, or download an SVG.',
+  },
+];
+
 export const platformPresets: PlatformPreset[] = [
   {
     id: 'twitter',

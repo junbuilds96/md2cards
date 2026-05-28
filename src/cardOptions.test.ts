@@ -11,10 +11,35 @@ import {
   getSafeAreaGuide,
   getStarterMarkdown,
   markdownTemplates,
+  onboardingWorkflowSteps,
   platformPresets,
   sampleMarkdown,
   type TemplateId,
 } from './cardOptions';
+
+describe('onboardingWorkflowSteps', () => {
+  it('keeps the first-run checklist focused on the path to export', () => {
+    expect(onboardingWorkflowSteps.map((step) => step.id)).toEqual([
+      'choose-start',
+      'paste-markdown',
+      'check-fit',
+      'select-export',
+      'export-card',
+    ]);
+    expect(onboardingWorkflowSteps.map((step) => step.label)).toEqual([
+      'Pick template or Start Blank',
+      'Paste Markdown',
+      'Check length and safe area',
+      'Choose platform/export quality',
+      'Export PNG/SVG',
+    ]);
+  });
+
+  it('provides concise helper text for every onboarding step', () => {
+    expect(onboardingWorkflowSteps.every((step) => step.detail.length > 0)).toBe(true);
+    expect(onboardingWorkflowSteps.every((step) => step.detail.length <= 85)).toBe(true);
+  });
+});
 
 describe('markdownTemplates', () => {
   it('exposes unique starter templates with valid preset and theme defaults', () => {

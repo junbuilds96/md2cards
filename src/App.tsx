@@ -24,6 +24,7 @@ import {
   getSafeAreaGuide,
   getStarterMarkdown,
   markdownTemplates,
+  onboardingWorkflowSteps,
   platformPresets,
   sampleMarkdown,
   type CardTheme,
@@ -112,6 +113,45 @@ function SafeAreaOverlay({
         </div>
       </div>
     </div>
+  );
+}
+
+function OnboardingChecklist({
+  starterCopyState,
+  onCopyStarterMarkdown,
+}: {
+  starterCopyState: StarterCopyState;
+  onCopyStarterMarkdown: () => void;
+}) {
+  return (
+    <section className="onboarding-checklist" aria-labelledby="workflow-title">
+      <div className="onboarding-heading">
+        <PanelRightOpen size={18} />
+        <div>
+          <p className="eyebrow">Getting Started</p>
+          <h2 id="workflow-title">60-second workflow</h2>
+        </div>
+      </div>
+      <ol className="workflow-steps">
+        {onboardingWorkflowSteps.map((step, index) => (
+          <li key={step.id}>
+            <span className="workflow-step-index">{index + 1}</span>
+            <span>
+              <strong>{step.label}</strong>
+              <small>{step.detail}</small>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <button className="ghost-button onboarding-action" type="button" onClick={onCopyStarterMarkdown}>
+        {starterCopyState === 'copied' ? <Check size={16} /> : <Clipboard size={16} />}
+        {starterCopyState === 'copying'
+          ? 'Copying...'
+          : starterCopyState === 'copied'
+            ? 'Starter Copied'
+            : 'Copy Starter Markdown'}
+      </button>
+    </section>
   );
 }
 
@@ -260,20 +300,10 @@ function App() {
             </div>
           </div>
 
-          <div className="onboarding-strip">
-            <PanelRightOpen size={18} />
-            <div className="onboarding-content">
-              <p>Quick start: choose a paste-ready example, start blank, or replace the Markdown below.</p>
-              <button className="ghost-button onboarding-action" type="button" onClick={handleCopyStarterMarkdown}>
-                {starterCopyState === 'copied' ? <Check size={16} /> : <Clipboard size={16} />}
-                {starterCopyState === 'copying'
-                  ? 'Copying...'
-                  : starterCopyState === 'copied'
-                    ? 'Starter Copied'
-                    : 'Copy Starter Markdown'}
-              </button>
-            </div>
-          </div>
+          <OnboardingChecklist
+            starterCopyState={starterCopyState}
+            onCopyStarterMarkdown={handleCopyStarterMarkdown}
+          />
 
           <div className="field-group">
             <div className="group-header">
