@@ -12,6 +12,13 @@ function getRule(selector: string): string {
   return match?.[1] ?? '';
 }
 
+function expectStylesToContainRule(selector: string, declaration: string): void {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const escapedDeclaration = declaration.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  expect(styles).toMatch(new RegExp(`${escapedSelector}\\s*\\{[^}]*${escapedDeclaration}`));
+}
+
 describe('clean social card CSS', () => {
   it('uses compact in-card spacing when labels are hidden', () => {
     const cardRule = getRule('.social-card');
@@ -49,5 +56,37 @@ describe('clean social card CSS', () => {
     expect(spaciousRule).toContain('--card-body-font-size: clamp(14px, 1.8cqw, 29px)');
     expect(spaciousRule).toContain('--card-body-line-height: 1.17');
     expect(spaciousRule).toContain('--card-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(8px, 0.9cqw, 14px)');
+  });
+
+  it('keeps the preview toolbar compact and grouped', () => {
+    const toolbarRule = getRule('.preview-toolbar');
+    const controlsRule = getRule('.preview-controls');
+    const togglesRule = getRule('.preview-toggles');
+    const guideToggleRule = getRule('.guide-toggle');
+    const toggleBoxRule = getRule('.toggle-box');
+    const guideDetailRule = getRule('.guide-toggle-copy small');
+
+    expect(toolbarRule).toContain('display: grid');
+    expect(toolbarRule).toContain('grid-template-columns: minmax(180px, 1fr) minmax(360px, auto)');
+    expect(toolbarRule).toContain('padding: 14px 16px');
+    expect(controlsRule).toContain('display: grid');
+    expect(togglesRule).toContain('display: flex');
+    expect(guideToggleRule).toContain('min-height: 38px');
+    expect(guideToggleRule).toContain('padding: 5px 8px');
+    expect(toggleBoxRule).toContain('width: 26px');
+    expect(toggleBoxRule).toContain('height: 26px');
+    expect(guideDetailRule).toContain('text-overflow: ellipsis');
+    expect(guideDetailRule).toContain('white-space: nowrap');
+  });
+
+  it('constrains the preview canvas footprint without changing export sizing', () => {
+    const stageRule = getRule('.preview-stage');
+    const scalerRule = getRule('.preview-scaler');
+
+    expectStylesToContainRule('.preview-panel', 'grid-template-rows: auto minmax(340px, 58vh) auto');
+    expectStylesToContainRule('.preview-panel', 'max-height: calc(100vh - 40px)');
+    expect(stageRule).toContain('max-height: 58vh');
+    expect(stageRule).toContain('padding: 18px');
+    expect(scalerRule).toContain('width: min(100%, 720px)');
   });
 });

@@ -1063,54 +1063,56 @@ function App() {
 
         <section className="preview-panel" aria-label="Live card preview">
           <div className="preview-toolbar">
-            <div>
+            <div className="preview-heading">
               <p className="eyebrow">Live Preview</p>
               <h2>{title}</h2>
             </div>
-            <div className="preview-controls">
-              <label className="guide-toggle">
-                <input
-                  type="checkbox"
-                  checked={showSafeAreaGuide}
-                  onChange={(event) => {
-                    setShowSafeAreaGuide(event.target.checked);
-                    setMessage(
-                      event.target.checked
-                        ? `Safe area guide shown for ${preset.label}: ${safeAreaGuide.marginLabel}.`
-                        : 'Safe area guide hidden. Exports are unchanged.',
-                    );
-                  }}
-                />
-                <span className="toggle-box" aria-hidden="true">
-                  <ShieldCheck size={16} />
-                </span>
-                <span className="guide-toggle-copy">
-                  <strong>Safe area</strong>
-                  <small>Avoid cropped UI/platform overlays on X/Twitter, Xiaohongshu, and launch cards.</small>
-                </span>
-              </label>
-              <label className="guide-toggle">
-                <input
-                  type="checkbox"
-                  checked={showCardLabels}
-                  onChange={(event) => {
-                    setShowCardLabels(event.target.checked);
-                    setExportState('idle');
-                    setMessage(
-                      event.target.checked
-                        ? 'Card labels shown. Exports include the header and footer metadata.'
-                        : 'Card labels hidden. Exports use the clean card only.',
-                    );
-                  }}
-                />
-                <span className="toggle-box" aria-hidden="true">
-                  <Tags size={16} />
-                </span>
-                <span className="guide-toggle-copy">
-                  <strong>Card labels</strong>
-                  <small>Show MD2Cards header and preset/footer metadata.</small>
-                </span>
-              </label>
+            <div className="preview-controls" aria-label="Preview controls">
+              <div className="preview-toggles" aria-label="Preview guides">
+                <label className="guide-toggle">
+                  <input
+                    type="checkbox"
+                    checked={showSafeAreaGuide}
+                    onChange={(event) => {
+                      setShowSafeAreaGuide(event.target.checked);
+                      setMessage(
+                        event.target.checked
+                          ? `Safe area guide shown for ${preset.label}: ${safeAreaGuide.marginLabel}.`
+                          : 'Safe area guide hidden. Exports are unchanged.',
+                      );
+                    }}
+                  />
+                  <span className="toggle-box" aria-hidden="true">
+                    <ShieldCheck size={15} />
+                  </span>
+                  <span className="guide-toggle-copy">
+                    <strong>Safe area</strong>
+                    <small>Platform crop guide</small>
+                  </span>
+                </label>
+                <label className="guide-toggle">
+                  <input
+                    type="checkbox"
+                    checked={showCardLabels}
+                    onChange={(event) => {
+                      setShowCardLabels(event.target.checked);
+                      setExportState('idle');
+                      setMessage(
+                        event.target.checked
+                          ? 'Card labels shown. Exports include the header and footer metadata.'
+                          : 'Card labels hidden. Exports use the clean card only.',
+                      );
+                    }}
+                  />
+                  <span className="toggle-box" aria-hidden="true">
+                    <Tags size={15} />
+                  </span>
+                  <span className="guide-toggle-copy">
+                    <strong>Card labels</strong>
+                    <small>Header and footer</small>
+                  </span>
+                </label>
+              </div>
               <div className="export-actions">
                 <button className="secondary-button" type="button" onClick={handleCopy}>
                   {exportState === 'copied' ? <Check size={18} /> : <Clipboard size={18} />}
