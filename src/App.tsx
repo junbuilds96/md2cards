@@ -17,6 +17,7 @@ import {
   cardThemes,
   defaultExportScaleId,
   exportScaleOptions,
+  fitMarkdownToPreset,
   getExportPixelSize,
   getExportScaleOption,
   getMarkdownFitGuidance,
@@ -165,6 +166,7 @@ function App() {
   const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
   const [exportState, setExportState] = useState<ExportState>('idle');
   const [starterCopyState, setStarterCopyState] = useState<StarterCopyState>('idle');
+  const [fitMessage, setFitMessage] = useState('');
   const [message, setMessage] = useState('Ready to export.');
   const cardRef = useRef<HTMLDivElement | null>(null);
   const markdownInputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -190,6 +192,7 @@ function App() {
     setThemeId(template.themeId);
     setActiveTemplateId(template.id);
     setMessage(`${template.label} loaded. Replace the text with your own Markdown when ready.`);
+    setFitMessage('');
     setExportState('idle');
     setStarterCopyState('idle');
   }
@@ -197,9 +200,23 @@ function App() {
   function startBlankMarkdown() {
     setMarkdown('');
     setMessage('Blank editor ready. Paste Markdown to create a card.');
+    setFitMessage('');
     setExportState('idle');
     setStarterCopyState('idle');
     window.setTimeout(() => markdownInputRef.current?.focus(), 0);
+  }
+
+  function handleFitMarkdown() {
+    const result = fitMarkdownToPreset(markdown, preset);
+
+    if (result.changed) {
+      setMarkdown(result.markdown);
+    }
+
+    setFitMessage(result.note);
+    setMessage(result.note);
+    setExportState('idle');
+    setStarterCopyState('idle');
   }
 
   async function handleCopyStarterMarkdown() {
@@ -334,10 +351,21 @@ function App() {
           <div className="field-group">
             <div className="group-header">
               <label htmlFor="markdown-input">Markdown</label>
-              <button className="ghost-button" type="button" onClick={() => applyTemplate(activeTemplateId)}>
-                <RotateCcw size={16} />
-                Reset Starter
-              </button>
+              <div className="editor-actions">
+                <button
+                  className="ghost-button"
+                  type="button"
+                  onClick={handleFitMarkdown}
+                  disabled={markdownGuidance.stats.isBlank}
+                >
+                  <Sparkles size={16} />
+                  Fit to {preset.label}
+                </button>
+                <button className="ghost-button" type="button" onClick={() => applyTemplate(activeTemplateId)}>
+                  <RotateCcw size={16} />
+                  Reset Starter
+                </button>
+              </div>
             </div>
             <textarea
               id="markdown-input"
@@ -350,6 +378,7 @@ function App() {
                     ? 'Paste Markdown to preview and export a card.'
                     : 'Editing Markdown. Preview updates live.',
                 );
+                setFitMessage('');
                 setExportState('idle');
                 setStarterCopyState('idle');
               }}
@@ -369,6 +398,7 @@ function App() {
                 {markdownGuidance.stats.characterCount}/{markdownGuidance.characterLimit} chars
               </span>
             </div>
+            {fitMessage ? <div className="fit-status">{fitMessage}</div> : null}
           </div>
 
           <div className="field-group">
@@ -379,7 +409,11 @@ function App() {
                   key={item.id}
                   className={item.id === preset.id ? 'active' : ''}
                   type="button"
-                  onClick={() => setPresetId(item.id)}
+                  onClick={() => {
+                    setPresetId(item.id);
+                    setFitMessage('');
+                    setMessage(`${item.label} preset selected. Use Fit to ${item.label} for a tighter draft.`);
+                  }}
                 >
                   <span>{item.label}</span>
                   <small>{item.sizeLabel}</small>

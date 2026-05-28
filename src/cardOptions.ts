@@ -70,6 +70,22 @@ export type MarkdownFitGuidance = {
   action: string;
 };
 
+export type MarkdownFitLimits = {
+  characterLimit: number;
+  lineLimit: number;
+  bulletLimit: number;
+  paragraphCharacterLimit: number;
+  tableDataRowLimit: number;
+  codeLineLimit: number;
+};
+
+export type MarkdownFitResult = {
+  markdown: string;
+  changed: boolean;
+  note: string;
+  changes: string[];
+};
+
 export type OnboardingWorkflowStep = {
   id: 'choose-start' | 'paste-markdown' | 'check-fit' | 'select-export' | 'export-card';
   label: string;
@@ -309,12 +325,42 @@ function getDenseMarkdownAction(stats: MarkdownStats, lineLimit: number, charact
   return 'Tighten sentences, keep one proof point, and move background detail to the caption.';
 }
 
+export function getMarkdownFitLimits(preset: PlatformPreset): MarkdownFitLimits {
+  if (preset.height > preset.width) {
+    return {
+      characterLimit: 1100,
+      lineLimit: 16,
+      bulletLimit: 5,
+      paragraphCharacterLimit: 220,
+      tableDataRowLimit: 4,
+      codeLineLimit: 6,
+    };
+  }
+
+  if (preset.height === preset.width) {
+    return {
+      characterLimit: 950,
+      lineLimit: 13,
+      bulletLimit: 4,
+      paragraphCharacterLimit: 190,
+      tableDataRowLimit: 3,
+      codeLineLimit: 5,
+    };
+  }
+
+  return {
+    characterLimit: 900,
+    lineLimit: 12,
+    bulletLimit: 3,
+    paragraphCharacterLimit: 170,
+    tableDataRowLimit: 2,
+    codeLineLimit: 4,
+  };
+}
+
 export function getMarkdownFitGuidance(markdown: string, preset: PlatformPreset): MarkdownFitGuidance {
   const stats = getMarkdownStats(markdown);
-  const isPortrait = preset.height > preset.width;
-  const isSquare = preset.height === preset.width;
-  const lineLimit = isPortrait ? 16 : isSquare ? 13 : 12;
-  const characterLimit = isPortrait ? 1100 : isSquare ? 950 : 900;
+  const { lineLimit, characterLimit } = getMarkdownFitLimits(preset);
   const isDense = stats.nonEmptyLineCount > lineLimit || stats.characterCount > characterLimit;
 
   if (stats.isBlank) {
@@ -346,6 +392,313 @@ export function getMarkdownFitGuidance(markdown: string, preset: PlatformPreset)
     tone: 'ready',
     summary: 'Good length for this card.',
     action: `Fits best as ${getPlatformFitHelper(preset).bestFor}`,
+  };
+}
+
+function addChange(changes: string[], change: string) {
+  if (!changes.includes(change)) {
+    changes.push(change);
+  }
+}
+
+function normalizeMarkdownLines(markdown: string): { lines: string[]; changed: boolean } {
+  const normalizedMarkdown = markdown.replace(/\r\n?/g, '\n');
+  const trimmedLines = normalizedMarkdown.split('\n').map((line) => line.replace(/[ \t]+$/g, ''));
+  const lines: string[] = [];
+  let previousWasBlank = true;
+
+  for (const line of trimmedLines) {
+    if (line.trim().length === 0) {
+      if (!previousWasBlank) {
+        lines.push('');
+        previousWasBlank = true;
+      }
+      continue;
+    }
+
+    lines.push(line);
+    previousWasBlank = false;
+  }
+
+  while (lines[lines.length - 1] === '') {
+    lines.pop();
+  }
+
+  return {
+    lines,
+    changed: lines.join('\n') !== markdown,
+  };
+}
+
+function shortenText(text: string, characterLimit: number): { text: string; changed: boolean } {
+  const normalizedText = text.replace(/\s+/g, ' ').trim();
+
+  if (normalizedText.length <= characterLimit) {
+    return {
+      text: normalizedText,
+      changed: normalizedText !== text,
+    };
+  }
+
+  const clipped = normalizedText.slice(0, Math.max(0, characterLimit - 3));
+  const wordBoundary = clipped.lastIndexOf(' ');
+  const cutIndex = wordBoundary > characterLimit * 0.55 ? wordBoundary : clipped.length;
+
+  return {
+    text: `${clipped.slice(0, cutIndex).trimEnd()}...`,
+    changed: true,
+  };
+}
+
+function compactListBlock(lines: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
+  const changes: string[] = [];
+  const keptLines = lines.slice(0, limits.bulletLimit).map((line) => {
+    const listMatch = line.match(/^(\s*(?:[-*+]|\d+[.)])\s+)(.+)$/);
+
+    if (!listMatch) {
+      return line;
+    }
+
+    const shortened = shortenText(listMatch[2], Math.min(130, limits.paragraphCharacterLimit));
+    if (shortened.changed) {
+      addChange(changes, 'shortened long list items');
+    }
+
+    return `${listMatch[1]}${shortened.text}`;
+  });
+
+  if (lines.length > keptLines.length) {
+    addChange(changes, `capped lists at ${limits.bulletLimit} items`);
+  }
+
+  return {
+    block: keptLines.join('\n'),
+    changes,
+  };
+}
+
+function compactTableBlock(lines: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
+  const requiredHeaderRows = 2;
+  const maxRows = requiredHeaderRows + limits.tableDataRowLimit;
+
+  if (lines.length <= maxRows) {
+    return {
+      block: lines.join('\n'),
+      changes: [],
+    };
+  }
+
+  return {
+    block: lines.slice(0, maxRows).join('\n'),
+    changes: [`kept the first ${limits.tableDataRowLimit} table rows`],
+  };
+}
+
+function compactCodeBlock(lines: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
+  if (lines.length <= limits.codeLineLimit + 2) {
+    return {
+      block: lines.join('\n'),
+      changes: [],
+    };
+  }
+
+  const firstLine = lines[0];
+  const lastLine = lines[lines.length - 1]?.startsWith('```') ? lines[lines.length - 1] : '```';
+  const codeLines = lines.slice(1, -1).slice(0, limits.codeLineLimit);
+
+  return {
+    block: [firstLine, ...codeLines, lastLine].join('\n'),
+    changes: [`kept the first ${limits.codeLineLimit} code lines`],
+  };
+}
+
+function compactParagraphBlock(lines: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
+  const prefixMatch = lines.length === 1 ? lines[0].match(/^(>\s+)(.+)$/) : null;
+  const paragraph = prefixMatch ? prefixMatch[2] : lines.join(' ');
+  const shortened = shortenText(paragraph, limits.paragraphCharacterLimit);
+  const changes: string[] = [];
+
+  if (lines.length > 1) {
+    addChange(changes, 'merged wrapped paragraphs');
+  }
+
+  if (shortened.changed) {
+    addChange(changes, 'shortened long paragraphs');
+  }
+
+  return {
+    block: prefixMatch ? `${prefixMatch[1]}${shortened.text}` : shortened.text,
+    changes,
+  };
+}
+
+function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { blocks: string[]; changes: string[] } {
+  const blocks: string[] = [];
+  const changes: string[] = [];
+  let headingCount = 0;
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index];
+
+    if (line === '') {
+      index += 1;
+      continue;
+    }
+
+    if (/^#{1,6}\s+\S/.test(line.trim())) {
+      headingCount += 1;
+      if (headingCount <= 2) {
+        const headingMatch = line.trim().match(/^(#{1,6}\s+)(.+)$/);
+        const headingText = headingMatch ? shortenText(headingMatch[2], Math.min(90, limits.paragraphCharacterLimit)) : null;
+
+        if (headingMatch && headingText) {
+          if (headingText.changed) {
+            addChange(changes, 'shortened long headings');
+          }
+          blocks.push(`${headingMatch[1]}${headingText.text}`);
+        } else {
+          blocks.push(line.trim());
+        }
+      } else {
+        addChange(changes, 'kept the first two headings');
+      }
+      index += 1;
+      continue;
+    }
+
+    if (line.trim().startsWith('```')) {
+      const codeLines = [line];
+      index += 1;
+
+      while (index < lines.length) {
+        codeLines.push(lines[index]);
+        const closesFence = lines[index].trim().startsWith('```');
+        index += 1;
+        if (closesFence) break;
+      }
+
+      const compacted = compactCodeBlock(codeLines, limits);
+      blocks.push(compacted.block);
+      compacted.changes.forEach((change) => addChange(changes, change));
+      continue;
+    }
+
+    if (/^\s*(?:[-*+]|\d+[.)])\s+\S/.test(line)) {
+      const listLines: string[] = [];
+
+      while (index < lines.length && /^\s*(?:[-*+]|\d+[.)])\s+\S/.test(lines[index])) {
+        listLines.push(lines[index]);
+        index += 1;
+      }
+
+      const compacted = compactListBlock(listLines, limits);
+      blocks.push(compacted.block);
+      compacted.changes.forEach((change) => addChange(changes, change));
+      continue;
+    }
+
+    if (line.includes('|')) {
+      const tableLines: string[] = [];
+
+      while (index < lines.length && lines[index].includes('|') && lines[index].trim().length > 0) {
+        tableLines.push(lines[index]);
+        index += 1;
+      }
+
+      const compacted = compactTableBlock(tableLines, limits);
+      blocks.push(compacted.block);
+      compacted.changes.forEach((change) => addChange(changes, change));
+      continue;
+    }
+
+    const paragraphLines: string[] = [];
+
+    while (
+      index < lines.length &&
+      lines[index].trim().length > 0 &&
+      !/^#{1,6}\s+\S/.test(lines[index].trim()) &&
+      !/^\s*(?:[-*+]|\d+[.)])\s+\S/.test(lines[index]) &&
+      !lines[index].trim().startsWith('```') &&
+      !lines[index].includes('|')
+    ) {
+      paragraphLines.push(lines[index]);
+      index += 1;
+    }
+
+    const compacted = compactParagraphBlock(paragraphLines, limits);
+    blocks.push(compacted.block);
+    compacted.changes.forEach((change) => addChange(changes, change));
+  }
+
+  return { blocks, changes };
+}
+
+function joinBlocks(blocks: string[]): string {
+  return blocks.filter((block) => block.trim().length > 0).join('\n\n');
+}
+
+function enforceFitLimits(blocks: string[], limits: MarkdownFitLimits): { markdown: string; changed: boolean } {
+  const keptBlocks: string[] = [];
+
+  for (const block of blocks) {
+    const candidate = joinBlocks([...keptBlocks, block]);
+    const stats = getMarkdownStats(candidate);
+
+    if (
+      keptBlocks.length === 0 ||
+      (stats.nonEmptyLineCount <= limits.lineLimit && stats.characterCount <= limits.characterLimit)
+    ) {
+      keptBlocks.push(block);
+    }
+  }
+
+  return {
+    markdown: joinBlocks(keptBlocks),
+    changed: keptBlocks.length < blocks.length,
+  };
+}
+
+export function fitMarkdownToPreset(markdown: string, preset: PlatformPreset): MarkdownFitResult {
+  if (getMarkdownStats(markdown).isBlank) {
+    return {
+      markdown: '',
+      changed: false,
+      note: 'Paste Markdown before fitting this card.',
+      changes: [],
+    };
+  }
+
+  const limits = getMarkdownFitLimits(preset);
+  const changes: string[] = [];
+  const normalized = normalizeMarkdownLines(markdown);
+
+  if (normalized.changed) {
+    addChange(changes, 'normalized spacing');
+  }
+
+  const compacted = compactMarkdownBlocks(normalized.lines, limits);
+  compacted.changes.forEach((change) => addChange(changes, change));
+
+  const fitted = enforceFitLimits(compacted.blocks, limits);
+  if (fitted.changed) {
+    addChange(changes, `kept content within ${limits.lineLimit} lines and ${limits.characterLimit} chars`);
+  }
+
+  const changed = fitted.markdown !== markdown;
+  if (changed && changes.length === 0) {
+    addChange(changes, 'tightened Markdown for this preset');
+  }
+
+  const note = changed
+    ? `Fitted for ${preset.label}: ${changes.join('; ')}.`
+    : `Already fits ${preset.label}. No changes made.`;
+
+  return {
+    markdown: fitted.markdown,
+    changed,
+    note,
+    changes,
   };
 }
 

@@ -13,6 +13,7 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 - Write once in Markdown and preview the card live.
 - Start from paste-ready examples for launch posts, GitHub releases, and Xiaohongshu-style insight cards.
 - Export landscape, portrait, or square cards for common sharing surfaces.
+- Fit pasted Markdown to the selected platform with a local, deterministic compaction helper.
 - Check line count, character count, safe areas, and export size before downloading.
 - Copy PNGs to the clipboard, download crisp PNGs, or keep reusable SVG output.
 
@@ -23,7 +24,7 @@ npm install
 npm run dev
 ```
 
-Open the local Vite URL, choose a starter or select **Start Blank**, paste Markdown, pick a platform preset and theme, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
+Open the local Vite URL, choose a starter or select **Start Blank**, paste Markdown, pick a platform preset and theme, optionally click **Fit to X / Twitter**, **Fit to Xiaohongshu**, or **Fit to GitHub / Launch**, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
 
 ## Common Use Cases
 
@@ -36,7 +37,7 @@ Open the local Vite URL, choose a starter or select **Start Blank**, paste Markd
 
 1. Pick a paste-ready template or start with an empty editor.
 2. Paste or edit Markdown while the preview updates.
-3. Use the fit guidance and safe-area overlay to keep the card readable.
+3. Use the fit guidance, one-click platform fitter, and safe-area overlay to keep the card readable.
 4. Choose a platform preset, visual theme, and PNG export quality.
 5. Copy or download the finished card.
 
@@ -45,6 +46,7 @@ Open the local Vite URL, choose a starter or select **Start Blank**, paste Markd
 - GitHub-flavored Markdown rendering with `react-markdown` and `remark-gfm`.
 - Browser-based PNG and SVG export powered by `html-to-image`.
 - Presets for X/Twitter landscape, Xiaohongshu portrait, and GitHub/launch square.
+- Local platform fitter that normalizes spacing, caps long lists, shortens dense paragraphs, and reports what changed.
 - Themes for crisp launch notes, editorial posts, paper-style notes, and dark technical updates.
 - Starter templates that map to sensible preset/theme defaults.
 - Fast 1x preview export and crisp 2x share export.

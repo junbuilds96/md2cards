@@ -28,6 +28,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .app-shell {
   min-height: 100vh;
   padding: 20px;
@@ -197,6 +202,13 @@ h2 {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+
+.editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 label,
@@ -403,6 +415,18 @@ textarea:focus {
 
 .markdown-guidance.empty {
   color: #667085;
+}
+
+.fit-status {
+  margin-top: -2px;
+  padding: 8px 10px;
+  color: #24446d;
+  background: #eef6ff;
+  border: 1px solid #c8defc;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 750;
+  line-height: 1.3;
 }
 
 .template-gallery small {
@@ -851,6 +875,15 @@ textarea:focus {
 
   h1 {
     font-size: 1.72rem;
+  }
+
+  .group-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .editor-actions {
+    justify-content: flex-start;
   }
 
   .preview-toolbar,

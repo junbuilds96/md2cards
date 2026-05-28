@@ -3,8 +3,10 @@ import {
   cardThemes,
   defaultExportScaleId,
   exportScaleOptions,
+  fitMarkdownToPreset,
   getExportPixelSize,
   getExportScaleOption,
+  getMarkdownFitLimits,
   getMarkdownFitGuidance,
   getMarkdownStats,
   getPlatformFitHelper,
@@ -144,6 +146,72 @@ describe('markdown guidance', () => {
       tone: 'dense',
       action: expect.stringContaining('multiple cards'),
     });
+  });
+
+  it('leaves concise Markdown unchanged when fitting to a preset', () => {
+    const markdown = '# Short update\n\n- One clear change\n- One proof point';
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+
+    expect(result).toMatchObject({
+      markdown,
+      changed: false,
+      note: 'Already fits X / Twitter. No changes made.',
+      changes: [],
+    });
+  });
+
+  it('compacts pasted Markdown by normalizing spacing and capping list items', () => {
+    const markdown = `# Launch note
+
+
+- First key proof
+- Second key proof
+- Third key proof
+- Fourth lower-priority detail
+- Fifth lower-priority detail
+
+
+More detail belongs in the caption.`;
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+
+    expect(result.changed).toBe(true);
+    expect(result.note).toContain('normalized spacing');
+    expect(result.note).toContain('capped lists at 3 items');
+    expect(result.markdown).toContain('- First key proof');
+    expect(result.markdown).toContain('- Third key proof');
+    expect(result.markdown).not.toContain('Fourth lower-priority detail');
+    expect(result.markdown).not.toContain('\n\n\n');
+  });
+
+  it('shortens long paragraphs and keeps the fitted result inside preset limits', () => {
+    const markdown = `# Big update\n\n${'This release note has too much background detail for a social card. '.repeat(35)}`;
+    const result = fitMarkdownToPreset(markdown, platformPresets[2]);
+    const stats = getMarkdownStats(result.markdown);
+    const limits = getMarkdownFitLimits(platformPresets[2]);
+
+    expect(result.changed).toBe(true);
+    expect(result.note).toContain('shortened long paragraphs');
+    expect(result.markdown).toContain('...');
+    expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+  });
+
+  it('preserves the first heading while dropping later sections when over platform limits', () => {
+    const markdown = [
+      '# Primary headline',
+      '',
+      '## Important proof',
+      '',
+      ...Array.from({ length: 18 }, (_, index) => `Paragraph ${index + 1} ${'detail '.repeat(18)}`),
+    ].join('\n\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+    const stats = getMarkdownStats(result.markdown);
+
+    expect(result.markdown.startsWith('# Primary headline')).toBe(true);
+    expect(result.markdown).toContain('## Important proof');
+    expect(result.note).toContain('kept content within 12 lines and 900 chars');
+    expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(12);
+    expect(stats.characterCount).toBeLessThanOrEqual(900);
   });
 });
 
