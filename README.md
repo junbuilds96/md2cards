@@ -20,6 +20,8 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 
 ## Quickstart
 
+Live demo: https://md2cards.dg822.com
+
 ```bash
 npm install
 npm run dev
