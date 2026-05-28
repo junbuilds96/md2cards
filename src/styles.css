@@ -663,6 +663,12 @@ textarea:focus {
   gap: 8px;
 }
 
+.corner-radius-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .template-gallery {
   display: grid;
   gap: 8px;
@@ -680,6 +686,7 @@ textarea:focus {
 .typography-control button,
 .accent-control button,
 .background-intensity-control button,
+.corner-radius-control button,
 .recipe-preset-grid button,
 .template-gallery button,
 .theme-option {
@@ -710,7 +717,8 @@ textarea:focus {
 .density-control button,
 .typography-control button,
 .accent-control button,
-.background-intensity-control button {
+.background-intensity-control button,
+.corner-radius-control button {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -741,6 +749,7 @@ textarea:focus {
 .typography-control button span,
 .accent-control button span:last-child,
 .background-intensity-control button span,
+.corner-radius-control button span,
 .recipe-preset-grid button span,
 .template-gallery button span,
 .theme-option span:last-child {
@@ -866,6 +875,7 @@ textarea:focus {
 .typography-control button.active,
 .accent-control button.active,
 .background-intensity-control button.active,
+.corner-radius-control button.active,
 .recipe-preset-grid button.active,
 .template-gallery button.active,
 .theme-option.active {
@@ -1142,12 +1152,16 @@ textarea:focus {
     radial-gradient(circle at 88% 84%, var(--card-edge-glow), transparent var(--card-edge-glow-stop)),
     linear-gradient(135deg, var(--card-bg), var(--card-bg-2));
   border: var(--card-border-width) solid var(--card-border);
+  border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
   --card-intensity-overlay: transparent;
   --card-glow-stop: 27%;
   --card-edge-glow: transparent;
   --card-edge-glow-stop: 28%;
   --card-border-width: 1px;
+  --card-radius: 0;
+  --card-surface-radius: 8px;
+  --card-inline-radius: 8px;
   --card-shadow: 0 26px 70px rgba(22, 30, 44, 0.28);
   --card-chrome-padding-block: 44px;
   --card-chrome-padding-inline: 58px;
@@ -1187,6 +1201,24 @@ textarea:focus {
   --card-edge-glow-stop: 42%;
   --card-border-width: 2px;
   --card-shadow: 0 30px 82px rgba(22, 30, 44, 0.34);
+}
+
+.social-card.radius-sharp {
+  --card-radius: 0;
+  --card-surface-radius: 8px;
+  --card-inline-radius: 8px;
+}
+
+.social-card.radius-subtle {
+  --card-radius: clamp(18px, 3cqw, 42px);
+  --card-surface-radius: clamp(10px, 1.3cqw, 18px);
+  --card-inline-radius: clamp(7px, 0.8cqw, 12px);
+}
+
+.social-card.radius-rounded {
+  --card-radius: clamp(34px, 5cqw, 72px);
+  --card-surface-radius: clamp(16px, 2cqw, 28px);
+  --card-inline-radius: clamp(10px, 1.2cqw, 16px);
 }
 
 .social-card.density-compact {
@@ -1338,7 +1370,7 @@ textarea:focus {
   padding: var(--card-code-padding);
   color: var(--code-text);
   background: var(--code-bg);
-  border-radius: 8px;
+  border-radius: var(--card-inline-radius);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.85em;
 }
@@ -1350,7 +1382,7 @@ textarea:focus {
   overflow: hidden;
   color: var(--code-text);
   background: var(--code-bg);
-  border-radius: 8px;
+  border-radius: var(--card-surface-radius);
 }
 
 .markdown-card-body pre code {
@@ -1644,6 +1676,7 @@ textarea:focus {
   .typography-control,
   .accent-control,
   .background-intensity-control,
+  .corner-radius-control,
   .recipe-preset-grid,
   .theme-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -1732,7 +1765,8 @@ textarea:focus {
   .density-control button,
   .typography-control button,
   .accent-control button,
-  .background-intensity-control button {
+  .background-intensity-control button,
+  .corner-radius-control button {
     min-height: auto;
   }
 

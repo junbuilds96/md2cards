@@ -68,6 +68,7 @@ describe('saved preset storage', () => {
         cardTypographyScaleId: 'large',
         cardAccentId: 'rose',
         cardBackgroundIntensityId: 'vivid',
+        cardCornerRadiusId: 'rounded',
         updatedAt: 200,
       },
     ]);
@@ -84,6 +85,7 @@ describe('saved preset storage', () => {
         cardTypographyScaleId: 'large',
         cardAccentId: 'rose',
         cardBackgroundIntensityId: 'vivid',
+        cardCornerRadiusId: 'rounded',
         updatedAt: 200,
       },
       {
@@ -97,6 +99,7 @@ describe('saved preset storage', () => {
         cardTypographyScaleId: 'default',
         cardAccentId: 'blue',
         cardBackgroundIntensityId: 'balanced',
+        cardCornerRadiusId: 'sharp',
         updatedAt: 100,
       },
     ]);
@@ -116,6 +119,7 @@ describe('saved preset storage', () => {
         cardTypographyScaleId: 'small',
         cardAccentId: 'amber',
         cardBackgroundIntensityId: 'soft',
+        cardCornerRadiusId: 'subtle',
       },
       storage,
       1234,
@@ -133,6 +137,7 @@ describe('saved preset storage', () => {
       cardTypographyScaleId: 'small',
       cardAccentId: 'amber',
       cardBackgroundIntensityId: 'soft',
+      cardCornerRadiusId: 'subtle',
       updatedAt: 1234,
     });
     expect(readSavedPresets(storage)).toEqual([result.preset]);
@@ -152,6 +157,7 @@ describe('saved preset storage', () => {
         cardTypographyScaleId: 'default',
         cardAccentId: 'blue',
         cardBackgroundIntensityId: 'balanced',
+        cardCornerRadiusId: 'sharp',
       },
       storage,
       100,
@@ -167,6 +173,7 @@ describe('saved preset storage', () => {
         cardTypographyScaleId: 'large',
         cardAccentId: 'emerald',
         cardBackgroundIntensityId: 'vivid',
+        cardCornerRadiusId: 'rounded',
       },
       storage,
       200,
@@ -186,6 +193,7 @@ describe('saved preset storage', () => {
         cardTypographyScaleId: 'large',
         cardAccentId: 'emerald',
         cardBackgroundIntensityId: 'vivid',
+        cardCornerRadiusId: 'rounded',
         updatedAt: 200,
       },
     ]);
@@ -206,6 +214,7 @@ describe('saved preset storage', () => {
           cardTypographyScaleId: 'default',
           cardAccentId: 'blue',
           cardBackgroundIntensityId: 'balanced',
+          cardCornerRadiusId: 'sharp',
         },
         storage,
         index,
@@ -235,6 +244,7 @@ describe('saved preset storage', () => {
           cardTypographyScaleId: 'default',
           cardAccentId: 'blue',
           cardBackgroundIntensityId: 'balanced',
+          cardCornerRadiusId: 'sharp',
         },
         createMemoryStorage(),
         1,

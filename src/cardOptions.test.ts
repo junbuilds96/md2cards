@@ -2,14 +2,17 @@ import { describe, expect, it } from 'vitest';
 import {
   cardAccentOptions,
   cardBackgroundIntensityOptions,
+  cardCornerRadiusOptions,
   cardDensityOptions,
   cardTypographyScaleOptions,
   cardThemes,
+  defaultCardCornerRadiusId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
   fitMarkdownToPreset,
   getCardBackgroundIntensityOption,
+  getCardCornerRadiusOption,
   getCardTypographyScaleOption,
   getExportPixelSize,
   getExportScaleOption,
@@ -89,6 +92,7 @@ describe('recipePresets', () => {
     const typographyIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
     const accentIds = new Set(cardAccentOptions.map((option) => option.id));
     const backgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
+    const cornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
 
     expect(recipeIds.size).toBe(recipePresets.length);
     expect(recipePresets.map((recipePreset) => recipePreset.id)).toEqual([
@@ -107,6 +111,7 @@ describe('recipePresets', () => {
     expect(
       recipePresets.every((recipePreset) => backgroundIntensityIds.has(recipePreset.cardBackgroundIntensityId)),
     ).toBe(true);
+    expect(recipePresets.every((recipePreset) => cornerRadiusIds.has(recipePreset.cardCornerRadiusId))).toBe(true);
     expect(recipePresets.every((recipePreset) => recipePreset.markdown.trim().startsWith('#'))).toBe(true);
   });
 
@@ -116,6 +121,7 @@ describe('recipePresets', () => {
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardDensityId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTypographyScaleId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardBackgroundIntensityId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardCornerRadiusId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.showCardLabels)).size).toBe(2);
     expect(getRecipePreset('code-snippet').markdown).toContain('```bash');
     expect(getRecipePreset('tutorial').markdown).toContain('1. Paste the Markdown draft');
@@ -139,6 +145,29 @@ describe('background intensity options', () => {
       id: 'balanced',
       label: 'Balanced',
       className: 'background-balanced',
+    });
+  });
+});
+
+describe('corner radius options', () => {
+  it('defaults to sharp corners and exposes card classes', () => {
+    expect(getCardCornerRadiusOption(defaultCardCornerRadiusId)).toMatchObject({
+      id: 'sharp',
+      className: 'radius-sharp',
+    });
+    expect(cardCornerRadiusOptions.map((option) => option.id)).toEqual(['sharp', 'subtle', 'rounded']);
+    expect(cardCornerRadiusOptions.map((option) => option.className)).toEqual([
+      'radius-sharp',
+      'radius-subtle',
+      'radius-rounded',
+    ]);
+  });
+
+  it('falls back to sharp corners for unknown ids', () => {
+    expect(getCardCornerRadiusOption('missing' as never)).toMatchObject({
+      id: 'sharp',
+      label: 'Sharp',
+      className: 'radius-sharp',
     });
   });
 });

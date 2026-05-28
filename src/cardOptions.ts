@@ -12,6 +12,8 @@ export type CardAccentId = 'blue' | 'emerald' | 'rose' | 'amber';
 
 export type CardBackgroundIntensityId = 'soft' | 'balanced' | 'vivid';
 
+export type CardCornerRadiusId = 'sharp' | 'subtle' | 'rounded';
+
 export type PlatformPreset = {
   id: PresetId;
   label: string;
@@ -80,6 +82,13 @@ export type CardBackgroundIntensityOption = {
   className: string;
 };
 
+export type CardCornerRadiusOption = {
+  id: CardCornerRadiusId;
+  label: string;
+  description: string;
+  className: string;
+};
+
 export type TemplateId = 'x-launch' | 'xiaohongshu-insight' | 'github-release';
 
 export type MarkdownTemplate = {
@@ -103,6 +112,7 @@ export type RecipePreset = {
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
+  cardCornerRadiusId: CardCornerRadiusId;
   showCardLabels: boolean;
   markdown: string;
 };
@@ -253,6 +263,8 @@ export const defaultCardAccentId: CardAccentId = 'blue';
 
 export const defaultCardBackgroundIntensityId: CardBackgroundIntensityId = 'balanced';
 
+export const defaultCardCornerRadiusId: CardCornerRadiusId = 'sharp';
+
 export const exportScaleOptions: ExportScaleOption[] = [
   {
     id: 'fast',
@@ -368,6 +380,27 @@ export const cardBackgroundIntensityOptions: CardBackgroundIntensityOption[] = [
   },
 ];
 
+export const cardCornerRadiusOptions: CardCornerRadiusOption[] = [
+  {
+    id: 'sharp',
+    label: 'Sharp',
+    description: 'Square export corners with the current card silhouette.',
+    className: 'radius-sharp',
+  },
+  {
+    id: 'subtle',
+    label: 'Subtle',
+    description: 'Lightly rounded corners for a softer design-tool feel.',
+    className: 'radius-subtle',
+  },
+  {
+    id: 'rounded',
+    label: 'Rounded',
+    description: 'More pronounced corners for poster-like cards.',
+    className: 'radius-rounded',
+  },
+];
+
 export const markdownTemplates: MarkdownTemplate[] = [
   {
     id: 'x-launch',
@@ -452,6 +485,7 @@ export const recipePresets: RecipePreset[] = [
     cardTypographyScaleId: 'default',
     cardAccentId: 'blue',
     cardBackgroundIntensityId: 'balanced',
+    cardCornerRadiusId: 'subtle',
     showCardLabels: true,
     markdown: `# Launch faster with Markdown cards
 
@@ -471,6 +505,7 @@ Turn a product update into a share-ready visual in one pass.
     cardTypographyScaleId: 'small',
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'vivid',
+    cardCornerRadiusId: 'sharp',
     showCardLabels: true,
     markdown: `# v0.4.0 Changelog
 
@@ -496,6 +531,7 @@ Turn a product update into a share-ready visual in one pass.
     cardTypographyScaleId: 'default',
     cardAccentId: 'amber',
     cardBackgroundIntensityId: 'soft',
+    cardCornerRadiusId: 'subtle',
     showCardLabels: false,
     markdown: `# Turn notes into a card
 
@@ -517,6 +553,7 @@ Turn a product update into a share-ready visual in one pass.
     cardTypographyScaleId: 'large',
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'vivid',
+    cardCornerRadiusId: 'rounded',
     showCardLabels: false,
     markdown: `# The card is the hook
 
@@ -536,6 +573,7 @@ People decide whether to read the caption from the first two seconds.
     cardTypographyScaleId: 'large',
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'soft',
+    cardCornerRadiusId: 'rounded',
     showCardLabels: false,
     markdown: `# "Design tools should disappear when the idea is clear."
 
@@ -553,6 +591,7 @@ Use Markdown for structure. Use recipes for the visual rhythm.
     cardTypographyScaleId: 'small',
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'balanced',
+    cardCornerRadiusId: 'sharp',
     showCardLabels: true,
     markdown: `# Export a card from Markdown
 
@@ -1018,6 +1057,10 @@ export function getCardBackgroundIntensityOption(
     cardBackgroundIntensityOptions.find((option) => option.id === cardBackgroundIntensityId) ??
     cardBackgroundIntensityOptions[1]
   );
+}
+
+export function getCardCornerRadiusOption(cardCornerRadiusId: CardCornerRadiusId): CardCornerRadiusOption {
+  return cardCornerRadiusOptions.find((option) => option.id === cardCornerRadiusId) ?? cardCornerRadiusOptions[0];
 }
 
 export function getExportPixelSize(

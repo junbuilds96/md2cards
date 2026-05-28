@@ -4,15 +4,15 @@ import { getCardAppearanceStyle, getCardClassName, shouldShowCardLabels } from '
 describe('card label layout', () => {
   it('keeps label chrome visible by default behavior', () => {
     expect(shouldShowCardLabels(true)).toBe(true);
-    expect(getCardClassName('theme-signal', true, 'balanced', 'default', 'balanced')).toBe(
-      'social-card theme-signal density-balanced type-default background-balanced',
+    expect(getCardClassName('theme-signal', true, 'balanced', 'default', 'balanced', 'sharp')).toBe(
+      'social-card theme-signal density-balanced type-default background-balanced radius-sharp',
     );
   });
 
   it('adds only the label visibility state when labels are hidden', () => {
     expect(shouldShowCardLabels(false)).toBe(false);
-    expect(getCardClassName('theme-signal', false, 'compact', 'large', 'vivid')).toBe(
-      'social-card theme-signal density-compact type-large background-vivid card-labels-hidden',
+    expect(getCardClassName('theme-signal', false, 'compact', 'large', 'vivid', 'rounded')).toBe(
+      'social-card theme-signal density-compact type-large background-vivid radius-rounded card-labels-hidden',
     );
   });
 

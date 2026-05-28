@@ -26,16 +26,19 @@ import {
   cardThemes,
   cardAccentOptions,
   cardBackgroundIntensityOptions,
+  cardCornerRadiusOptions,
   cardDensityOptions,
   cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardBackgroundIntensityId,
+  defaultCardCornerRadiusId,
   defaultCardDensityId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
   getCardAccentOption,
   getCardBackgroundIntensityOption,
+  getCardCornerRadiusOption,
   getCardDensityOption,
   getCardTypographyScaleOption,
   fitMarkdownToPreset,
@@ -54,6 +57,7 @@ import {
   sampleMarkdown,
   type CardAccentId,
   type CardBackgroundIntensityId,
+  type CardCornerRadiusId,
   type CardDensityId,
   type CardTypographyScaleId,
   type CardTheme,
@@ -103,6 +107,7 @@ function CardPreview({
   cardTypographyScaleId,
   cardAccentId,
   cardBackgroundIntensityId,
+  cardCornerRadiusId,
 }: {
   markdown: string;
   preset: PlatformPreset;
@@ -114,6 +119,7 @@ function CardPreview({
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
+  cardCornerRadiusId: CardCornerRadiusId;
 }) {
   const labelsVisible = shouldShowCardLabels(showCardLabels);
 
@@ -126,6 +132,7 @@ function CardPreview({
         cardDensityId,
         cardTypographyScaleId,
         cardBackgroundIntensityId,
+        cardCornerRadiusId,
       )}
       style={{
         ...getCardAppearanceStyle(cardAccentId),
@@ -316,8 +323,11 @@ function SavedPresetsPanel({
     const backgroundIntensityLabel =
       cardBackgroundIntensityOptions.find((item) => item.id === savedPreset.cardBackgroundIntensityId)?.label ??
       savedPreset.cardBackgroundIntensityId;
+    const cornerRadiusLabel =
+      cardCornerRadiusOptions.find((item) => item.id === savedPreset.cardCornerRadiusId)?.label ??
+      savedPreset.cardCornerRadiusId;
 
-    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${accentLabel} · ${backgroundIntensityLabel} · ${scaleLabel}`;
+    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${accentLabel} · ${backgroundIntensityLabel} · ${cornerRadiusLabel} · ${scaleLabel}`;
   }
 
   return (
@@ -425,19 +435,23 @@ function AppearanceControls({
   cardTypographyScaleId,
   cardAccentId,
   cardBackgroundIntensityId,
+  cardCornerRadiusId,
   onDensityChange,
   onTypographyScaleChange,
   onAccentChange,
   onBackgroundIntensityChange,
+  onCornerRadiusChange,
 }: {
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
+  cardCornerRadiusId: CardCornerRadiusId;
   onDensityChange: (densityId: CardDensityId) => void;
   onTypographyScaleChange: (typographyScaleId: CardTypographyScaleId) => void;
   onAccentChange: (accentId: CardAccentId) => void;
   onBackgroundIntensityChange: (backgroundIntensityId: CardBackgroundIntensityId) => void;
+  onCornerRadiusChange: (cornerRadiusId: CardCornerRadiusId) => void;
 }) {
   return (
     <div className="appearance-controls">
@@ -507,6 +521,22 @@ function AppearanceControls({
           ))}
         </div>
       </div>
+      <div className="appearance-control-block">
+        <span className="mini-label">Corners</span>
+        <div className="corner-radius-control">
+          {cardCornerRadiusOptions.map((item) => (
+            <button
+              key={item.id}
+              className={item.id === cardCornerRadiusId ? 'active' : ''}
+              type="button"
+              onClick={() => onCornerRadiusChange(item.id)}
+              title={item.description}
+            >
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -547,6 +577,7 @@ function App() {
   const [cardAccentId, setCardAccentId] = useState<CardAccentId>(defaultCardAccentId);
   const [cardBackgroundIntensityId, setCardBackgroundIntensityId] =
     useState<CardBackgroundIntensityId>(defaultCardBackgroundIntensityId);
+  const [cardCornerRadiusId, setCardCornerRadiusId] = useState<CardCornerRadiusId>(defaultCardCornerRadiusId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
   const [activeRecipeId, setActiveRecipeId] = useState<RecipePresetId | null>(null);
   const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
@@ -584,6 +615,7 @@ function App() {
     () => getCardBackgroundIntensityOption(cardBackgroundIntensityId),
     [cardBackgroundIntensityId],
   );
+  const cardCornerRadius = useMemo(() => getCardCornerRadiusOption(cardCornerRadiusId), [cardCornerRadiusId]);
   const exportPixelSize = useMemo(() => getExportPixelSize(preset, exportScale), [preset, exportScale]);
   const safeAreaGuide = useMemo(() => getSafeAreaGuide(preset), [preset]);
   const platformFitHelper = useMemo(() => getPlatformFitHelper(preset), [preset]);
@@ -624,6 +656,7 @@ function App() {
     setCardTypographyScaleId(recipePreset.cardTypographyScaleId);
     setCardAccentId(recipePreset.cardAccentId);
     setCardBackgroundIntensityId(recipePreset.cardBackgroundIntensityId);
+    setCardCornerRadiusId(recipePreset.cardCornerRadiusId);
     setShowCardLabels(recipePreset.showCardLabels);
     setActiveRecipeId(recipePreset.id);
     setPresetName('');
@@ -655,6 +688,7 @@ function App() {
         cardTypographyScaleId: cardTypographyScale.id,
         cardAccentId: cardAccent.id,
         cardBackgroundIntensityId: cardBackgroundIntensity.id,
+        cardCornerRadiusId: cardCornerRadius.id,
       });
 
       setSavedPresets(result.presets);
@@ -681,6 +715,7 @@ function App() {
     setCardTypographyScaleId(savedPreset.cardTypographyScaleId);
     setCardAccentId(savedPreset.cardAccentId);
     setCardBackgroundIntensityId(savedPreset.cardBackgroundIntensityId);
+    setCardCornerRadiusId(savedPreset.cardCornerRadiusId);
     setPresetName(savedPreset.name);
     setActiveRecipeId(null);
     setMessage(`${savedPreset.name} loaded. Preview updated from your local preset.`);
@@ -718,6 +753,7 @@ function App() {
         cardTypographyScaleId: cardTypographyScale.id,
         cardAccentId: cardAccent.id,
         cardBackgroundIntensityId: cardBackgroundIntensity.id,
+        cardCornerRadiusId: cardCornerRadius.id,
         showCardLabels,
       });
       const blob = new Blob([recipeJson], { type: 'application/json' });
@@ -778,6 +814,7 @@ function App() {
       setCardTypographyScaleId(importedRecipe.config.cardTypographyScaleId);
       setCardAccentId(importedRecipe.config.cardAccentId);
       setCardBackgroundIntensityId(importedRecipe.config.cardBackgroundIntensityId);
+      setCardCornerRadiusId(importedRecipe.config.cardCornerRadiusId);
       setShowCardLabels(importedRecipe.config.showCardLabels);
       setActiveRecipeId(null);
       setImportState('idle');
@@ -1108,6 +1145,7 @@ function App() {
               cardTypographyScaleId={cardTypographyScale.id}
               cardAccentId={cardAccent.id}
               cardBackgroundIntensityId={cardBackgroundIntensity.id}
+              cardCornerRadiusId={cardCornerRadius.id}
               onDensityChange={(densityId) => {
                 setCardDensityId(densityId);
                 setActiveRecipeId(null);
@@ -1130,6 +1168,13 @@ function App() {
                 setActiveRecipeId(null);
                 setMessage(
                   `${getCardBackgroundIntensityOption(backgroundIntensityId).label} background intensity selected. Preview and exports updated.`,
+                );
+              }}
+              onCornerRadiusChange={(cornerRadiusId) => {
+                setCardCornerRadiusId(cornerRadiusId);
+                setActiveRecipeId(null);
+                setMessage(
+                  `${getCardCornerRadiusOption(cornerRadiusId).label} corners selected. Preview and exports updated.`,
                 );
               }}
             />
@@ -1328,6 +1373,7 @@ function App() {
                   cardTypographyScaleId={cardTypographyScale.id}
                   cardAccentId={cardAccent.id}
                   cardBackgroundIntensityId={cardBackgroundIntensity.id}
+                  cardCornerRadiusId={cardCornerRadius.id}
                 />
               </div>
               {showSafeAreaGuide ? <SafeAreaOverlay preset={preset} guide={safeAreaGuide} /> : null}
@@ -1343,8 +1389,8 @@ function App() {
             <span>{message}</span>
             <span>
               {theme.label} · {cardDensity.label} · {cardTypographyScale.label} type · {cardAccent.label} ·{' '}
-              {cardBackgroundIntensity.label} · {preset.sizeLabel} · Export {exportPixelSize.width} x{' '}
-              {exportPixelSize.height}px
+              {cardBackgroundIntensity.label} · {cardCornerRadius.label} corners · {preset.sizeLabel} · Export{' '}
+              {exportPixelSize.width} x {exportPixelSize.height}px
             </span>
           </div>
         </section>

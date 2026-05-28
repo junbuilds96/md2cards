@@ -62,6 +62,26 @@ describe('social card CSS', () => {
     expect(vividRule).toContain('--card-edge-glow: var(--card-glow)');
   });
 
+  it('defines corner radius classes without changing export sizing rules', () => {
+    const cardRule = getRule('.social-card');
+    const sharpRule = getRule('.social-card.radius-sharp');
+    const subtleRule = getRule('.social-card.radius-subtle');
+    const roundedRule = getRule('.social-card.radius-rounded');
+    const codeRule = getRule('.markdown-card-body code');
+    const preRule = getRule('.markdown-card-body pre');
+
+    expect(cardRule).toContain('width: 100%');
+    expect(cardRule).toContain('height: 100%');
+    expect(cardRule).toContain('overflow: hidden');
+    expect(cardRule).toContain('border-radius: var(--card-radius)');
+    expect(cardRule).toContain('--card-radius: 0');
+    expect(sharpRule).toContain('--card-radius: 0');
+    expect(subtleRule).toContain('--card-radius: clamp(18px, 3cqw, 42px)');
+    expect(roundedRule).toContain('--card-radius: clamp(34px, 5cqw, 72px)');
+    expect(codeRule).toContain('border-radius: var(--card-inline-radius)');
+    expect(preRule).toContain('border-radius: var(--card-surface-radius)');
+  });
+
   it('keeps the preview toolbar compact and grouped', () => {
     const toolbarRule = getRule('.preview-toolbar');
     const controlsRule = getRule('.preview-controls');
@@ -142,5 +162,6 @@ describe('social card CSS', () => {
     expect(styles).toContain('overflow-y: visible');
     expect(styles).toContain('grid-template-rows: auto minmax(320px, 54dvh) auto');
     expect(styles).toContain('.github-star-link,\n  .export-actions button');
+    expect(styles).toContain('.corner-radius-control');
   });
 });

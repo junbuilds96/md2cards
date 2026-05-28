@@ -23,6 +23,7 @@ describe('card config recipes', () => {
       cardTypographyScaleId: 'large',
       cardAccentId: 'rose',
       cardBackgroundIntensityId: 'vivid',
+      cardCornerRadiusId: 'rounded',
       showCardLabels: false,
     });
 
@@ -37,6 +38,7 @@ describe('card config recipes', () => {
       cardTypographyScaleId: 'large',
       cardAccentId: 'rose',
       cardBackgroundIntensityId: 'vivid',
+      cardCornerRadiusId: 'rounded',
       showCardLabels: false,
     });
     expect(json.endsWith('\n')).toBe(true);
@@ -55,6 +57,7 @@ describe('card config recipes', () => {
         cardTypographyScaleId: 'small',
         cardAccentId: 'emerald',
         cardBackgroundIntensityId: 'soft',
+        cardCornerRadiusId: 'subtle',
         showCardLabels: true,
       }),
     );
@@ -72,6 +75,7 @@ describe('card config recipes', () => {
         cardTypographyScaleId: 'small',
         cardAccentId: 'emerald',
         cardBackgroundIntensityId: 'soft',
+        cardCornerRadiusId: 'subtle',
         showCardLabels: true,
       },
     });
@@ -97,6 +101,7 @@ describe('card config recipes', () => {
         cardTypographyScaleId: 'default',
         cardAccentId: 'blue',
         cardBackgroundIntensityId: 'balanced',
+        cardCornerRadiusId: 'sharp',
       },
     });
   });
@@ -132,6 +137,7 @@ describe('card config recipes', () => {
       cardTypographyScaleId: 'default',
       cardAccentId: 'blue',
       cardBackgroundIntensityId: 'balanced',
+      cardCornerRadiusId: 'sharp',
       showCardLabels: true,
     };
 
@@ -162,6 +168,10 @@ describe('card config recipes', () => {
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardBackgroundIntensityId: 'missing' }))).toEqual({
       valid: false,
       message: 'This recipe uses an unknown background intensity.',
+    });
+    expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardCornerRadiusId: 'missing' }))).toEqual({
+      valid: false,
+      message: 'This recipe uses an unknown corner radius.',
     });
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, showCardLabels: 'yes' }))).toEqual({
       valid: false,

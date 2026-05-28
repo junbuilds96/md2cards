@@ -2,10 +2,12 @@ import {
   cardThemes,
   cardAccentOptions,
   cardBackgroundIntensityOptions,
+  cardCornerRadiusOptions,
   cardDensityOptions,
   cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardBackgroundIntensityId,
+  defaultCardCornerRadiusId,
   defaultCardDensityId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
@@ -13,6 +15,7 @@ import {
   platformPresets,
   type CardAccentId,
   type CardBackgroundIntensityId,
+  type CardCornerRadiusId,
   type CardDensityId,
   type CardTypographyScaleId,
   type ExportScaleId,
@@ -35,6 +38,7 @@ export type CardConfig = {
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
+  cardCornerRadiusId: CardCornerRadiusId;
   showCardLabels: boolean;
 };
 
@@ -47,6 +51,7 @@ export type CardConfigDraft = {
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
+  cardCornerRadiusId: CardCornerRadiusId;
   showCardLabels: boolean;
 };
 
@@ -76,6 +81,7 @@ const validCardDensityIds = new Set(cardDensityOptions.map((option) => option.id
 const validCardTypographyScaleIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
 const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
 const validCardBackgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
+const validCardCornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -123,6 +129,9 @@ export function createCardConfig(draft: CardConfigDraft): CardConfig {
     cardBackgroundIntensityId: validCardBackgroundIntensityIds.has(draft.cardBackgroundIntensityId)
       ? draft.cardBackgroundIntensityId
       : defaultCardBackgroundIntensityId,
+    cardCornerRadiusId: validCardCornerRadiusIds.has(draft.cardCornerRadiusId)
+      ? draft.cardCornerRadiusId
+      : defaultCardCornerRadiusId,
     showCardLabels: draft.showCardLabels,
   };
 }
@@ -241,6 +250,17 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
     };
   }
 
+  const cardCornerRadiusId =
+    parsed.cardCornerRadiusId === undefined
+      ? defaultCardCornerRadiusId
+      : (parsed.cardCornerRadiusId as CardCornerRadiusId);
+  if (!validCardCornerRadiusIds.has(cardCornerRadiusId)) {
+    return {
+      valid: false,
+      message: 'This recipe uses an unknown corner radius.',
+    };
+  }
+
   if (typeof parsed.showCardLabels !== 'boolean') {
     return {
       valid: false,
@@ -261,6 +281,7 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
       cardTypographyScaleId,
       cardAccentId,
       cardBackgroundIntensityId,
+      cardCornerRadiusId,
       showCardLabels: parsed.showCardLabels,
     },
   };
