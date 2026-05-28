@@ -1,80 +1,48 @@
 # MD2Cards
 
-Markdown in, polished cards out.
+Markdown in, polished social cards out.
 
-MD2Cards is a local web app for turning Markdown snippets into exportable PNG and SVG social cards. It is built for product launches, release notes, documentation posts, and creator updates where you want a clean image without opening a design tool.
+MD2Cards turns Markdown snippets into exportable PNG and SVG cards for launches, changelogs, documentation posts, and creator updates. Paste a draft, choose a recipe, tune the card, then export locally from the browser.
+
+[Live demo](https://junbuilds96.github.io/md2cards/) · [GitHub](https://github.com/junbuilds96/md2cards)
 
 ![MD2Cards screenshot](docs/assets/md2cards-screenshot.png)
 
-<p align="center"><sub>Paste or import Markdown, choose a platform preset, preview safe areas, share recipe JSON, then export PNG/SVG cards locally.</sub></p>
+## Example Outputs
 
-## Why MD2Cards
+| Launch card | Insight card | Code card |
+| --- | --- | --- |
+| ![Launch announcement card exported from MD2Cards](docs/assets/md2cards-output-launch.png) | ![Portrait insight card exported from MD2Cards](docs/assets/md2cards-output-insight.png) | ![Code snippet card exported from MD2Cards](docs/assets/md2cards-output-code.png) |
 
-- Write once in Markdown, paste text, or import a local `.md`, `.markdown`, or `.txt` file and preview the card live.
-- Start from paste-ready examples for launch posts, GitHub releases, and Xiaohongshu-style insight cards.
-- Apply curated recipe presets for launches, changelogs, tutorials, insights, quotes, and code snippets.
-- Export landscape, portrait, or square cards for common sharing surfaces.
-- Save named card presets locally in your browser and reload them for repeat posts.
-- Export/import reusable JSON card recipes to move a finished setup between browsers or share it with a teammate.
-- Fit pasted Markdown to the selected platform with a local, deterministic compaction helper.
-- Check line count, character count, safe areas, and export size before downloading, including on narrow laptop and mobile screens.
-- Hide header and footer labels, then copy PNGs to the clipboard, download crisp PNGs, or keep reusable SVG output.
+## Workflow
 
-## Quickstart
+1. Paste Markdown, import a `.md`/`.markdown`/`.txt` file, pick a paste-ready example, or start blank.
+2. Choose a platform preset for X/Twitter, Xiaohongshu, or GitHub/launch cards.
+3. Apply a recipe preset for launches, changelogs, tutorials, insights, quotes, or code snippets.
+4. Tune theme, density, type scale, accent, background intensity, corner radius, and export quality.
+5. Fit/check the card with line counts, character counts, safe-area guides, and exact export dimensions.
+6. Hide header/footer card labels when desired, then copy PNG, download PNG/SVG, or export/import recipe JSON.
 
-Live demo: https://junbuilds96.github.io/md2cards/
+The current layout keeps the control panel independently scrollable on desktop while the preview stays fixed. Getting Started is collapsed by default, export actions live beside the preview, and the GitHub star link is always available from the preview toolbar.
+
+## Features
+
+- GitHub-flavored Markdown rendering with headings, lists, tables, code blocks, quotes, and links.
+- Platform presets for 1600 x 900 landscape, 1080 x 1440 portrait, and 1200 x 1200 square cards.
+- Built-in recipes that set content, platform, theme, appearance, and card-label visibility together.
+- Appearance controls for density, typography, accent color, background intensity, and corner radius.
+- Local fitting helper for tightening dense Markdown to the selected platform.
+- Safe-area overlay for previewing platform crops without changing exports.
+- Browser-local saved presets and portable JSON card recipes.
+- Clipboard PNG, PNG download, and SVG download powered by local browser rendering.
+- Responsive controls and preview panels for desktop, narrow laptop, and mobile screens.
+
+## Local Dev
 
 ```bash
 npm install
 npm run dev
 ```
-
-Open the local Vite URL on desktop or a narrow screen, choose a starter or recipe preset, select **Start Blank**, paste Markdown, drop in a local `.md`/`.markdown`/`.txt` file, or import a recipe `.json`. Pick a platform preset, theme, density, accent color, background intensity, and corner radius, hide **Card labels** if you want to remove the header and footer text, optionally save the setup as a local preset or export the recipe JSON, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
-
-## Common Use Cases
-
-- Launch announcements that need a stronger visual than plain text.
-- Changelog and release-note cards for GitHub, docs, and newsletters.
-- Technical snippets with headings, lists, tables, code, and quotes.
-- Creator or team updates that should fit a known platform crop.
-
-## Workflow
-
-1. Pick a paste-ready template or start with an empty editor.
-2. Paste, import, or edit Markdown while the preview updates.
-3. Use the fit guidance, one-click platform fitter, and safe-area overlay to keep the card readable.
-4. Choose a platform preset, visual theme, appearance, and PNG export quality.
-5. Save a named local preset for repeat card setups, or export/import a JSON recipe for sharing across browsers.
-6. Copy or download the finished card.
-
-## Features
-
-- GitHub-flavored Markdown rendering with `react-markdown` and `remark-gfm`.
-- Local Markdown file import for `.md`, `.markdown`, and `.txt` drafts.
-- Browser-based PNG and SVG export powered by `html-to-image`.
-- Exact-size PNG and SVG exports use the selected preset bounds without preview-stage padding or safe-area overlays.
-- Presets for X/Twitter landscape, Xiaohongshu portrait, and GitHub/launch square.
-- Local platform fitter that normalizes spacing, caps long lists, shortens dense paragraphs, and reports what changed.
-- Themes for crisp launch notes, editorial posts, paper-style notes, and dark technical updates.
-- Appearance controls for Compact, Balanced, and Spacious density, typography scale, Blue/Emerald/Rose/Amber accents, Soft/Balanced/Vivid background intensity, and Sharp/Subtle/Rounded corners.
-- Starter templates that map to sensible preset/theme defaults.
-- Built-in recipe presets that apply Markdown, platform, theme, density, typography, accent, background intensity, corner radius, and label visibility together.
-- Browser-local saved presets for Markdown, platform, theme, appearance, and export quality.
-- Portable JSON card recipes with schema/version metadata, Markdown, platform, theme, appearance, export quality, and card-label visibility.
-- Responsive controls and preview panels for narrow laptop and mobile widths.
-- Fast 1x preview export and crisp 2x share export.
-- Optional card-label toggle for hiding the MD2Cards header and footer metadata in previews and exports.
-- Clipboard PNG support when the browser allows image clipboard writes.
-
-## Tech Stack
-
-- Vite
-- React
-- TypeScript
-- `react-markdown`
-- `remark-gfm`
-- `html-to-image`
-- Vitest
 
 ## Scripts
 
@@ -87,16 +55,11 @@ npm run preview  # Preview the production build
 
 ## Deployment
 
-Pushes to `main` deploy the production build to GitHub Pages at https://junbuilds96.github.io/md2cards/. The workflow builds with `npm ci` and `npm run build`, uploads `dist`, and deploys it with GitHub's official Pages actions.
-
-## Roadmap
-
-- More card templates for launches, docs, changelogs, and creator posts.
-- More precise platform guidance as sharing surfaces change.
+Pushes to `main` deploy the production build to GitHub Pages at https://junbuilds96.github.io/md2cards/.
 
 ## Contributing
 
-Issues and pull requests are welcome. For changes that affect rendering or export behavior, include a focused test or a clear manual verification note.
+Issues and pull requests are welcome. For rendering or export changes, include a focused test or a clear manual verification note.
 
 ## License
 
