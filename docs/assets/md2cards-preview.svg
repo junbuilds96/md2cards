@@ -1,0 +1,66 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">MD2Cards product preview</title>
+  <desc id="desc">Illustration of MD2Cards turning Markdown into a polished social card with platform and export controls.</desc>
+  <rect width="1280" height="720" rx="28" fill="#EEF2F7"/>
+  <path d="M0 122H1280" stroke="#D7DFEA" stroke-width="2"/>
+  <rect x="38" y="38" width="18" height="18" rx="9" fill="#F25F5C"/>
+  <rect x="68" y="38" width="18" height="18" rx="9" fill="#F4C95D"/>
+  <rect x="98" y="38" width="18" height="18" rx="9" fill="#57C785"/>
+  <text x="640" y="56" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" fill="#475467">MD2Cards local preview</text>
+
+  <rect x="44" y="154" width="388" height="512" rx="16" fill="#FFFFFF" stroke="#D6DEEA" stroke-width="2"/>
+  <rect x="72" y="182" width="42" height="42" rx="10" fill="#2059E8"/>
+  <path d="M93 191L97.5 203.5L110 208L97.5 212.5L93 225L88.5 212.5L76 208L88.5 203.5L93 191Z" fill="#FFFFFF"/>
+  <text x="130" y="197" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing=".08em" fill="#667085">MD2CARDS</text>
+  <text x="130" y="222" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="25" font-weight="850" fill="#101828">Markdown in.</text>
+  <text x="130" y="252" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="25" font-weight="850" fill="#101828">Polished cards out.</text>
+
+  <rect x="72" y="286" width="332" height="174" rx="12" fill="#F8FBFF" stroke="#CBD8EA"/>
+  <text x="92" y="318" font-family="SFMono-Regular, Consolas, monospace" font-size="18" font-weight="700" fill="#1F344D"># Ship notes that travel</text>
+  <text x="92" y="354" font-family="SFMono-Regular, Consolas, monospace" font-size="15" fill="#475467">- Platform presets</text>
+  <text x="92" y="382" font-family="SFMono-Regular, Consolas, monospace" font-size="15" fill="#475467">- GFM tables and code</text>
+  <text x="92" y="410" font-family="SFMono-Regular, Consolas, monospace" font-size="15" fill="#475467">- PNG and SVG export</text>
+  <rect x="92" y="431" width="150" height="12" rx="6" fill="#D9E7FF"/>
+
+  <text x="72" y="502" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="800" fill="#233044">Platform</text>
+  <rect x="72" y="518" width="96" height="54" rx="10" fill="#FFFFFF" stroke="#2059E8" stroke-width="2"/>
+  <text x="120" y="542" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="800" fill="#182230">X</text>
+  <text x="120" y="560" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#667085">1600 x 900</text>
+  <rect x="180" y="518" width="96" height="54" rx="10" fill="#FFFFFF" stroke="#D6DEEA"/>
+  <text x="228" y="542" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="800" fill="#182230">Portrait</text>
+  <text x="228" y="560" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#667085">1080 x 1440</text>
+  <rect x="288" y="518" width="116" height="54" rx="10" fill="#FFFFFF" stroke="#D6DEEA"/>
+  <text x="346" y="542" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="800" fill="#182230">Launch</text>
+  <text x="346" y="560" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#667085">1200 x 1200</text>
+
+  <rect x="72" y="596" width="150" height="42" rx="10" fill="#FFFFFF" stroke="#CBD8EA"/>
+  <text x="147" y="622" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="800" fill="#24446D">Copy PNG</text>
+  <rect x="234" y="596" width="170" height="42" rx="10" fill="#2059E8"/>
+  <text x="319" y="622" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="850" fill="#FFFFFF">Download SVG</text>
+
+  <rect x="476" y="154" width="760" height="512" rx="16" fill="#FFFFFF" stroke="#D6DEEA" stroke-width="2"/>
+  <rect x="508" y="186" width="696" height="70" rx="12" fill="#F8FBFF" stroke="#D6DEEA"/>
+  <text x="532" y="214" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing=".08em" fill="#667085">LIVE PREVIEW</text>
+  <text x="532" y="240" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="23" font-weight="850" fill="#101828">Ship notes that travel</text>
+  <rect x="1028" y="205" width="152" height="32" rx="8" fill="#2059E8"/>
+  <text x="1104" y="226" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="850" fill="#FFFFFF">Crisp share 2x</text>
+
+  <rect x="528" y="292" width="636" height="358" rx="0" fill="#0F172A"/>
+  <rect x="560" y="324" width="572" height="294" rx="0" fill="#F8FBFF" stroke="#BDD3F2" stroke-width="2"/>
+  <circle cx="636" cy="386" r="126" fill="#3790FF" opacity=".12"/>
+  <text x="602" y="360" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="850" fill="#4D668A">MD2Cards</text>
+  <text x="1036" y="360" text-anchor="end" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="850" fill="#4D668A">X / Twitter</text>
+  <text x="602" y="430" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="46" font-weight="900" fill="#09204A">Ship notes</text>
+  <text x="602" y="482" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="46" font-weight="900" fill="#09204A">that travel</text>
+  <text x="604" y="530" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="22" fill="#1B2B45">Turn a Markdown update into a polished card.</text>
+  <rect x="604" y="558" width="166" height="20" rx="10" fill="#DCEAFF"/>
+  <rect x="786" y="558" width="120" height="20" rx="10" fill="#DCEAFF"/>
+  <path d="M590 342H1102V600H590V342Z" stroke="#2059E8" stroke-width="3" stroke-dasharray="12 10"/>
+  <rect x="604" y="328" width="116" height="32" rx="8" fill="#112344" opacity=".9"/>
+  <text x="662" y="349" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="850" fill="#FFFFFF">Safe area</text>
+  <text x="602" y="594" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="850" fill="#4D668A">Markdown to social card</text>
+  <text x="1036" y="594" text-anchor="end" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="850" fill="#4D668A">1600 x 900</text>
+
+  <path d="M432 410H494" stroke="#2059E8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M478 394L494 410L478 426" stroke="#2059E8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
