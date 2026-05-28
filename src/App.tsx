@@ -1,4 +1,4 @@
-import { type ChangeEvent, type DragEvent, type RefObject, useMemo, useRef, useState } from 'react';
+import { type ChangeEvent, type CSSProperties, type DragEvent, type RefObject, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
@@ -11,6 +11,7 @@ import {
   FileUp,
   ImageDown,
   LayoutTemplate,
+  Palette,
   PanelRightOpen,
   RotateCcw,
   Save,
@@ -22,8 +23,14 @@ import {
 } from 'lucide-react';
 import {
   cardThemes,
+  cardAccentOptions,
+  cardDensityOptions,
+  defaultCardAccentId,
+  defaultCardDensityId,
   defaultExportScaleId,
   exportScaleOptions,
+  getCardAccentOption,
+  getCardDensityOption,
   fitMarkdownToPreset,
   getExportPixelSize,
   getExportScaleOption,
@@ -36,6 +43,8 @@ import {
   onboardingWorkflowSteps,
   platformPresets,
   sampleMarkdown,
+  type CardAccentId,
+  type CardDensityId,
   type CardTheme,
   type ExportScaleId,
   type PlatformPreset,
@@ -46,7 +55,7 @@ import {
   serializeCardConfig,
   validateCardConfigImportFile,
 } from './cardConfig';
-import { getCardClassName, shouldShowCardLabels } from './cardLayout';
+import { getCardAppearanceStyle, getCardClassName, shouldShowCardLabels } from './cardLayout';
 import { copyCard, downloadCard, downloadSvgCard } from './exportImage';
 import { validateMarkdownImportFile } from './markdownFileImport';
 import {
@@ -78,6 +87,8 @@ function CardPreview({
   isBlank,
   cardRef,
   showCardLabels,
+  cardDensityId,
+  cardAccentId,
 }: {
   markdown: string;
   preset: PlatformPreset;
@@ -85,16 +96,19 @@ function CardPreview({
   isBlank: boolean;
   cardRef: React.RefObject<HTMLDivElement | null>;
   showCardLabels: boolean;
+  cardDensityId: CardDensityId;
+  cardAccentId: CardAccentId;
 }) {
   const renderLabels = shouldShowCardLabels(showCardLabels);
 
   return (
     <div
       ref={cardRef}
-      className={getCardClassName(theme.className, showCardLabels)}
+      className={getCardClassName(theme.className, showCardLabels, cardDensityId)}
       style={{
+        ...getCardAppearanceStyle(cardAccentId),
         aspectRatio: `${preset.width} / ${preset.height}`,
-      }}
+      } as CSSProperties}
     >
       {renderLabels ? (
         <div className="card-chrome">
@@ -272,8 +286,12 @@ function SavedPresetsPanel({
     const scaleLabel =
       exportScaleOptions.find((item) => item.id === savedPreset.exportScaleId)?.shortLabel ??
       savedPreset.exportScaleId;
+    const densityLabel =
+      cardDensityOptions.find((item) => item.id === savedPreset.cardDensityId)?.label ?? savedPreset.cardDensityId;
+    const accentLabel =
+      cardAccentOptions.find((item) => item.id === savedPreset.cardAccentId)?.label ?? savedPreset.cardAccentId;
 
-    return `${platformLabel} · ${themeLabel} · ${scaleLabel}`;
+    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${accentLabel} · ${scaleLabel}`;
   }
 
   return (
@@ -347,7 +365,7 @@ function CardConfigTransferPanel({
     <div className={`card-config-transfer ${recipeState}`}>
       <div className="card-config-transfer-copy">
         <strong>Share this card recipe</strong>
-        <span>Export or import Markdown, platform, theme, export quality, and label visibility.</span>
+        <span>Export or import Markdown, platform, theme, appearance, export quality, and label visibility.</span>
         {recipeMessage ? (
           <small className="card-config-transfer-status" aria-live="polite">
             {recipeState === 'error' ? <AlertCircle size={14} /> : <Check size={14} />}
@@ -376,11 +394,64 @@ function CardConfigTransferPanel({
   );
 }
 
+function AppearanceControls({
+  cardDensityId,
+  cardAccentId,
+  onDensityChange,
+  onAccentChange,
+}: {
+  cardDensityId: CardDensityId;
+  cardAccentId: CardAccentId;
+  onDensityChange: (densityId: CardDensityId) => void;
+  onAccentChange: (accentId: CardAccentId) => void;
+}) {
+  return (
+    <div className="appearance-controls">
+      <div className="appearance-control-block">
+        <span className="mini-label">Density</span>
+        <div className="density-control">
+          {cardDensityOptions.map((item) => (
+            <button
+              key={item.id}
+              className={item.id === cardDensityId ? 'active' : ''}
+              type="button"
+              onClick={() => onDensityChange(item.id)}
+              title={item.description}
+            >
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="appearance-control-block">
+        <span className="mini-label">Accent</span>
+        <div className="accent-control" aria-label="Accent color">
+          {cardAccentOptions.map((item) => (
+            <button
+              key={item.id}
+              className={item.id === cardAccentId ? 'active' : ''}
+              type="button"
+              onClick={() => onAccentChange(item.id)}
+              title={`${item.label} accent`}
+              aria-label={`${item.label} accent`}
+            >
+              <span className="accent-swatch" style={{ background: item.color }} aria-hidden="true" />
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [presetId, setPresetId] = useState<PlatformPreset['id']>('twitter');
   const [themeId, setThemeId] = useState<CardTheme['id']>('signal');
   const [exportScaleId, setExportScaleId] = useState<ExportScaleId>(defaultExportScaleId);
+  const [cardDensityId, setCardDensityId] = useState<CardDensityId>(defaultCardDensityId);
+  const [cardAccentId, setCardAccentId] = useState<CardAccentId>(defaultCardAccentId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
   const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
   const [showCardLabels, setShowCardLabels] = useState(true);
@@ -407,6 +478,8 @@ function App() {
   );
   const theme = useMemo(() => cardThemes.find((item) => item.id === themeId) ?? cardThemes[0], [themeId]);
   const exportScale = useMemo(() => getExportScaleOption(exportScaleId), [exportScaleId]);
+  const cardDensity = useMemo(() => getCardDensityOption(cardDensityId), [cardDensityId]);
+  const cardAccent = useMemo(() => getCardAccentOption(cardAccentId), [cardAccentId]);
   const exportPixelSize = useMemo(() => getExportPixelSize(preset, exportScale), [preset, exportScale]);
   const safeAreaGuide = useMemo(() => getSafeAreaGuide(preset), [preset]);
   const platformFitHelper = useMemo(() => getPlatformFitHelper(preset), [preset]);
@@ -453,6 +526,8 @@ function App() {
         presetId: preset.id,
         themeId: theme.id,
         exportScaleId: exportScale.id,
+        cardDensityId: cardDensity.id,
+        cardAccentId: cardAccent.id,
       });
 
       setSavedPresets(result.presets);
@@ -475,6 +550,8 @@ function App() {
     setPresetId(savedPreset.presetId);
     setThemeId(savedPreset.themeId);
     setExportScaleId(savedPreset.exportScaleId);
+    setCardDensityId(savedPreset.cardDensityId);
+    setCardAccentId(savedPreset.cardAccentId);
     setPresetName(savedPreset.name);
     setMessage(`${savedPreset.name} loaded. Preview updated from your local preset.`);
     setImportState('idle');
@@ -507,6 +584,8 @@ function App() {
         presetId: preset.id,
         themeId: theme.id,
         exportScaleId: exportScale.id,
+        cardDensityId: cardDensity.id,
+        cardAccentId: cardAccent.id,
         showCardLabels,
       });
       const blob = new Blob([recipeJson], { type: 'application/json' });
@@ -563,6 +642,8 @@ function App() {
       setPresetId(importedRecipe.config.presetId);
       setThemeId(importedRecipe.config.themeId);
       setExportScaleId(importedRecipe.config.exportScaleId);
+      setCardDensityId(importedRecipe.config.cardDensityId);
+      setCardAccentId(importedRecipe.config.cardAccentId);
       setShowCardLabels(importedRecipe.config.showCardLabels);
       setImportState('idle');
       setImportMessage('');
@@ -909,6 +990,22 @@ function App() {
           </div>
 
           <div className="field-group">
+            <span className="field-label">Appearance</span>
+            <AppearanceControls
+              cardDensityId={cardDensity.id}
+              cardAccentId={cardAccent.id}
+              onDensityChange={(densityId) => {
+                setCardDensityId(densityId);
+                setMessage(`${getCardDensityOption(densityId).label} density selected. Preview and exports updated.`);
+              }}
+              onAccentChange={(accentId) => {
+                setCardAccentId(accentId);
+                setMessage(`${getCardAccentOption(accentId).label} accent selected. Preview and exports updated.`);
+              }}
+            />
+          </div>
+
+          <div className="field-group">
             <span className="field-label">Export Quality</span>
             <div className="quality-control">
               {exportScaleOptions.map((item) => (
@@ -1046,6 +1143,8 @@ function App() {
                   isBlank={markdownGuidance.stats.isBlank}
                   cardRef={cardRef}
                   showCardLabels={showCardLabels}
+                  cardDensityId={cardDensity.id}
+                  cardAccentId={cardAccent.id}
                 />
               </div>
               {showSafeAreaGuide ? <SafeAreaOverlay preset={preset} guide={safeAreaGuide} /> : null}
@@ -1060,7 +1159,8 @@ function App() {
           >
             <span>{message}</span>
             <span>
-              {theme.label} · {preset.sizeLabel} · Export {exportPixelSize.width} x {exportPixelSize.height}px
+              {theme.label} · {cardDensity.label} · {cardAccent.label} · {preset.sizeLabel} · Export{' '}
+              {exportPixelSize.width} x {exportPixelSize.height}px
             </span>
           </div>
         </section>

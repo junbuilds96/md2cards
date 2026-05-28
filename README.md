@@ -30,7 +30,7 @@ npm install
 npm run dev
 ```
 
-Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, drop in a local `.md`/`.markdown`/`.txt` file, or import a recipe `.json`. Pick a platform preset and theme, hide **Card labels** if you want a clean card, optionally save the setup as a local preset or export the recipe JSON, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
+Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, drop in a local `.md`/`.markdown`/`.txt` file, or import a recipe `.json`. Pick a platform preset, theme, density, and accent color, hide **Card labels** if you want a clean card, optionally save the setup as a local preset or export the recipe JSON, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
 
 ## Common Use Cases
 
@@ -44,7 +44,7 @@ Open the local Vite URL on desktop or a narrow screen, choose a starter, select 
 1. Pick a paste-ready template or start with an empty editor.
 2. Paste, import, or edit Markdown while the preview updates.
 3. Use the fit guidance, one-click platform fitter, and safe-area overlay to keep the card readable.
-4. Choose a platform preset, visual theme, and PNG export quality.
+4. Choose a platform preset, visual theme, appearance, and PNG export quality.
 5. Save a named local preset for repeat card setups, or export/import a JSON recipe for sharing across browsers.
 6. Copy or download the finished card.
 
@@ -57,9 +57,10 @@ Open the local Vite URL on desktop or a narrow screen, choose a starter, select 
 - Presets for X/Twitter landscape, Xiaohongshu portrait, and GitHub/launch square.
 - Local platform fitter that normalizes spacing, caps long lists, shortens dense paragraphs, and reports what changed.
 - Themes for crisp launch notes, editorial posts, paper-style notes, and dark technical updates.
+- Appearance controls for Compact, Balanced, and Spacious density plus Blue, Emerald, Rose, and Amber accent swatches.
 - Starter templates that map to sensible preset/theme defaults.
-- Browser-local saved presets for Markdown, platform, theme, and export quality.
-- Portable JSON card recipes with schema/version metadata, Markdown, platform, theme, export quality, and card-label visibility.
+- Browser-local saved presets for Markdown, platform, theme, appearance, and export quality.
+- Portable JSON card recipes with schema/version metadata, Markdown, platform, theme, appearance, export quality, and card-label visibility.
 - Responsive controls and preview panels for narrow laptop and mobile widths.
 - Fast 1x preview export and crisp 2x share export.
 - Optional card-label toggle for hiding the MD2Cards header and footer metadata in previews and exports.

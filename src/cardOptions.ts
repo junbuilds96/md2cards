@@ -4,6 +4,10 @@ export type ThemeId = 'signal' | 'paper' | 'midnight' | 'editorial';
 
 export type ExportScaleId = 'fast' | 'crisp';
 
+export type CardDensityId = 'compact' | 'balanced' | 'spacious';
+
+export type CardAccentId = 'blue' | 'emerald' | 'rose' | 'amber';
+
 export type PlatformPreset = {
   id: PresetId;
   label: string;
@@ -40,6 +44,22 @@ export type ExportScaleOption = {
   scale: number;
   shortLabel: string;
   description: string;
+};
+
+export type CardDensityOption = {
+  id: CardDensityId;
+  label: string;
+  description: string;
+  className: string;
+};
+
+export type CardAccentOption = {
+  id: CardAccentId;
+  label: string;
+  color: string;
+  softColor: string;
+  faintColor: string;
+  glowColor: string;
 };
 
 export type TemplateId = 'x-launch' | 'xiaohongshu-insight' | 'github-release';
@@ -191,6 +211,10 @@ export const cardThemes: CardTheme[] = [
 
 export const defaultExportScaleId: ExportScaleId = 'crisp';
 
+export const defaultCardDensityId: CardDensityId = 'balanced';
+
+export const defaultCardAccentId: CardAccentId = 'blue';
+
 export const exportScaleOptions: ExportScaleOption[] = [
   {
     id: 'fast',
@@ -205,6 +229,62 @@ export const exportScaleOptions: ExportScaleOption[] = [
     scale: 2,
     shortLabel: '2x',
     description: 'Sharper PNG for posting and sharing.',
+  },
+];
+
+export const cardDensityOptions: CardDensityOption[] = [
+  {
+    id: 'compact',
+    label: 'Compact',
+    description: 'Tighter padding and rhythm for denser posts.',
+    className: 'density-compact',
+  },
+  {
+    id: 'balanced',
+    label: 'Balanced',
+    description: 'Default spacing for most cards.',
+    className: 'density-balanced',
+  },
+  {
+    id: 'spacious',
+    label: 'Spacious',
+    description: 'Airier padding for short, editorial cards.',
+    className: 'density-spacious',
+  },
+];
+
+export const cardAccentOptions: CardAccentOption[] = [
+  {
+    id: 'blue',
+    label: 'Blue',
+    color: '#1f6feb',
+    softColor: 'rgba(31, 111, 235, 0.13)',
+    faintColor: 'rgba(31, 111, 235, 0.24)',
+    glowColor: 'rgba(31, 111, 235, 0.2)',
+  },
+  {
+    id: 'emerald',
+    label: 'Emerald',
+    color: '#15956b',
+    softColor: 'rgba(21, 149, 107, 0.14)',
+    faintColor: 'rgba(21, 149, 107, 0.25)',
+    glowColor: 'rgba(21, 149, 107, 0.2)',
+  },
+  {
+    id: 'rose',
+    label: 'Rose',
+    color: '#e25579',
+    softColor: 'rgba(226, 85, 121, 0.14)',
+    faintColor: 'rgba(226, 85, 121, 0.25)',
+    glowColor: 'rgba(226, 85, 121, 0.2)',
+  },
+  {
+    id: 'amber',
+    label: 'Amber',
+    color: '#c47a12',
+    softColor: 'rgba(196, 122, 18, 0.15)',
+    faintColor: 'rgba(196, 122, 18, 0.28)',
+    glowColor: 'rgba(196, 122, 18, 0.2)',
   },
 ];
 
@@ -704,6 +784,14 @@ export function fitMarkdownToPreset(markdown: string, preset: PlatformPreset): M
 
 export function getExportScaleOption(exportScaleId: ExportScaleId): ExportScaleOption {
   return exportScaleOptions.find((option) => option.id === exportScaleId) ?? exportScaleOptions[1];
+}
+
+export function getCardDensityOption(cardDensityId: CardDensityId): CardDensityOption {
+  return cardDensityOptions.find((option) => option.id === cardDensityId) ?? cardDensityOptions[1];
+}
+
+export function getCardAccentOption(cardAccentId: CardAccentId): CardAccentOption {
+  return cardAccentOptions.find((option) => option.id === cardAccentId) ?? cardAccentOptions[0];
 }
 
 export function getExportPixelSize(

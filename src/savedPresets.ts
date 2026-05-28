@@ -1,8 +1,14 @@
 import {
   cardThemes,
+  cardAccentOptions,
+  cardDensityOptions,
+  defaultCardAccentId,
+  defaultCardDensityId,
   defaultExportScaleId,
   exportScaleOptions,
   platformPresets,
+  type CardAccentId,
+  type CardDensityId,
   type ExportScaleId,
   type PresetId,
   type ThemeId,
@@ -18,6 +24,8 @@ export type SavedCardPreset = {
   presetId: PresetId;
   themeId: ThemeId;
   exportScaleId: ExportScaleId;
+  cardDensityId: CardDensityId;
+  cardAccentId: CardAccentId;
   updatedAt: number;
 };
 
@@ -27,6 +35,8 @@ export type SavedCardPresetDraft = {
   presetId: PresetId;
   themeId: ThemeId;
   exportScaleId: ExportScaleId;
+  cardDensityId: CardDensityId;
+  cardAccentId: CardAccentId;
 };
 
 export type SaveSavedPresetResult = {
@@ -40,6 +50,8 @@ type PresetStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 const validPresetIds = new Set(platformPresets.map((preset) => preset.id));
 const validThemeIds = new Set(cardThemes.map((theme) => theme.id));
 const validExportScaleIds = new Set(exportScaleOptions.map((option) => option.id));
+const validCardDensityIds = new Set(cardDensityOptions.map((option) => option.id));
+const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -73,6 +85,8 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
   const presetId = value.presetId;
   const themeId = value.themeId;
   const exportScaleId = value.exportScaleId;
+  const cardDensityId = value.cardDensityId === undefined ? defaultCardDensityId : value.cardDensityId;
+  const cardAccentId = value.cardAccentId === undefined ? defaultCardAccentId : value.cardAccentId;
   const updatedAt = typeof value.updatedAt === 'number' && Number.isFinite(value.updatedAt) ? value.updatedAt : 0;
 
   if (
@@ -81,7 +95,9 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     name.length === 0 ||
     !validPresetIds.has(presetId as PresetId) ||
     !validThemeIds.has(themeId as ThemeId) ||
-    !validExportScaleIds.has(exportScaleId as ExportScaleId)
+    !validExportScaleIds.has(exportScaleId as ExportScaleId) ||
+    !validCardDensityIds.has(cardDensityId as CardDensityId) ||
+    !validCardAccentIds.has(cardAccentId as CardAccentId)
   ) {
     return null;
   }
@@ -93,6 +109,8 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     presetId: presetId as PresetId,
     themeId: themeId as ThemeId,
     exportScaleId: exportScaleId as ExportScaleId,
+    cardDensityId: cardDensityId as CardDensityId,
+    cardAccentId: cardAccentId as CardAccentId,
     updatedAt,
   };
 }
@@ -175,6 +193,8 @@ export function saveSavedPreset(
     presetId: validPresetIds.has(draft.presetId) ? draft.presetId : platformPresets[0].id,
     themeId: validThemeIds.has(draft.themeId) ? draft.themeId : cardThemes[0].id,
     exportScaleId: validExportScaleIds.has(draft.exportScaleId) ? draft.exportScaleId : defaultExportScaleId,
+    cardDensityId: validCardDensityIds.has(draft.cardDensityId) ? draft.cardDensityId : defaultCardDensityId,
+    cardAccentId: validCardAccentIds.has(draft.cardAccentId) ? draft.cardAccentId : defaultCardAccentId,
     updatedAt,
   };
 

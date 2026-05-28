@@ -19,6 +19,8 @@ describe('card config recipes', () => {
       presetId: 'xiaohongshu',
       themeId: 'editorial',
       exportScaleId: 'crisp',
+      cardDensityId: 'spacious',
+      cardAccentId: 'rose',
       showCardLabels: false,
     });
 
@@ -29,6 +31,8 @@ describe('card config recipes', () => {
       presetId: 'xiaohongshu',
       themeId: 'editorial',
       exportScaleId: 'crisp',
+      cardDensityId: 'spacious',
+      cardAccentId: 'rose',
       showCardLabels: false,
     });
     expect(json.endsWith('\n')).toBe(true);
@@ -43,6 +47,8 @@ describe('card config recipes', () => {
         presetId: 'launch',
         themeId: 'midnight',
         exportScaleId: 'fast',
+        cardDensityId: 'compact',
+        cardAccentId: 'emerald',
         showCardLabels: true,
       }),
     );
@@ -56,7 +62,31 @@ describe('card config recipes', () => {
         presetId: 'launch',
         themeId: 'midnight',
         exportScaleId: 'fast',
+        cardDensityId: 'compact',
+        cardAccentId: 'emerald',
         showCardLabels: true,
+      },
+    });
+  });
+
+  it('defaults appearance when importing an older recipe without those settings', () => {
+    const result = parseCardConfigJson(
+      JSON.stringify({
+        schema: cardConfigSchema,
+        version: cardConfigVersion,
+        markdown: '# Older recipe',
+        presetId: 'twitter',
+        themeId: 'signal',
+        exportScaleId: 'crisp',
+        showCardLabels: true,
+      }),
+    );
+
+    expect(result).toMatchObject({
+      valid: true,
+      config: {
+        cardDensityId: 'balanced',
+        cardAccentId: 'blue',
       },
     });
   });
@@ -88,6 +118,8 @@ describe('card config recipes', () => {
       presetId: 'twitter',
       themeId: 'signal',
       exportScaleId: 'fast',
+      cardDensityId: 'balanced',
+      cardAccentId: 'blue',
       showCardLabels: true,
     };
 
@@ -102,6 +134,14 @@ describe('card config recipes', () => {
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, exportScaleId: 'missing' }))).toEqual({
       valid: false,
       message: 'This recipe uses an unknown export quality.',
+    });
+    expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardDensityId: 'missing' }))).toEqual({
+      valid: false,
+      message: 'This recipe uses an unknown density setting.',
+    });
+    expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardAccentId: 'missing' }))).toEqual({
+      valid: false,
+      message: 'This recipe uses an unknown accent color.',
     });
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, showCardLabels: 'yes' }))).toEqual({
       valid: false,
@@ -125,4 +165,3 @@ describe('card config recipes', () => {
     });
   });
 });
-

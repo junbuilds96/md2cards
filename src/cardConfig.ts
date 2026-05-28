@@ -1,8 +1,14 @@
 import {
   cardThemes,
+  cardAccentOptions,
+  cardDensityOptions,
+  defaultCardAccentId,
+  defaultCardDensityId,
   defaultExportScaleId,
   exportScaleOptions,
   platformPresets,
+  type CardAccentId,
+  type CardDensityId,
   type ExportScaleId,
   type PresetId,
   type ThemeId,
@@ -19,6 +25,8 @@ export type CardConfig = {
   presetId: PresetId;
   themeId: ThemeId;
   exportScaleId: ExportScaleId;
+  cardDensityId: CardDensityId;
+  cardAccentId: CardAccentId;
   showCardLabels: boolean;
 };
 
@@ -27,6 +35,8 @@ export type CardConfigDraft = {
   presetId: PresetId;
   themeId: ThemeId;
   exportScaleId: ExportScaleId;
+  cardDensityId: CardDensityId;
+  cardAccentId: CardAccentId;
   showCardLabels: boolean;
 };
 
@@ -52,6 +62,8 @@ export type CardConfigFileValidationResult =
 const validPresetIds = new Set(platformPresets.map((preset) => preset.id));
 const validThemeIds = new Set(cardThemes.map((theme) => theme.id));
 const validExportScaleIds = new Set(exportScaleOptions.map((option) => option.id));
+const validCardDensityIds = new Set(cardDensityOptions.map((option) => option.id));
+const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -91,6 +103,8 @@ export function createCardConfig(draft: CardConfigDraft): CardConfig {
     presetId: validPresetIds.has(draft.presetId) ? draft.presetId : platformPresets[0].id,
     themeId: validThemeIds.has(draft.themeId) ? draft.themeId : cardThemes[0].id,
     exportScaleId: validExportScaleIds.has(draft.exportScaleId) ? draft.exportScaleId : defaultExportScaleId,
+    cardDensityId: validCardDensityIds.has(draft.cardDensityId) ? draft.cardDensityId : defaultCardDensityId,
+    cardAccentId: validCardAccentIds.has(draft.cardAccentId) ? draft.cardAccentId : defaultCardAccentId,
     showCardLabels: draft.showCardLabels,
   };
 }
@@ -169,6 +183,24 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
     };
   }
 
+  const cardDensityId =
+    parsed.cardDensityId === undefined ? defaultCardDensityId : (parsed.cardDensityId as CardDensityId);
+  if (!validCardDensityIds.has(cardDensityId)) {
+    return {
+      valid: false,
+      message: 'This recipe uses an unknown density setting.',
+    };
+  }
+
+  const cardAccentId =
+    parsed.cardAccentId === undefined ? defaultCardAccentId : (parsed.cardAccentId as CardAccentId);
+  if (!validCardAccentIds.has(cardAccentId)) {
+    return {
+      valid: false,
+      message: 'This recipe uses an unknown accent color.',
+    };
+  }
+
   if (typeof parsed.showCardLabels !== 'boolean') {
     return {
       valid: false,
@@ -185,6 +217,8 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
       presetId: parsed.presetId as PresetId,
       themeId: parsed.themeId as ThemeId,
       exportScaleId: parsed.exportScaleId as ExportScaleId,
+      cardDensityId,
+      cardAccentId,
       showCardLabels: parsed.showCardLabels,
     },
   };
@@ -220,4 +254,3 @@ export function validateCardConfigImportFile(
     valid: true,
   };
 }
-

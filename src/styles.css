@@ -588,6 +588,36 @@ textarea:focus {
   gap: 8px;
 }
 
+.appearance-controls {
+  display: grid;
+  gap: 12px;
+}
+
+.appearance-control-block {
+  display: grid;
+  gap: 8px;
+}
+
+.mini-label {
+  color: #667085;
+  font-size: 0.74rem;
+  font-weight: 850;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.density-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.accent-control {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .template-gallery {
   display: grid;
   gap: 8px;
@@ -595,6 +625,8 @@ textarea:focus {
 
 .segmented-control button,
 .quality-control button,
+.density-control button,
+.accent-control button,
 .template-gallery button,
 .theme-option {
   min-width: 0;
@@ -621,6 +653,15 @@ textarea:focus {
   gap: 6px;
 }
 
+.density-control button,
+.accent-control button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .template-gallery button {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -631,6 +672,8 @@ textarea:focus {
 
 .segmented-control button span,
 .quality-control button span,
+.density-control button span,
+.accent-control button span:last-child,
 .template-gallery button span,
 .theme-option span:last-child {
   overflow-wrap: anywhere;
@@ -739,10 +782,20 @@ textarea:focus {
 
 .segmented-control button.active,
 .quality-control button.active,
+.density-control button.active,
+.accent-control button.active,
 .template-gallery button.active,
 .theme-option.active {
   border-color: #2059e8;
   box-shadow: 0 0 0 3px rgba(32, 89, 232, 0.14);
+}
+
+.accent-swatch {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(23, 32, 42, 0.18);
+  border-radius: 50%;
 }
 
 .theme-grid {
@@ -955,6 +1008,110 @@ textarea:focus {
     linear-gradient(135deg, var(--card-bg), var(--card-bg-2));
   border: 1px solid var(--card-border);
   box-shadow: 0 26px 70px rgba(22, 30, 44, 0.28);
+  --card-chrome-padding-block: 44px;
+  --card-chrome-padding-inline: 58px;
+  --card-body-block-padding: 1cqh;
+  --card-body-inline-padding: 5.5cqw;
+  --card-clean-body-padding-block: clamp(30px, 6cqh, 60px);
+  --card-h1-font-size: clamp(28px, 7cqw, 112px);
+  --card-h2-font-size: clamp(22px, 3.5cqw, 54px);
+  --card-body-font-size: clamp(16px, 2.7cqw, 43px);
+  --card-h1-margin-bottom: 28px;
+  --card-h2-margin: 26px 0 16px;
+  --card-body-line-height: 1.25;
+  --card-p-margin-bottom: 18px;
+  --card-list-margin: 12px 0 18px;
+  --card-list-padding-left: 1.15em;
+  --card-li-gap: 8px;
+  --card-code-padding: 0.08em 0.28em;
+  --card-pre-margin: 18px 0;
+  --card-pre-padding: 20px;
+  --card-table-margin-top: 18px;
+  --card-table-cell-padding: 12px 14px;
+  --card-blockquote-margin: 20px 0;
+  --card-blockquote-padding-left: 24px;
+  --card-blockquote-border-width: 8px;
+  --card-clean-h1-font-size: clamp(32px, 6cqw, 96px);
+  --card-clean-h2-font-size: clamp(20px, 2.5cqw, 40px);
+  --card-clean-body-font-size: clamp(16px, 2.3cqw, 37px);
+  --card-clean-table-cell-font-size: clamp(14px, 2.05cqw, 33px);
+  --card-clean-h1-margin-bottom: clamp(16px, 2.2cqh, 22px);
+  --card-clean-h2-margin: clamp(8px, 1.2cqh, 12px) 0 clamp(6px, 1cqh, 10px);
+  --card-clean-body-line-height: 1.2;
+  --card-clean-p-margin-bottom: clamp(8px, 1.3cqh, 12px);
+  --card-clean-list-margin: clamp(6px, 1cqh, 10px) 0 clamp(8px, 1.3cqh, 12px);
+  --card-clean-list-padding-left: 1.05em;
+  --card-clean-li-gap: clamp(4px, 0.7cqh, 6px);
+  --card-clean-table-margin-top: clamp(8px, 1.2cqh, 12px);
+  --card-clean-table-cell-padding: clamp(6px, 1cqh, 9px) clamp(8px, 1cqw, 12px);
+}
+
+.social-card.density-compact {
+  --card-chrome-padding-block: 32px;
+  --card-chrome-padding-inline: 46px;
+  --card-body-block-padding: 0.5cqh;
+  --card-body-inline-padding: 4.8cqw;
+  --card-clean-body-padding-block: clamp(24px, 4.5cqh, 46px);
+  --card-h1-margin-bottom: 18px;
+  --card-h2-margin: 18px 0 10px;
+  --card-body-line-height: 1.18;
+  --card-p-margin-bottom: 12px;
+  --card-list-margin: 8px 0 12px;
+  --card-list-padding-left: 1.05em;
+  --card-li-gap: 5px;
+  --card-pre-margin: 12px 0;
+  --card-pre-padding: 16px;
+  --card-table-margin-top: 12px;
+  --card-table-cell-padding: 8px 10px;
+  --card-blockquote-margin: 14px 0;
+  --card-blockquote-padding-left: 18px;
+  --card-blockquote-border-width: 6px;
+  --card-clean-h1-margin-bottom: clamp(12px, 1.7cqh, 18px);
+  --card-clean-h2-margin: clamp(6px, 0.9cqh, 9px) 0 clamp(4px, 0.7cqh, 8px);
+  --card-clean-body-line-height: 1.15;
+  --card-clean-p-margin-bottom: clamp(6px, 1cqh, 9px);
+  --card-clean-list-margin: clamp(4px, 0.8cqh, 8px) 0 clamp(6px, 1cqh, 9px);
+  --card-clean-li-gap: clamp(3px, 0.5cqh, 5px);
+  --card-clean-table-margin-top: clamp(6px, 1cqh, 9px);
+  --card-clean-table-cell-padding: clamp(5px, 0.8cqh, 7px) clamp(7px, 0.9cqw, 10px);
+}
+
+.social-card.density-spacious {
+  --card-chrome-padding-block: clamp(28px, 4.8cqh, 48px);
+  --card-chrome-padding-inline: 68px;
+  --card-body-block-padding: clamp(4px, 0.9cqh, 10px);
+  --card-body-inline-padding: 6.5cqw;
+  --card-clean-body-padding-block: clamp(30px, 6cqh, 56px);
+  --card-h1-font-size: clamp(28px, 5.2cqw, 82px);
+  --card-h2-font-size: clamp(20px, 2.4cqw, 38px);
+  --card-body-font-size: clamp(14px, 1.8cqw, 29px);
+  --card-h1-margin-bottom: clamp(14px, 2cqh, 22px);
+  --card-h2-margin: clamp(10px, 1.6cqh, 16px) 0 clamp(6px, 1cqh, 10px);
+  --card-body-line-height: 1.17;
+  --card-p-margin-bottom: clamp(6px, 1.1cqh, 10px);
+  --card-list-margin: clamp(5px, 1cqh, 8px) 0 clamp(7px, 1.3cqh, 10px);
+  --card-list-padding-left: 1.22em;
+  --card-li-gap: clamp(3px, 0.8cqh, 5px);
+  --card-pre-margin: clamp(8px, 1.4cqh, 12px) 0;
+  --card-pre-padding: 24px;
+  --card-table-margin-top: clamp(7px, 1.3cqh, 10px);
+  --card-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(8px, 0.9cqw, 14px);
+  --card-blockquote-margin: clamp(10px, 1.8cqh, 14px) 0;
+  --card-blockquote-padding-left: 30px;
+  --card-blockquote-border-width: 10px;
+  --card-clean-h1-font-size: clamp(32px, 5cqw, 80px);
+  --card-clean-h2-font-size: clamp(20px, 2.25cqw, 36px);
+  --card-clean-body-font-size: clamp(15px, 2cqw, 32px);
+  --card-clean-table-cell-font-size: clamp(13px, 1.8cqw, 29px);
+  --card-clean-h1-margin-bottom: clamp(14px, 2.2cqh, 22px);
+  --card-clean-h2-margin: clamp(7px, 1.2cqh, 11px) 0 clamp(5px, 0.9cqh, 8px);
+  --card-clean-body-line-height: 1.17;
+  --card-clean-p-margin-bottom: clamp(6px, 1.1cqh, 10px);
+  --card-clean-list-margin: clamp(5px, 0.9cqh, 8px) 0 clamp(6px, 1.1cqh, 10px);
+  --card-clean-list-padding-left: 1.15em;
+  --card-clean-li-gap: clamp(3px, 0.7cqh, 5px);
+  --card-clean-table-margin-top: clamp(6px, 1cqh, 9px);
+  --card-clean-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(7px, 0.9cqw, 11px);
 }
 
 .social-card.card-labels-hidden {
@@ -968,11 +1125,16 @@ textarea:focus {
   align-items: center;
   justify-content: space-between;
   gap: 32px;
-  padding: 44px 58px;
+  padding: var(--card-chrome-padding-block) var(--card-chrome-padding-inline);
   color: var(--card-muted);
   font-size: clamp(13px, 2.1cqw, 31px);
   font-weight: 850;
   letter-spacing: 0;
+}
+
+.card-chrome span:first-child,
+.card-footer span:last-child {
+  color: var(--card-accent);
 }
 
 .markdown-card-body {
@@ -982,13 +1144,13 @@ textarea:focus {
   flex-direction: column;
   justify-content: center;
   justify-content: safe center;
-  padding: 1cqh 5.5cqw;
+  padding: var(--card-body-block-padding) var(--card-body-inline-padding);
   overflow: hidden;
 }
 
 .social-card.card-labels-hidden .markdown-card-body {
   justify-content: flex-start;
-  padding-block: clamp(30px, 6cqh, 60px);
+  padding-block: var(--card-clean-body-padding-block);
 }
 
 .markdown-card-body > * {
@@ -1001,17 +1163,17 @@ textarea:focus {
 
 .markdown-card-body h1 {
   max-width: 100%;
-  margin: 0 0 28px;
+  margin: 0 0 var(--card-h1-margin-bottom);
   color: var(--card-heading);
-  font-size: clamp(28px, 7cqw, 112px);
+  font-size: var(--card-h1-font-size);
   line-height: 0.98;
 }
 
 .markdown-card-body h2 {
   max-width: 100%;
-  margin: 26px 0 16px;
-  color: var(--card-heading);
-  font-size: clamp(22px, 3.5cqw, 54px);
+  margin: var(--card-h2-margin);
+  color: var(--card-accent);
+  font-size: var(--card-h2-font-size);
   line-height: 1.1;
   white-space: normal;
 }
@@ -1021,26 +1183,31 @@ textarea:focus {
 .markdown-card-body td,
 .markdown-card-body th {
   color: var(--card-text);
-  font-size: clamp(16px, 2.7cqw, 43px);
-  line-height: 1.25;
+  font-size: var(--card-body-font-size);
+  line-height: var(--card-body-line-height);
 }
 
 .markdown-card-body p {
-  margin: 0 0 18px;
+  margin: 0 0 var(--card-p-margin-bottom);
 }
 
 .markdown-card-body ul,
 .markdown-card-body ol {
-  margin: 12px 0 18px;
-  padding-left: 1.15em;
+  margin: var(--card-list-margin);
+  padding-left: var(--card-list-padding-left);
+}
+
+.markdown-card-body li::marker,
+.markdown-card-body a {
+  color: var(--card-accent);
 }
 
 .markdown-card-body li + li {
-  margin-top: 8px;
+  margin-top: var(--card-li-gap);
 }
 
 .markdown-card-body code {
-  padding: 0.08em 0.28em;
+  padding: var(--card-code-padding);
   color: var(--code-text);
   background: var(--code-bg);
   border-radius: 8px;
@@ -1050,8 +1217,8 @@ textarea:focus {
 
 .markdown-card-body pre {
   max-width: 100%;
-  margin: 18px 0;
-  padding: 20px;
+  margin: var(--card-pre-margin);
+  padding: var(--card-pre-padding);
   overflow: hidden;
   color: var(--code-text);
   background: var(--code-bg);
@@ -1065,33 +1232,33 @@ textarea:focus {
 
 .markdown-card-body table {
   width: 100%;
-  margin-top: 18px;
+  margin-top: var(--card-table-margin-top);
   border-collapse: collapse;
 }
 
 .markdown-card-body th,
 .markdown-card-body td {
-  padding: 12px 14px;
+  padding: var(--card-table-cell-padding);
   border-bottom: 2px solid var(--table-rule);
   text-align: left;
 }
 
 .markdown-card-body blockquote {
-  margin: 20px 0;
-  padding-left: 24px;
-  border-left: 8px solid var(--card-accent);
+  margin: var(--card-blockquote-margin);
+  padding-left: var(--card-blockquote-padding-left);
+  border-left: var(--card-blockquote-border-width) solid var(--card-accent);
 }
 
 .social-card.card-labels-hidden .markdown-card-body h1 {
-  margin-bottom: clamp(16px, 2.2cqh, 22px);
-  font-size: clamp(32px, 6cqw, 96px);
+  margin-bottom: var(--card-clean-h1-margin-bottom);
+  font-size: var(--card-clean-h1-font-size);
   line-height: 0.98;
 }
 
 /* Clean cards keep secondary headings visible; compact sizing prevents h2 from flex-collapsing into clipped fragments. */
 .social-card.card-labels-hidden .markdown-card-body h2 {
-  margin: clamp(8px, 1.2cqh, 12px) 0 clamp(6px, 1cqh, 10px);
-  font-size: clamp(20px, 2.5cqw, 40px);
+  margin: var(--card-clean-h2-margin);
+  font-size: var(--card-clean-h2-font-size);
   line-height: 1.1;
 }
 
@@ -1099,33 +1266,33 @@ textarea:focus {
 .social-card.card-labels-hidden .markdown-card-body li,
 .social-card.card-labels-hidden .markdown-card-body td,
 .social-card.card-labels-hidden .markdown-card-body th {
-  font-size: clamp(16px, 2.3cqw, 37px);
-  line-height: 1.2;
+  font-size: var(--card-clean-body-font-size);
+  line-height: var(--card-clean-body-line-height);
 }
 
 .social-card.card-labels-hidden .markdown-card-body p {
-  margin-bottom: clamp(8px, 1.3cqh, 12px);
+  margin-bottom: var(--card-clean-p-margin-bottom);
 }
 
 .social-card.card-labels-hidden .markdown-card-body ul,
 .social-card.card-labels-hidden .markdown-card-body ol {
-  margin: clamp(6px, 1cqh, 10px) 0 clamp(8px, 1.3cqh, 12px);
-  padding-left: 1.05em;
+  margin: var(--card-clean-list-margin);
+  padding-left: var(--card-clean-list-padding-left);
 }
 
 .social-card.card-labels-hidden .markdown-card-body li + li {
-  margin-top: clamp(4px, 0.7cqh, 6px);
+  margin-top: var(--card-clean-li-gap);
 }
 
 .social-card.card-labels-hidden .markdown-card-body table {
-  margin-top: clamp(8px, 1.2cqh, 12px);
+  margin-top: var(--card-clean-table-margin-top);
 }
 
 .social-card.card-labels-hidden .markdown-card-body th,
 .social-card.card-labels-hidden .markdown-card-body td {
-  padding: clamp(6px, 1cqh, 9px) clamp(8px, 1cqw, 12px);
+  padding: var(--card-clean-table-cell-padding);
   border-bottom-width: 1px;
-  font-size: clamp(14px, 2.05cqw, 33px);
+  font-size: var(--card-clean-table-cell-font-size);
   line-height: 1.15;
 }
 
@@ -1336,6 +1503,8 @@ textarea:focus {
 
   .segmented-control,
   .quality-control,
+  .density-control,
+  .accent-control,
   .theme-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
@@ -1416,7 +1585,9 @@ textarea:focus {
 
   .template-gallery button,
   .segmented-control button,
-  .quality-control button {
+  .quality-control button,
+  .density-control button,
+  .accent-control button {
     min-height: auto;
   }
 
