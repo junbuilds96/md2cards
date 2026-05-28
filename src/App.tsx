@@ -105,7 +105,7 @@ function CardPreview({
   cardTypographyScaleId: CardTypographyScaleId;
   cardAccentId: CardAccentId;
 }) {
-  const renderLabels = shouldShowCardLabels(showCardLabels);
+  const labelsVisible = shouldShowCardLabels(showCardLabels);
 
   return (
     <div
@@ -116,12 +116,10 @@ function CardPreview({
         aspectRatio: `${preset.width} / ${preset.height}`,
       } as CSSProperties}
     >
-      {renderLabels ? (
-        <div className="card-chrome">
-          <span>MD2Cards</span>
-          <span>{preset.label}</span>
-        </div>
-      ) : null}
+      <div className="card-chrome" aria-hidden={!labelsVisible}>
+        <span>MD2Cards</span>
+        <span>{preset.label}</span>
+      </div>
       <div className="markdown-card-body">
         {isBlank ? (
           <div className="empty-card-state">
@@ -132,12 +130,10 @@ function CardPreview({
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
         )}
       </div>
-      {renderLabels ? (
-        <div className="card-footer">
-          <span>Markdown to social card</span>
-          <span>{preset.sizeLabel}</span>
-        </div>
-      ) : null}
+      <div className="card-footer" aria-hidden={!labelsVisible}>
+        <span>Markdown to social card</span>
+        <span>{preset.sizeLabel}</span>
+      </div>
     </div>
   );
 }
@@ -1150,7 +1146,7 @@ function App() {
                       setMessage(
                         event.target.checked
                           ? 'Card labels shown. Exports include the header and footer metadata.'
-                          : 'Card labels hidden. Exports use the clean card only.',
+                          : 'Card labels hidden. Exports hide the header and footer labels.',
                       );
                     }}
                   />

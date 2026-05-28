@@ -19,30 +19,18 @@ function getRuleContaining(selector: string, declaration: string): string {
   return matches.find((match) => match[1]?.includes(declaration))?.[1] ?? '';
 }
 
-describe('clean social card CSS', () => {
-  it('uses compact in-card spacing when labels are hidden', () => {
+describe('social card CSS', () => {
+  it('hides card labels without changing body layout or typography', () => {
     const cardRule = getRule('.social-card');
-    const bodyRule = getRule('.social-card.card-labels-hidden .markdown-card-body');
-    const h1Rule = getRule('.social-card.card-labels-hidden .markdown-card-body h1');
-    const tableCellRule = getRule(
-      '.social-card.card-labels-hidden .markdown-card-body th,\n.social-card.card-labels-hidden .markdown-card-body td',
+    const labelRule = getRule(
+      '.social-card.card-labels-hidden .card-chrome,\n.social-card.card-labels-hidden .card-footer',
     );
 
-    expect(cardRule).toContain('--card-clean-body-padding-block: clamp(30px, 6cqh, 60px)');
-    expect(cardRule).toContain('--card-clean-h1-font-size: clamp(32px, 6cqw, 96px)');
-    expect(bodyRule).toContain('justify-content: flex-start');
-    expect(bodyRule).toContain('padding-block: var(--card-clean-body-padding-block)');
-    expect(h1Rule).toContain('font-size: var(--card-clean-h1-font-size)');
-    expect(tableCellRule).toContain('font-size: var(--card-clean-table-cell-font-size)');
-  });
-
-  it('keeps markdown children and h2 from collapsing into clipped fragments', () => {
-    const childRule = getRule('.social-card.card-labels-hidden .markdown-card-body > *');
-    const h2Rule = getRule('.social-card.card-labels-hidden .markdown-card-body h2');
-
-    expect(childRule).toContain('flex-shrink: 0');
-    expect(h2Rule).toContain('font-size: var(--card-clean-h2-font-size)');
-    expect(h2Rule).not.toMatch(/(?:^|[;\s])(?:height|max-height)\s*:\s*0/);
+    expect(cardRule).toContain('grid-template-rows: auto minmax(0, 1fr) auto');
+    expect(labelRule).toContain('visibility: hidden');
+    expect(styles).not.toMatch(/\.social-card\.card-labels-hidden\s*\{\s*grid-template-rows:/);
+    expect(styles).not.toContain('.social-card.card-labels-hidden .markdown-card-body');
+    expect(styles).not.toContain('--card-clean-');
   });
 
   it('keeps spacious launch samples constrained while preserving visible density differences', () => {

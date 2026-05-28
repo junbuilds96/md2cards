@@ -17,7 +17,7 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 - Export/import reusable JSON card recipes to move a finished setup between browsers or share it with a teammate.
 - Fit pasted Markdown to the selected platform with a local, deterministic compaction helper.
 - Check line count, character count, safe areas, and export size before downloading, including on narrow laptop and mobile screens.
-- Hide card labels for clean unbranded cards, then copy PNGs to the clipboard, download crisp PNGs, or keep reusable SVG output.
+- Hide header and footer labels, then copy PNGs to the clipboard, download crisp PNGs, or keep reusable SVG output.
 
 ## Quickstart
 
@@ -28,7 +28,7 @@ npm install
 npm run dev
 ```
 
-Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, drop in a local `.md`/`.markdown`/`.txt` file, or import a recipe `.json`. Pick a platform preset, theme, density, and accent color, hide **Card labels** if you want a clean card, optionally save the setup as a local preset or export the recipe JSON, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
+Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, drop in a local `.md`/`.markdown`/`.txt` file, or import a recipe `.json`. Pick a platform preset, theme, density, and accent color, hide **Card labels** if you want to remove the header and footer text, optionally save the setup as a local preset or export the recipe JSON, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
 
 ## Common Use Cases
 

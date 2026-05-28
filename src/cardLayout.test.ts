@@ -9,7 +9,7 @@ describe('card label layout', () => {
     );
   });
 
-  it('adds the clean-card class when labels are hidden', () => {
+  it('adds only the label visibility state when labels are hidden', () => {
     expect(shouldShowCardLabels(false)).toBe(false);
     expect(getCardClassName('theme-signal', false, 'compact', 'large')).toBe(
       'social-card theme-signal density-compact type-large card-labels-hidden',

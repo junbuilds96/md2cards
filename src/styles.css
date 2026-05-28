@@ -1064,7 +1064,6 @@ textarea:focus {
   --card-chrome-padding-inline: 58px;
   --card-body-block-padding: 1cqh;
   --card-body-inline-padding: 5.5cqw;
-  --card-clean-body-padding-block: clamp(30px, 6cqh, 60px);
   --card-h1-font-size: clamp(28px, 7cqw, 112px);
   --card-h2-font-size: clamp(22px, 3.5cqw, 54px);
   --card-body-font-size: clamp(16px, 2.7cqw, 43px);
@@ -1083,19 +1082,6 @@ textarea:focus {
   --card-blockquote-margin: 20px 0;
   --card-blockquote-padding-left: 24px;
   --card-blockquote-border-width: 8px;
-  --card-clean-h1-font-size: clamp(32px, 6cqw, 96px);
-  --card-clean-h2-font-size: clamp(20px, 2.5cqw, 40px);
-  --card-clean-body-font-size: clamp(16px, 2.3cqw, 37px);
-  --card-clean-table-cell-font-size: clamp(14px, 2.05cqw, 33px);
-  --card-clean-h1-margin-bottom: clamp(16px, 2.2cqh, 22px);
-  --card-clean-h2-margin: clamp(8px, 1.2cqh, 12px) 0 clamp(6px, 1cqh, 10px);
-  --card-clean-body-line-height: 1.2;
-  --card-clean-p-margin-bottom: clamp(8px, 1.3cqh, 12px);
-  --card-clean-list-margin: clamp(6px, 1cqh, 10px) 0 clamp(8px, 1.3cqh, 12px);
-  --card-clean-list-padding-left: 1.05em;
-  --card-clean-li-gap: clamp(4px, 0.7cqh, 6px);
-  --card-clean-table-margin-top: clamp(8px, 1.2cqh, 12px);
-  --card-clean-table-cell-padding: clamp(6px, 1cqh, 9px) clamp(8px, 1cqw, 12px);
 }
 
 .social-card.density-compact {
@@ -1103,7 +1089,6 @@ textarea:focus {
   --card-chrome-padding-inline: 46px;
   --card-body-block-padding: 0.5cqh;
   --card-body-inline-padding: 4.8cqw;
-  --card-clean-body-padding-block: clamp(24px, 4.5cqh, 46px);
   --card-h1-margin-bottom: 18px;
   --card-h2-margin: 18px 0 10px;
   --card-body-line-height: 1.18;
@@ -1118,14 +1103,6 @@ textarea:focus {
   --card-blockquote-margin: 14px 0;
   --card-blockquote-padding-left: 18px;
   --card-blockquote-border-width: 6px;
-  --card-clean-h1-margin-bottom: clamp(12px, 1.7cqh, 18px);
-  --card-clean-h2-margin: clamp(6px, 0.9cqh, 9px) 0 clamp(4px, 0.7cqh, 8px);
-  --card-clean-body-line-height: 1.15;
-  --card-clean-p-margin-bottom: clamp(6px, 1cqh, 9px);
-  --card-clean-list-margin: clamp(4px, 0.8cqh, 8px) 0 clamp(6px, 1cqh, 9px);
-  --card-clean-li-gap: clamp(3px, 0.5cqh, 5px);
-  --card-clean-table-margin-top: clamp(6px, 1cqh, 9px);
-  --card-clean-table-cell-padding: clamp(5px, 0.8cqh, 7px) clamp(7px, 0.9cqw, 10px);
 }
 
 .social-card.density-spacious {
@@ -1133,7 +1110,6 @@ textarea:focus {
   --card-chrome-padding-inline: 68px;
   --card-body-block-padding: clamp(4px, 0.9cqh, 10px);
   --card-body-inline-padding: 6.5cqw;
-  --card-clean-body-padding-block: clamp(30px, 6cqh, 56px);
   --card-h1-font-size: clamp(28px, 5.2cqw, 82px);
   --card-h2-font-size: clamp(20px, 2.4cqw, 38px);
   --card-body-font-size: clamp(14px, 1.8cqw, 29px);
@@ -1151,29 +1127,12 @@ textarea:focus {
   --card-blockquote-margin: clamp(10px, 1.8cqh, 14px) 0;
   --card-blockquote-padding-left: 30px;
   --card-blockquote-border-width: 10px;
-  --card-clean-h1-font-size: clamp(32px, 5cqw, 80px);
-  --card-clean-h2-font-size: clamp(20px, 2.25cqw, 36px);
-  --card-clean-body-font-size: clamp(15px, 2cqw, 32px);
-  --card-clean-table-cell-font-size: clamp(13px, 1.8cqw, 29px);
-  --card-clean-h1-margin-bottom: clamp(14px, 2.2cqh, 22px);
-  --card-clean-h2-margin: clamp(7px, 1.2cqh, 11px) 0 clamp(5px, 0.9cqh, 8px);
-  --card-clean-body-line-height: 1.17;
-  --card-clean-p-margin-bottom: clamp(6px, 1.1cqh, 10px);
-  --card-clean-list-margin: clamp(5px, 0.9cqh, 8px) 0 clamp(6px, 1.1cqh, 10px);
-  --card-clean-list-padding-left: 1.15em;
-  --card-clean-li-gap: clamp(3px, 0.7cqh, 5px);
-  --card-clean-table-margin-top: clamp(6px, 1cqh, 9px);
-  --card-clean-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(7px, 0.9cqw, 11px);
 }
 
 .social-card.type-small {
   --card-h1-font-size: clamp(24px, 5.9cqw, 94px);
   --card-h2-font-size: clamp(18px, 2.9cqw, 45px);
   --card-body-font-size: clamp(14px, 2.25cqw, 36px);
-  --card-clean-h1-font-size: clamp(28px, 5.15cqw, 82px);
-  --card-clean-h2-font-size: clamp(18px, 2.15cqw, 34px);
-  --card-clean-body-font-size: clamp(14px, 1.95cqw, 31px);
-  --card-clean-table-cell-font-size: clamp(12px, 1.75cqw, 28px);
   --card-empty-heading-font-size: clamp(24px, 5.5cqw, 82px);
   --card-empty-body-font-size: clamp(14px, 2.3cqw, 35px);
 }
@@ -1182,16 +1141,8 @@ textarea:focus {
   --card-h1-font-size: clamp(32px, 8cqw, 128px);
   --card-h2-font-size: clamp(24px, 4cqw, 62px);
   --card-body-font-size: clamp(18px, 3.05cqw, 49px);
-  --card-clean-h1-font-size: clamp(36px, 6.75cqw, 108px);
-  --card-clean-h2-font-size: clamp(22px, 2.85cqw, 46px);
-  --card-clean-body-font-size: clamp(18px, 2.55cqw, 41px);
-  --card-clean-table-cell-font-size: clamp(15px, 2.25cqw, 36px);
   --card-empty-heading-font-size: clamp(32px, 7.15cqw, 108px);
   --card-empty-body-font-size: clamp(18px, 3.1cqw, 47px);
-}
-
-.social-card.card-labels-hidden {
-  grid-template-rows: minmax(0, 1fr);
 }
 
 .card-chrome,
@@ -1213,6 +1164,11 @@ textarea:focus {
   color: var(--card-accent);
 }
 
+.social-card.card-labels-hidden .card-chrome,
+.social-card.card-labels-hidden .card-footer {
+  visibility: hidden;
+}
+
 .markdown-card-body {
   z-index: 1;
   display: flex;
@@ -1224,17 +1180,8 @@ textarea:focus {
   overflow: hidden;
 }
 
-.social-card.card-labels-hidden .markdown-card-body {
-  justify-content: flex-start;
-  padding-block: var(--card-clean-body-padding-block);
-}
-
 .markdown-card-body > * {
   max-width: 100%;
-}
-
-.social-card.card-labels-hidden .markdown-card-body > * {
-  flex-shrink: 0;
 }
 
 .markdown-card-body h1 {
@@ -1323,57 +1270,6 @@ textarea:focus {
   margin: var(--card-blockquote-margin);
   padding-left: var(--card-blockquote-padding-left);
   border-left: var(--card-blockquote-border-width) solid var(--card-accent);
-}
-
-.social-card.card-labels-hidden .markdown-card-body h1 {
-  margin-bottom: var(--card-clean-h1-margin-bottom);
-  font-size: var(--card-clean-h1-font-size);
-  line-height: 0.98;
-}
-
-/* Clean cards keep secondary headings visible; compact sizing prevents h2 from flex-collapsing into clipped fragments. */
-.social-card.card-labels-hidden .markdown-card-body h2 {
-  margin: var(--card-clean-h2-margin);
-  font-size: var(--card-clean-h2-font-size);
-  line-height: 1.1;
-}
-
-.social-card.card-labels-hidden .markdown-card-body p,
-.social-card.card-labels-hidden .markdown-card-body li,
-.social-card.card-labels-hidden .markdown-card-body td,
-.social-card.card-labels-hidden .markdown-card-body th {
-  font-size: var(--card-clean-body-font-size);
-  line-height: var(--card-clean-body-line-height);
-}
-
-.social-card.card-labels-hidden .markdown-card-body p {
-  margin-bottom: var(--card-clean-p-margin-bottom);
-}
-
-.social-card.card-labels-hidden .markdown-card-body ul,
-.social-card.card-labels-hidden .markdown-card-body ol {
-  margin: var(--card-clean-list-margin);
-  padding-left: var(--card-clean-list-padding-left);
-}
-
-.social-card.card-labels-hidden .markdown-card-body li + li {
-  margin-top: var(--card-clean-li-gap);
-}
-
-.social-card.card-labels-hidden .markdown-card-body table {
-  margin-top: var(--card-clean-table-margin-top);
-}
-
-.social-card.card-labels-hidden .markdown-card-body th,
-.social-card.card-labels-hidden .markdown-card-body td {
-  padding: var(--card-clean-table-cell-padding);
-  border-bottom-width: 1px;
-  font-size: var(--card-clean-table-cell-font-size);
-  line-height: 1.15;
-}
-
-.social-card.card-labels-hidden .markdown-card-body > :last-child {
-  margin-bottom: 0;
 }
 
 .empty-card-state {
