@@ -83,6 +83,16 @@ describe('markdownTemplates', () => {
   });
 });
 
+describe('cardThemes', () => {
+  it('describes distinct design personalities for the theme controls', () => {
+    expect(cardThemes.map((theme) => theme.id)).toEqual(['signal', 'paper', 'midnight', 'editorial']);
+    expect(cardThemes.find((theme) => theme.id === 'signal')?.description).toContain('blueprint grid');
+    expect(cardThemes.find((theme) => theme.id === 'paper')?.description).toContain('paper grain');
+    expect(cardThemes.find((theme) => theme.id === 'midnight')?.description).toContain('terminal chrome');
+    expect(cardThemes.find((theme) => theme.id === 'editorial')?.description).toContain('soft panels');
+  });
+});
+
 describe('recipePresets', () => {
   it('exposes curated recipe presets with valid visual settings', () => {
     const recipeIds = new Set(recipePresets.map((recipePreset) => recipePreset.id));

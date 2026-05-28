@@ -62,6 +62,36 @@ describe('social card CSS', () => {
     expect(vividRule).toContain('--card-edge-glow: var(--card-glow)');
   });
 
+  it('gives every card theme distinct CSS personality hooks', () => {
+    const cardRule = getRule('.social-card');
+    const beforeRule = getRule('.social-card::before');
+    const afterRule = getRuleContaining('.social-card::after', 'background-image');
+    const signalRule = getRule('.theme-signal');
+    const paperRule = getRule('.theme-paper');
+    const midnightRule = getRule('.theme-midnight');
+    const editorialRule = getRule('.theme-editorial');
+    const preRule = getRule('.markdown-card-body pre');
+    const preChromeRule = getRule('.markdown-card-body pre::before');
+    const preCodeRule = getRule('.markdown-card-body pre code');
+
+    expect(cardRule).toContain('isolation: isolate');
+    expect(cardRule).toContain('--card-personality-layer-image: linear-gradient(transparent, transparent)');
+    expect(beforeRule).toContain('background-image: var(--card-personality-layer-image)');
+    expect(beforeRule).toContain('background-size: var(--card-personality-layer-size)');
+    expect(afterRule).toContain('background-image: var(--card-personality-accent-image)');
+    expect(signalRule).toContain('rgba(31, 111, 235, 0.14) 1px');
+    expect(signalRule).toContain('--card-personality-layer-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px');
+    expect(paperRule).toContain('radial-gradient(circle at 1px 1px');
+    expect(paperRule).toContain('rgba(189, 59, 50, 0.2)');
+    expect(midnightRule).toContain('radial-gradient(circle at 34px 28px, #ff5f57');
+    expect(midnightRule).toContain('--card-pre-chrome-content: ""');
+    expect(editorialRule).toContain('rgba(255, 184, 77, 0.18)');
+    expect(editorialRule).toContain('rgba(28, 21, 51, 0.82)');
+    expect(preRule).toContain('padding: var(--card-pre-padding-top, var(--card-pre-padding))');
+    expect(preChromeRule).toContain('content: var(--card-pre-chrome-content)');
+    expect(preCodeRule).toContain('position: relative');
+  });
+
   it('defines corner radius classes without changing export sizing rules', () => {
     const cardRule = getRule('.social-card');
     const sharpRule = getRule('.social-card.radius-sharp');

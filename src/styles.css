@@ -1139,6 +1139,7 @@ textarea:focus {
 
 .social-card {
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   width: 100%;
@@ -1163,7 +1164,7 @@ textarea:focus {
   --card-surface-radius: 8px;
   --card-inline-radius: 8px;
   --card-shadow: 0 26px 70px rgba(22, 30, 44, 0.28);
-  --card-chrome-padding-block: 44px;
+  --card-chrome-padding-block: 38px;
   --card-chrome-padding-inline: 58px;
   --card-body-block-padding: 1cqh;
   --card-body-inline-padding: 5.5cqw;
@@ -1193,6 +1194,37 @@ textarea:focus {
   --card-surface-border: var(--table-rule);
   --card-surface-shine: rgba(255, 255, 255, 0.46);
   --card-surface-shadow: inset 0 1px 0 var(--card-surface-shine);
+  --card-personality-layer-image: linear-gradient(transparent, transparent);
+  --card-personality-layer-size: auto;
+  --card-personality-layer-position: 0 0;
+  --card-personality-layer-opacity: 0;
+  --card-personality-accent-image: linear-gradient(transparent, transparent);
+  --card-personality-accent-opacity: 0;
+  --card-pre-chrome-content: none;
+  --card-pre-chrome-height: 0;
+  --card-pre-chrome-bg: transparent;
+  --card-pre-chrome-border: 0 solid transparent;
+}
+
+.social-card::before,
+.social-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.social-card::before {
+  background-image: var(--card-personality-layer-image);
+  background-position: var(--card-personality-layer-position);
+  background-size: var(--card-personality-layer-size);
+  opacity: var(--card-personality-layer-opacity);
+}
+
+.social-card::after {
+  background-image: var(--card-personality-accent-image);
+  opacity: var(--card-personality-accent-opacity);
 }
 
 .social-card.background-soft {
@@ -1333,6 +1365,10 @@ textarea:focus {
   max-width: 100%;
 }
 
+.markdown-card-body > :last-child {
+  margin-bottom: 0;
+}
+
 .markdown-card-body h1 {
   max-width: 100%;
   margin: 0 0 var(--card-h1-margin-bottom);
@@ -1413,7 +1449,7 @@ textarea:focus {
   position: relative;
   max-width: 100%;
   margin: var(--card-pre-margin);
-  padding: var(--card-pre-padding);
+  padding: var(--card-pre-padding-top, var(--card-pre-padding)) var(--card-pre-padding) var(--card-pre-padding);
   overflow: hidden;
   color: var(--code-text);
   background:
@@ -1426,8 +1462,18 @@ textarea:focus {
   line-height: var(--card-code-line-height);
 }
 
+.markdown-card-body pre::before {
+  content: var(--card-pre-chrome-content);
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--card-pre-chrome-height);
+  background: var(--card-pre-chrome-bg);
+  border-bottom: var(--card-pre-chrome-border);
+}
+
 .markdown-card-body pre code {
   display: block;
+  position: relative;
   padding: 0;
   overflow-wrap: anywhere;
   background: transparent;
@@ -1549,6 +1595,19 @@ textarea:focus {
   --code-bg: rgba(31, 111, 235, 0.12);
   --code-text: #123f8c;
   --table-rule: rgba(31, 111, 235, 0.18);
+  --card-surface-shine: rgba(255, 255, 255, 0.58);
+  --card-personality-layer-image:
+    linear-gradient(rgba(31, 111, 235, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 111, 235, 0.14) 1px, transparent 1px),
+    linear-gradient(rgba(31, 111, 235, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 111, 235, 0.07) 1px, transparent 1px);
+  --card-personality-layer-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
+  --card-personality-layer-position: -1px -1px;
+  --card-personality-layer-opacity: 0.58;
+  --card-personality-accent-image:
+    linear-gradient(90deg, rgba(31, 111, 235, 0.24), transparent 42%),
+    linear-gradient(180deg, rgba(31, 111, 235, 0.16), transparent 36%);
+  --card-personality-accent-opacity: 0.5;
 }
 
 .theme-paper {
@@ -1565,6 +1624,20 @@ textarea:focus {
   --code-bg: rgba(51, 41, 31, 0.1);
   --code-text: #6d2b24;
   --table-rule: rgba(115, 94, 73, 0.22);
+  --card-surface-bg: rgba(255, 250, 242, 0.62);
+  --card-surface-shine: rgba(255, 255, 255, 0.34);
+  --card-surface-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    0 1px 0 rgba(51, 41, 31, 0.06);
+  --card-personality-layer-image:
+    radial-gradient(circle at 1px 1px, rgba(51, 41, 31, 0.16) 1px, transparent 1.6px),
+    linear-gradient(90deg, rgba(115, 94, 73, 0.08) 1px, transparent 1px);
+  --card-personality-layer-size: 18px 18px, 112px 100%;
+  --card-personality-layer-opacity: 0.34;
+  --card-personality-accent-image:
+    linear-gradient(180deg, transparent 17%, rgba(51, 41, 31, 0.16) 17%, rgba(51, 41, 31, 0.16) calc(17% + 2px), transparent calc(17% + 2px)),
+    linear-gradient(180deg, transparent 77%, rgba(189, 59, 50, 0.2) 77%, rgba(189, 59, 50, 0.2) calc(77% + 8px), transparent calc(77% + 8px));
+  --card-personality-accent-opacity: 0.66;
 }
 
 .theme-midnight {
@@ -1581,6 +1654,32 @@ textarea:focus {
   --code-bg: rgba(84, 214, 166, 0.12);
   --code-text: #99f0ce;
   --table-rule: rgba(159, 176, 202, 0.22);
+  --card-surface-bg: rgba(8, 13, 23, 0.74);
+  --card-surface-border: rgba(84, 214, 166, 0.24);
+  --card-surface-shine: rgba(153, 240, 206, 0.1);
+  --card-surface-shadow:
+    inset 0 1px 0 rgba(153, 240, 206, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --card-personality-layer-image:
+    linear-gradient(rgba(84, 214, 166, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(159, 176, 202, 0.07) 1px, transparent 1px);
+  --card-personality-layer-size: 100% 30px, 44px 100%;
+  --card-personality-layer-opacity: 0.42;
+  --card-personality-accent-image:
+    radial-gradient(circle at 34px 28px, #ff5f57 0 5px, transparent 6px),
+    radial-gradient(circle at 54px 28px, #febc2e 0 5px, transparent 6px),
+    radial-gradient(circle at 74px 28px, #28c840 0 5px, transparent 6px),
+    linear-gradient(180deg, rgba(4, 9, 18, 0.54) 0 72px, transparent 72px);
+  --card-personality-accent-opacity: 0.78;
+  --card-pre-padding-top: calc(var(--card-pre-padding) + 16px);
+  --card-pre-chrome-content: "";
+  --card-pre-chrome-height: 24px;
+  --card-pre-chrome-bg:
+    radial-gradient(circle at 14px 12px, #ff5f57 0 4px, transparent 5px),
+    radial-gradient(circle at 30px 12px, #febc2e 0 4px, transparent 5px),
+    radial-gradient(circle at 46px 12px, #28c840 0 4px, transparent 5px),
+    linear-gradient(90deg, rgba(84, 214, 166, 0.14), rgba(255, 255, 255, 0.03));
+  --card-pre-chrome-border: 1px solid rgba(84, 214, 166, 0.18);
 }
 
 .theme-editorial {
@@ -1597,6 +1696,17 @@ textarea:focus {
   --code-bg: rgba(28, 21, 51, 0.1);
   --code-text: #932d54;
   --table-rule: rgba(103, 93, 125, 0.22);
+  --card-surface-bg: rgba(255, 252, 248, 0.56);
+  --card-surface-shine: rgba(255, 255, 255, 0.5);
+  --card-personality-layer-image:
+    linear-gradient(90deg, rgba(226, 85, 121, 0.14) 0 18%, transparent 18%),
+    linear-gradient(180deg, rgba(255, 184, 77, 0.18) 0 24%, transparent 24%),
+    linear-gradient(90deg, transparent 0 67%, rgba(70, 94, 196, 0.12) 67% 100%);
+  --card-personality-layer-opacity: 0.82;
+  --card-personality-accent-image:
+    linear-gradient(90deg, transparent 0 3.5%, rgba(28, 21, 51, 0.82) 3.5%, rgba(28, 21, 51, 0.82) calc(3.5% + 10px), transparent calc(3.5% + 10px)),
+    linear-gradient(180deg, transparent 71%, rgba(226, 85, 121, 0.18) 71%, rgba(226, 85, 121, 0.18) 100%);
+  --card-personality-accent-opacity: 0.54;
 }
 
 @media (max-width: 1040px) {

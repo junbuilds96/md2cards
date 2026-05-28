@@ -231,25 +231,25 @@ export const cardThemes: CardTheme[] = [
     id: 'signal',
     label: 'Signal',
     className: 'theme-signal',
-    description: 'Crisp white, blue accents, and launch-note contrast.',
+    description: 'Crisp blueprint grid, blue accents, and launch-note contrast.',
   },
   {
     id: 'paper',
     label: 'Paper',
     className: 'theme-paper',
-    description: 'Warm editorial surface with ink-like typography.',
+    description: 'Warm paper grain, ink rules, and editorial typography.',
   },
   {
     id: 'midnight',
     label: 'Midnight',
     className: 'theme-midnight',
-    description: 'Dark, focused, and high-contrast for technical posts.',
+    description: 'Dark terminal chrome and high-contrast technical surfaces.',
   },
   {
     id: 'editorial',
     label: 'Editorial',
     className: 'theme-editorial',
-    description: 'Magazine-style color blocks for creator updates.',
+    description: 'Magazine-style blocks and soft panels for creator updates.',
   },
 ];
 
@@ -410,21 +410,10 @@ export const markdownTemplates: MarkdownTemplate[] = [
     themeId: 'signal',
     markdown: `# Ship notes that travel
 
-Turn a Markdown update into a polished card without opening a design tool.
+Markdown in, polished social card out.
 
-## Today in MD2Cards
-
-- Platform presets for launch posts
-- GitHub-flavored Markdown support
-- Browser-native PNG and SVG export
-
-| Output | Best for |
-| --- | --- |
-| Landscape | X / Twitter |
-| Portrait | Xiaohongshu |
-| Square | GitHub launches |
-
-\`npm run build\` and share the result.`,
+- Platform-ready sizes
+- PNG/SVG export`,
   },
   {
     id: 'xiaohongshu-insight',
