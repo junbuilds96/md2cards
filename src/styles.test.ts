@@ -70,26 +70,64 @@ describe('social card CSS', () => {
     const paperRule = getRule('.theme-paper');
     const midnightRule = getRule('.theme-midnight');
     const editorialRule = getRule('.theme-editorial');
+    const chromeRule = getRule('.card-chrome,\n.card-footer');
+    const h1Rule = getRule('.markdown-card-body h1');
+    const h2Rule = getRule('.markdown-card-body h2');
     const preRule = getRule('.markdown-card-body pre');
     const preChromeRule = getRule('.markdown-card-body pre::before');
     const preCodeRule = getRule('.markdown-card-body pre code');
 
     expect(cardRule).toContain('isolation: isolate');
+    expect(cardRule).toContain('--card-heading-font-family: inherit');
+    expect(cardRule).toContain('--card-h2-bg: transparent');
+    expect(chromeRule).toContain('font-family: var(--card-chrome-font-family)');
+    expect(chromeRule).toContain('text-transform: var(--card-chrome-text-transform)');
+    expect(h1Rule).toContain('font-family: var(--card-heading-font-family)');
+    expect(h1Rule).toContain('text-shadow: var(--card-heading-text-shadow)');
+    expect(h2Rule).toContain('background: var(--card-h2-bg)');
+    expect(h2Rule).toContain('border: var(--card-h2-border)');
     expect(cardRule).toContain('--card-personality-layer-image: linear-gradient(transparent, transparent)');
     expect(beforeRule).toContain('background-image: var(--card-personality-layer-image)');
     expect(beforeRule).toContain('background-size: var(--card-personality-layer-size)');
     expect(afterRule).toContain('background-image: var(--card-personality-accent-image)');
     expect(signalRule).toContain('rgba(31, 111, 235, 0.14) 1px');
     expect(signalRule).toContain('--card-personality-layer-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px');
+    expect(signalRule).toContain('--card-chrome-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace');
+    expect(signalRule).toContain('--card-h2-bg: linear-gradient(90deg, rgba(31, 111, 235, 0.14)');
     expect(paperRule).toContain('radial-gradient(circle at 1px 1px');
     expect(paperRule).toContain('rgba(189, 59, 50, 0.2)');
+    expect(paperRule).toContain('--card-heading-font-family: Georgia, "Times New Roman", serif');
+    expect(paperRule).toContain('--card-h2-bg: linear-gradient(180deg, transparent 58%');
     expect(midnightRule).toContain('radial-gradient(circle at 34px 28px, #ff5f57');
     expect(midnightRule).toContain('--card-pre-chrome-content: ""');
+    expect(midnightRule).toContain('--card-heading-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace');
+    expect(midnightRule).toContain('--card-h2-border: 1px solid rgba(84, 214, 166, 0.26)');
     expect(editorialRule).toContain('rgba(255, 184, 77, 0.18)');
     expect(editorialRule).toContain('rgba(28, 21, 51, 0.82)');
+    expect(editorialRule).toContain('--card-heading-font-family: Georgia, "Times New Roman", serif');
+    expect(editorialRule).toContain('--card-h2-bg: linear-gradient(90deg, rgba(226, 85, 121, 0.18)');
     expect(preRule).toContain('padding: var(--card-pre-padding-top, var(--card-pre-padding))');
     expect(preChromeRule).toContain('content: var(--card-pre-chrome-content)');
     expect(preCodeRule).toContain('position: relative');
+  });
+
+  it('defines texture classes that only tune decorative personality overlays', () => {
+    const beforeRule = getRule('.social-card::before');
+    const afterRule = getRuleContaining('.social-card::after', 'background-image');
+    const cleanRule = getRule('.social-card.texture-clean');
+    const subtleRule = getRule('.social-card.texture-subtle');
+    const richRule = getRule('.social-card.texture-rich');
+
+    expect(beforeRule).toContain('opacity: var(--card-texture-layer-opacity)');
+    expect(afterRule).toContain('opacity: var(--card-texture-accent-opacity)');
+    expect(cleanRule).toContain('--card-texture-layer-opacity: 0.06');
+    expect(cleanRule).toContain('--card-texture-accent-opacity: 0.08');
+    expect(subtleRule).toContain('--card-texture-layer-opacity: var(--card-personality-layer-opacity)');
+    expect(subtleRule).toContain('--card-texture-accent-opacity: var(--card-personality-accent-opacity)');
+    expect(richRule).toContain('--card-texture-layer-opacity: 0.7');
+    expect(richRule).toContain('--card-texture-accent-opacity: 0.78');
+    expect(cleanRule).not.toContain('--card-body');
+    expect(richRule).not.toContain('--card-body');
   });
 
   it('defines corner radius classes without changing export sizing rules', () => {

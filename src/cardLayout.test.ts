@@ -4,15 +4,21 @@ import { getCardAppearanceStyle, getCardClassName, shouldShowCardLabels } from '
 describe('card label layout', () => {
   it('keeps label chrome visible by default behavior', () => {
     expect(shouldShowCardLabels(true)).toBe(true);
-    expect(getCardClassName('theme-signal', true, 'balanced', 'default', 'balanced', 'sharp')).toBe(
-      'social-card theme-signal density-balanced type-default background-balanced radius-sharp',
+    expect(getCardClassName('theme-signal', true, 'balanced', 'default', 'balanced', 'sharp', 'subtle')).toBe(
+      'social-card theme-signal density-balanced type-default background-balanced radius-sharp texture-subtle',
     );
   });
 
   it('adds only the label visibility state when labels are hidden', () => {
     expect(shouldShowCardLabels(false)).toBe(false);
-    expect(getCardClassName('theme-signal', false, 'compact', 'large', 'vivid', 'rounded')).toBe(
-      'social-card theme-signal density-compact type-large background-vivid radius-rounded card-labels-hidden',
+    expect(getCardClassName('theme-signal', false, 'compact', 'large', 'vivid', 'rounded', 'clean')).toBe(
+      'social-card theme-signal density-compact type-large background-vivid radius-rounded texture-clean card-labels-hidden',
+    );
+  });
+
+  it('adds the selected texture depth class to exported card markup', () => {
+    expect(getCardClassName('theme-paper', true, 'spacious', 'small', 'soft', 'subtle', 'rich')).toBe(
+      'social-card theme-paper density-spacious type-small background-soft radius-subtle texture-rich',
     );
   });
 

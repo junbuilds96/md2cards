@@ -14,6 +14,8 @@ export type CardBackgroundIntensityId = 'soft' | 'balanced' | 'vivid';
 
 export type CardCornerRadiusId = 'sharp' | 'subtle' | 'rounded';
 
+export type CardTextureId = 'clean' | 'subtle' | 'rich';
+
 export type PlatformPreset = {
   id: PresetId;
   label: string;
@@ -89,6 +91,13 @@ export type CardCornerRadiusOption = {
   className: string;
 };
 
+export type CardTextureOption = {
+  id: CardTextureId;
+  label: string;
+  description: string;
+  className: string;
+};
+
 export type TemplateId = 'x-launch' | 'xiaohongshu-insight' | 'github-release';
 
 export type MarkdownTemplate = {
@@ -113,6 +122,7 @@ export type RecipePreset = {
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
+  cardTextureId: CardTextureId;
   showCardLabels: boolean;
   markdown: string;
 };
@@ -265,6 +275,8 @@ export const defaultCardBackgroundIntensityId: CardBackgroundIntensityId = 'bala
 
 export const defaultCardCornerRadiusId: CardCornerRadiusId = 'sharp';
 
+export const defaultCardTextureId: CardTextureId = 'subtle';
+
 export const exportScaleOptions: ExportScaleOption[] = [
   {
     id: 'fast',
@@ -401,6 +413,27 @@ export const cardCornerRadiusOptions: CardCornerRadiusOption[] = [
   },
 ];
 
+export const cardTextureOptions: CardTextureOption[] = [
+  {
+    id: 'clean',
+    label: 'Clean',
+    description: 'Minimizes decorative overlays for a quieter card.',
+    className: 'texture-clean',
+  },
+  {
+    id: 'subtle',
+    label: 'Subtle',
+    description: 'Keeps the current theme texture depth.',
+    className: 'texture-subtle',
+  },
+  {
+    id: 'rich',
+    label: 'Rich',
+    description: 'Adds stronger decorative depth without reducing readability.',
+    className: 'texture-rich',
+  },
+];
+
 export const markdownTemplates: MarkdownTemplate[] = [
   {
     id: 'x-launch',
@@ -475,6 +508,7 @@ export const recipePresets: RecipePreset[] = [
     cardAccentId: 'blue',
     cardBackgroundIntensityId: 'balanced',
     cardCornerRadiusId: 'subtle',
+    cardTextureId: 'subtle',
     showCardLabels: true,
     markdown: `# Launch faster with Markdown cards
 
@@ -495,6 +529,7 @@ Turn a product update into a share-ready visual in one pass.
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
+    cardTextureId: 'rich',
     showCardLabels: true,
     markdown: `# v0.4.0 Changelog
 
@@ -521,6 +556,7 @@ Turn a product update into a share-ready visual in one pass.
     cardAccentId: 'amber',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'subtle',
+    cardTextureId: 'subtle',
     showCardLabels: false,
     markdown: `# Turn notes into a card
 
@@ -543,6 +579,7 @@ Turn a product update into a share-ready visual in one pass.
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'rounded',
+    cardTextureId: 'rich',
     showCardLabels: false,
     markdown: `# The card is the hook
 
@@ -563,6 +600,7 @@ People decide whether to read the caption from the first two seconds.
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
+    cardTextureId: 'clean',
     showCardLabels: false,
     markdown: `# "Design tools should disappear when the idea is clear."
 
@@ -581,6 +619,7 @@ Use Markdown for structure. Use recipes for the visual rhythm.
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'balanced',
     cardCornerRadiusId: 'sharp',
+    cardTextureId: 'subtle',
     showCardLabels: true,
     markdown: `# Export a card from Markdown
 
@@ -1050,6 +1089,10 @@ export function getCardBackgroundIntensityOption(
 
 export function getCardCornerRadiusOption(cardCornerRadiusId: CardCornerRadiusId): CardCornerRadiusOption {
   return cardCornerRadiusOptions.find((option) => option.id === cardCornerRadiusId) ?? cardCornerRadiusOptions[0];
+}
+
+export function getCardTextureOption(cardTextureId: CardTextureId): CardTextureOption {
+  return cardTextureOptions.find((option) => option.id === cardTextureId) ?? cardTextureOptions[1];
 }
 
 export function getExportPixelSize(

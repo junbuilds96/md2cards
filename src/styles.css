@@ -669,6 +669,12 @@ textarea:focus {
   gap: 8px;
 }
 
+.texture-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .template-gallery {
   display: grid;
   gap: 8px;
@@ -687,6 +693,7 @@ textarea:focus {
 .accent-control button,
 .background-intensity-control button,
 .corner-radius-control button,
+.texture-control button,
 .recipe-preset-grid button,
 .template-gallery button,
 .theme-option {
@@ -718,7 +725,8 @@ textarea:focus {
 .typography-control button,
 .accent-control button,
 .background-intensity-control button,
-.corner-radius-control button {
+.corner-radius-control button,
+.texture-control button {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -750,6 +758,7 @@ textarea:focus {
 .accent-control button span:last-child,
 .background-intensity-control button span,
 .corner-radius-control button span,
+.texture-control button span,
 .recipe-preset-grid button span,
 .template-gallery button span,
 .theme-option span:last-child {
@@ -876,6 +885,7 @@ textarea:focus {
 .accent-control button.active,
 .background-intensity-control button.active,
 .corner-radius-control button.active,
+.texture-control button.active,
 .recipe-preset-grid button.active,
 .template-gallery button.active,
 .theme-option.active {
@@ -1194,12 +1204,24 @@ textarea:focus {
   --card-surface-border: var(--table-rule);
   --card-surface-shine: rgba(255, 255, 255, 0.46);
   --card-surface-shadow: inset 0 1px 0 var(--card-surface-shine);
+  --card-heading-font-family: inherit;
+  --card-heading-font-weight: 850;
+  --card-heading-text-shadow: none;
+  --card-h2-bg: transparent;
+  --card-h2-padding: 0;
+  --card-h2-border: 0 solid transparent;
+  --card-h2-radius: 0;
+  --card-h2-shadow: none;
+  --card-chrome-font-family: inherit;
+  --card-chrome-text-transform: none;
   --card-personality-layer-image: linear-gradient(transparent, transparent);
   --card-personality-layer-size: auto;
   --card-personality-layer-position: 0 0;
   --card-personality-layer-opacity: 0;
+  --card-texture-layer-opacity: var(--card-personality-layer-opacity);
   --card-personality-accent-image: linear-gradient(transparent, transparent);
   --card-personality-accent-opacity: 0;
+  --card-texture-accent-opacity: var(--card-personality-accent-opacity);
   --card-pre-chrome-content: none;
   --card-pre-chrome-height: 0;
   --card-pre-chrome-bg: transparent;
@@ -1219,12 +1241,12 @@ textarea:focus {
   background-image: var(--card-personality-layer-image);
   background-position: var(--card-personality-layer-position);
   background-size: var(--card-personality-layer-size);
-  opacity: var(--card-personality-layer-opacity);
+  opacity: var(--card-texture-layer-opacity);
 }
 
 .social-card::after {
   background-image: var(--card-personality-accent-image);
-  opacity: var(--card-personality-accent-opacity);
+  opacity: var(--card-texture-accent-opacity);
 }
 
 .social-card.background-soft {
@@ -1259,6 +1281,21 @@ textarea:focus {
   --card-radius: clamp(34px, 5cqw, 72px);
   --card-surface-radius: clamp(16px, 2cqw, 28px);
   --card-inline-radius: clamp(10px, 1.2cqw, 16px);
+}
+
+.social-card.texture-clean {
+  --card-texture-layer-opacity: 0.06;
+  --card-texture-accent-opacity: 0.08;
+}
+
+.social-card.texture-subtle {
+  --card-texture-layer-opacity: var(--card-personality-layer-opacity);
+  --card-texture-accent-opacity: var(--card-personality-accent-opacity);
+}
+
+.social-card.texture-rich {
+  --card-texture-layer-opacity: 0.7;
+  --card-texture-accent-opacity: 0.78;
 }
 
 .social-card.density-compact {
@@ -1335,9 +1372,11 @@ textarea:focus {
   gap: 32px;
   padding: var(--card-chrome-padding-block) var(--card-chrome-padding-inline);
   color: var(--card-muted);
+  font-family: var(--card-chrome-font-family);
   font-size: clamp(13px, 2.1cqw, 31px);
   font-weight: 850;
   letter-spacing: 0;
+  text-transform: var(--card-chrome-text-transform);
 }
 
 .card-chrome span:first-child,
@@ -1373,16 +1412,28 @@ textarea:focus {
   max-width: 100%;
   margin: 0 0 var(--card-h1-margin-bottom);
   color: var(--card-heading);
+  font-family: var(--card-heading-font-family);
   font-size: var(--card-h1-font-size);
+  font-weight: var(--card-heading-font-weight);
   line-height: 0.98;
+  text-shadow: var(--card-heading-text-shadow);
 }
 
 .markdown-card-body h2 {
+  width: fit-content;
   max-width: 100%;
   margin: var(--card-h2-margin);
+  padding: var(--card-h2-padding);
   color: var(--card-accent);
+  background: var(--card-h2-bg);
+  border: var(--card-h2-border);
+  border-radius: var(--card-h2-radius);
+  box-shadow: var(--card-h2-shadow);
+  font-family: var(--card-heading-font-family);
   font-size: var(--card-h2-font-size);
+  font-weight: var(--card-heading-font-weight);
   line-height: 1.1;
+  overflow-wrap: anywhere;
   white-space: normal;
 }
 
@@ -1596,6 +1647,14 @@ textarea:focus {
   --code-text: #123f8c;
   --table-rule: rgba(31, 111, 235, 0.18);
   --card-surface-shine: rgba(255, 255, 255, 0.58);
+  --card-heading-font-weight: 900;
+  --card-heading-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.68);
+  --card-h2-bg: linear-gradient(90deg, rgba(31, 111, 235, 0.14), rgba(31, 111, 235, 0.04));
+  --card-h2-padding: 0.18em 0.42em 0.2em;
+  --card-h2-border: 1px solid rgba(31, 111, 235, 0.22);
+  --card-h2-radius: var(--card-inline-radius);
+  --card-chrome-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --card-chrome-text-transform: uppercase;
   --card-personality-layer-image:
     linear-gradient(rgba(31, 111, 235, 0.14) 1px, transparent 1px),
     linear-gradient(90deg, rgba(31, 111, 235, 0.14) 1px, transparent 1px),
@@ -1629,6 +1688,12 @@ textarea:focus {
   --card-surface-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.52),
     0 1px 0 rgba(51, 41, 31, 0.06);
+  --card-heading-font-family: Georgia, "Times New Roman", serif;
+  --card-heading-font-weight: 700;
+  --card-heading-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.46);
+  --card-h2-bg: linear-gradient(180deg, transparent 58%, rgba(189, 59, 50, 0.16) 58%);
+  --card-h2-padding: 0 0.12em 0.06em;
+  --card-chrome-font-family: Georgia, "Times New Roman", serif;
   --card-personality-layer-image:
     radial-gradient(circle at 1px 1px, rgba(51, 41, 31, 0.16) 1px, transparent 1.6px),
     linear-gradient(90deg, rgba(115, 94, 73, 0.08) 1px, transparent 1px);
@@ -1660,6 +1725,16 @@ textarea:focus {
   --card-surface-shadow:
     inset 0 1px 0 rgba(153, 240, 206, 0.12),
     inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --card-heading-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --card-heading-font-weight: 800;
+  --card-heading-text-shadow: 0 0 20px rgba(84, 214, 166, 0.22);
+  --card-h2-bg: rgba(84, 214, 166, 0.1);
+  --card-h2-padding: 0.18em 0.45em;
+  --card-h2-border: 1px solid rgba(84, 214, 166, 0.26);
+  --card-h2-radius: 6px;
+  --card-h2-shadow: inset 0 1px 0 rgba(153, 240, 206, 0.12);
+  --card-chrome-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --card-chrome-text-transform: uppercase;
   --card-personality-layer-image:
     linear-gradient(rgba(84, 214, 166, 0.09) 1px, transparent 1px),
     linear-gradient(90deg, rgba(159, 176, 202, 0.07) 1px, transparent 1px);
@@ -1698,6 +1773,13 @@ textarea:focus {
   --table-rule: rgba(103, 93, 125, 0.22);
   --card-surface-bg: rgba(255, 252, 248, 0.56);
   --card-surface-shine: rgba(255, 255, 255, 0.5);
+  --card-heading-font-family: Georgia, "Times New Roman", serif;
+  --card-heading-font-weight: 760;
+  --card-heading-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.48);
+  --card-h2-bg: linear-gradient(90deg, rgba(226, 85, 121, 0.18), rgba(255, 184, 77, 0.2));
+  --card-h2-padding: 0.16em 0.44em 0.18em;
+  --card-h2-radius: var(--card-inline-radius);
+  --card-chrome-font-family: Georgia, "Times New Roman", serif;
   --card-personality-layer-image:
     linear-gradient(90deg, rgba(226, 85, 121, 0.14) 0 18%, transparent 18%),
     linear-gradient(180deg, rgba(255, 184, 77, 0.18) 0 24%, transparent 24%),
@@ -1872,6 +1954,7 @@ textarea:focus {
   .accent-control,
   .background-intensity-control,
   .corner-radius-control,
+  .texture-control,
   .recipe-preset-grid,
   .theme-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -1961,7 +2044,8 @@ textarea:focus {
   .typography-control button,
   .accent-control button,
   .background-intensity-control button,
-  .corner-radius-control button {
+  .corner-radius-control button,
+  .texture-control button {
     min-height: auto;
   }
 

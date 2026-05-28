@@ -4,11 +4,13 @@ import {
   cardBackgroundIntensityOptions,
   cardCornerRadiusOptions,
   cardDensityOptions,
+  cardTextureOptions,
   cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardBackgroundIntensityId,
   defaultCardCornerRadiusId,
   defaultCardDensityId,
+  defaultCardTextureId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
@@ -17,6 +19,7 @@ import {
   type CardBackgroundIntensityId,
   type CardCornerRadiusId,
   type CardDensityId,
+  type CardTextureId,
   type CardTypographyScaleId,
   type ExportScaleId,
   type PresetId,
@@ -38,6 +41,7 @@ export type SavedCardPreset = {
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
+  cardTextureId: CardTextureId;
   updatedAt: number;
 };
 
@@ -52,6 +56,7 @@ export type SavedCardPresetDraft = {
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
+  cardTextureId: CardTextureId;
 };
 
 export type SaveSavedPresetResult = {
@@ -70,6 +75,7 @@ const validCardTypographyScaleIds = new Set(cardTypographyScaleOptions.map((opti
 const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
 const validCardBackgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
 const validCardCornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
+const validCardTextureIds = new Set(cardTextureOptions.map((option) => option.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -113,6 +119,7 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
       : value.cardBackgroundIntensityId;
   const cardCornerRadiusId =
     value.cardCornerRadiusId === undefined ? defaultCardCornerRadiusId : value.cardCornerRadiusId;
+  const cardTextureId = value.cardTextureId === undefined ? defaultCardTextureId : value.cardTextureId;
   const updatedAt = typeof value.updatedAt === 'number' && Number.isFinite(value.updatedAt) ? value.updatedAt : 0;
 
   if (
@@ -126,7 +133,8 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     !validCardTypographyScaleIds.has(cardTypographyScaleId as CardTypographyScaleId) ||
     !validCardAccentIds.has(cardAccentId as CardAccentId) ||
     !validCardBackgroundIntensityIds.has(cardBackgroundIntensityId as CardBackgroundIntensityId) ||
-    !validCardCornerRadiusIds.has(cardCornerRadiusId as CardCornerRadiusId)
+    !validCardCornerRadiusIds.has(cardCornerRadiusId as CardCornerRadiusId) ||
+    !validCardTextureIds.has(cardTextureId as CardTextureId)
   ) {
     return null;
   }
@@ -143,6 +151,7 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     cardAccentId: cardAccentId as CardAccentId,
     cardBackgroundIntensityId: cardBackgroundIntensityId as CardBackgroundIntensityId,
     cardCornerRadiusId: cardCornerRadiusId as CardCornerRadiusId,
+    cardTextureId: cardTextureId as CardTextureId,
     updatedAt,
   };
 }
@@ -236,6 +245,7 @@ export function saveSavedPreset(
     cardCornerRadiusId: validCardCornerRadiusIds.has(draft.cardCornerRadiusId)
       ? draft.cardCornerRadiusId
       : defaultCardCornerRadiusId,
+    cardTextureId: validCardTextureIds.has(draft.cardTextureId) ? draft.cardTextureId : defaultCardTextureId,
     updatedAt,
   };
 

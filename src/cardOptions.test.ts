@@ -4,15 +4,18 @@ import {
   cardBackgroundIntensityOptions,
   cardCornerRadiusOptions,
   cardDensityOptions,
+  cardTextureOptions,
   cardTypographyScaleOptions,
   cardThemes,
   defaultCardCornerRadiusId,
+  defaultCardTextureId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
   fitMarkdownToPreset,
   getCardBackgroundIntensityOption,
   getCardCornerRadiusOption,
+  getCardTextureOption,
   getCardTypographyScaleOption,
   getExportPixelSize,
   getExportScaleOption,
@@ -103,6 +106,7 @@ describe('recipePresets', () => {
     const accentIds = new Set(cardAccentOptions.map((option) => option.id));
     const backgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
     const cornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
+    const textureIds = new Set(cardTextureOptions.map((option) => option.id));
 
     expect(recipeIds.size).toBe(recipePresets.length);
     expect(recipePresets.map((recipePreset) => recipePreset.id)).toEqual([
@@ -122,6 +126,7 @@ describe('recipePresets', () => {
       recipePresets.every((recipePreset) => backgroundIntensityIds.has(recipePreset.cardBackgroundIntensityId)),
     ).toBe(true);
     expect(recipePresets.every((recipePreset) => cornerRadiusIds.has(recipePreset.cardCornerRadiusId))).toBe(true);
+    expect(recipePresets.every((recipePreset) => textureIds.has(recipePreset.cardTextureId))).toBe(true);
     expect(recipePresets.every((recipePreset) => recipePreset.markdown.trim().startsWith('#'))).toBe(true);
   });
 
@@ -132,6 +137,7 @@ describe('recipePresets', () => {
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTypographyScaleId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardBackgroundIntensityId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardCornerRadiusId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTextureId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.showCardLabels)).size).toBe(2);
     expect(getRecipePreset('code-snippet').markdown).toContain('```bash');
     expect(getRecipePreset('tutorial').markdown).toContain('1. Paste the Markdown draft');
@@ -178,6 +184,29 @@ describe('corner radius options', () => {
       id: 'sharp',
       label: 'Sharp',
       className: 'radius-sharp',
+    });
+  });
+});
+
+describe('texture options', () => {
+  it('defaults to subtle texture and exposes decorative depth classes', () => {
+    expect(getCardTextureOption(defaultCardTextureId)).toMatchObject({
+      id: 'subtle',
+      className: 'texture-subtle',
+    });
+    expect(cardTextureOptions.map((option) => option.id)).toEqual(['clean', 'subtle', 'rich']);
+    expect(cardTextureOptions.map((option) => option.className)).toEqual([
+      'texture-clean',
+      'texture-subtle',
+      'texture-rich',
+    ]);
+  });
+
+  it('falls back to subtle texture for unknown ids', () => {
+    expect(getCardTextureOption('missing' as never)).toMatchObject({
+      id: 'subtle',
+      label: 'Subtle',
+      className: 'texture-subtle',
     });
   });
 });

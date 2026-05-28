@@ -3,11 +3,13 @@ import {
   getCardBackgroundIntensityOption,
   getCardCornerRadiusOption,
   getCardDensityOption,
+  getCardTextureOption,
   getCardTypographyScaleOption,
   type CardAccentId,
   type CardBackgroundIntensityId,
   type CardCornerRadiusId,
   type CardDensityId,
+  type CardTextureId,
   type CardTypographyScaleId,
 } from './cardOptions';
 
@@ -24,6 +26,7 @@ export function getCardClassName(
   cardTypographyScaleId: CardTypographyScaleId,
   cardBackgroundIntensityId: CardBackgroundIntensityId,
   cardCornerRadiusId: CardCornerRadiusId,
+  cardTextureId: CardTextureId,
 ): string {
   return [
     'social-card',
@@ -32,6 +35,7 @@ export function getCardClassName(
     getCardTypographyScaleOption(cardTypographyScaleId).className,
     getCardBackgroundIntensityOption(cardBackgroundIntensityId).className,
     getCardCornerRadiusOption(cardCornerRadiusId).className,
+    getCardTextureOption(cardTextureId).className,
     showCardLabels ? '' : 'card-labels-hidden',
   ]
     .filter(Boolean)
