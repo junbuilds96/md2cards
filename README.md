@@ -73,6 +73,17 @@ npm run test     # Run tests
 npm run preview  # Preview the production build
 ```
 
+## Docker
+
+Build the static production image and run it locally:
+
+```bash
+docker build -t md2cards .
+docker run --rm -p 8080:80 md2cards
+```
+
+Open `http://localhost:8080`. The image builds the Vite app with Node and serves the generated `dist` directory with nginx.
+
 ## Roadmap
 
 - More card templates for launches, docs, changelogs, and creator posts.
