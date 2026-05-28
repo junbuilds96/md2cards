@@ -1,4 +1,13 @@
-import { type ChangeEvent, type CSSProperties, type DragEvent, type RefObject, useMemo, useRef, useState } from 'react';
+import {
+  type ChangeEvent,
+  type ComponentPropsWithoutRef,
+  type CSSProperties,
+  type DragEvent,
+  type RefObject,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
@@ -91,6 +100,16 @@ type ImportState = 'idle' | 'importing' | 'success' | 'error';
 type PresetSaveState = 'idle' | 'saved' | 'error';
 type RecipeTransferState = 'idle' | 'importing' | 'success' | 'error';
 
+const markdownComponents = {
+  table({ children }: ComponentPropsWithoutRef<'table'>) {
+    return (
+      <div className="markdown-table-scroll">
+        <table>{children}</table>
+      </div>
+    );
+  },
+};
+
 function firstMarkdownHeading(markdown: string): string {
   const heading = markdown
     .split('\n')
@@ -157,7 +176,9 @@ function CardPreview({
             <span>Headings, lists, tables, code, and quotes render here.</span>
           </div>
         ) : (
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+            {markdown}
+          </ReactMarkdown>
         )}
       </div>
       <div className="card-footer" aria-hidden={!labelsVisible}>
