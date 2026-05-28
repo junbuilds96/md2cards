@@ -84,15 +84,25 @@ describe('social card CSS', () => {
   });
 
   it('keeps the desktop workspace viewport-fixed with independent control scrolling', () => {
+    const rootRule = getRule(':root');
+    const bodyRule = getRule('body');
+    const reactRootRule = getRule('#root');
     const appShellRule = getRule('.app-shell');
     const workspaceRule = getRule('.workspace');
     const controlPanelRule = getRule('.control-panel');
 
+    expect(rootRule).toContain('height: 100%');
+    expect(rootRule).toContain('overflow: hidden');
+    expect(bodyRule).toContain('height: 100dvh');
+    expect(bodyRule).toContain('overflow: hidden');
+    expect(reactRootRule).toContain('height: 100%');
+    expect(reactRootRule).toContain('overflow: hidden');
     expect(appShellRule).toContain('height: 100dvh');
     expect(appShellRule).toContain('min-height: 100dvh');
     expect(appShellRule).toContain('overflow: hidden');
     expect(workspaceRule).toContain('height: calc(100dvh - 40px)');
     expect(workspaceRule).toContain('min-height: calc(100dvh - 40px)');
+    expect(controlPanelRule).toContain('contain: layout paint');
     expect(controlPanelRule).toContain('min-height: 0');
     expect(controlPanelRule).toContain('overflow-y: auto');
   });
@@ -114,7 +124,15 @@ describe('social card CSS', () => {
   });
 
   it('keeps mobile layout document-scrolled with a bounded preview row', () => {
+    const mobileRootRule = getRuleContaining(':root', 'height: auto');
+    const mobileBodyRule = getRuleContaining('body', 'height: auto');
+    const mobileReactRootRule = getRuleContaining('#root', 'height: auto');
+
     expect(styles).toContain('@media (max-width: 1040px)');
+    expect(mobileRootRule).toContain('overflow: visible');
+    expect(mobileBodyRule).toContain('overflow-y: visible');
+    expect(mobileReactRootRule).toContain('overflow: visible');
+    expect(styles).toContain('contain: none');
     expect(styles).toContain('height: auto');
     expect(styles).toContain('overflow: visible');
     expect(styles).toContain('overflow-y: visible');
