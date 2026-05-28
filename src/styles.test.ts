@@ -43,6 +43,7 @@ describe('social card CSS', () => {
     expect(spaciousRule).toContain('--card-h1-font-size: clamp(28px, 5.2cqw, 82px)');
     expect(spaciousRule).toContain('--card-body-font-size: clamp(14px, 1.8cqw, 29px)');
     expect(spaciousRule).toContain('--card-body-line-height: 1.17');
+    expect(spaciousRule).toContain('--card-list-item-padding-inline: 0.58em');
     expect(spaciousRule).toContain('--card-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(8px, 0.9cqw, 14px)');
   });
 
@@ -156,31 +157,52 @@ describe('social card CSS', () => {
       '.markdown-card-body p,\n.markdown-card-body li,\n.markdown-card-body td,\n.markdown-card-body th',
     );
     const listRule = getRule('.markdown-card-body ul,\n.markdown-card-body ol');
-    const markerRule = getRule('.markdown-card-body li::marker');
+    const listItemRule = getRule('.markdown-card-body li');
+    const listBulletRule = getRule('.markdown-card-body li::before');
+    const orderedListRule = getRuleContaining('.markdown-card-body ol', 'counter-reset: markdown-card-list');
+    const orderedItemRule = getRule('.markdown-card-body ol > li::before');
+    const inlineCodeRule = getRule('.markdown-card-body code');
     const preRule = getRule('.markdown-card-body pre');
     const preCodeRule = getRule('.markdown-card-body pre code');
     const tableRule = getRule('.markdown-card-body table');
-    const tableHeaderRule = getRuleContaining('.markdown-card-body th', 'background: var(--code-bg)');
+    const tableHeaderRule = getRuleContaining('.markdown-card-body th', 'background: var(--card-table-header-bg)');
+    const tableCellRule = getRuleContaining('.markdown-card-body td', 'background: var(--card-table-row-bg)');
     const quoteRule = getRule('.markdown-card-body blockquote');
+    const quoteAccentRule = getRule('.markdown-card-body blockquote::before');
     const quoteParagraphRule = getRule('.markdown-card-body blockquote p');
 
     expect(cardRule).toContain('--card-surface-bg: var(--code-bg)');
     expect(cardRule).toContain('--card-surface-border: var(--table-rule)');
+    expect(cardRule).toContain('--card-surface-soft-bg: var(--card-surface-bg)');
+    expect(cardRule).toContain('--card-table-header-bg: linear-gradient(180deg, var(--card-surface-shine), var(--code-bg))');
     expect(cardRule).toContain('--card-code-block-font-size: clamp(12px, 1.45cqw, 24px)');
     expect(textRule).toContain('overflow-wrap: anywhere');
-    expect(listRule).toContain('list-style-position: outside');
-    expect(markerRule).toContain('font-weight: 850');
+    expect(listRule).toContain('display: grid');
+    expect(listRule).toContain('list-style: none');
+    expect(listItemRule).toContain('background:');
+    expect(listItemRule).toContain('border: 1px solid var(--card-surface-border)');
+    expect(listItemRule).toContain('border-radius: var(--card-inline-radius)');
+    expect(listBulletRule).toContain('box-shadow: 0 0 0 0.22em var(--code-bg)');
+    expect(orderedListRule).toContain('counter-reset: markdown-card-list');
+    expect(orderedItemRule).toContain('content: counter(markdown-card-list)');
+    expect(inlineCodeRule).toContain('border: 1px solid var(--card-surface-border)');
     expect(preRule).toContain('linear-gradient(180deg, var(--card-surface-shine), transparent 34%)');
     expect(preRule).toContain('border: 1px solid var(--card-surface-border)');
     expect(preRule).toContain('font-size: var(--card-code-block-font-size)');
+    expect(preRule).toContain('overflow: hidden auto');
+    expect(preRule).toContain('scrollbar-width: thin');
     expect(preCodeRule).toContain('white-space: pre-wrap');
     expect(preCodeRule).toContain('overflow-wrap: anywhere');
+    expect(preCodeRule).toContain('word-break: break-word');
     expect(tableRule).toContain('table-layout: fixed');
     expect(tableRule).toContain('border-collapse: separate');
     expect(tableRule).toContain('border-radius: var(--card-surface-radius)');
-    expect(tableHeaderRule).toContain('background: var(--code-bg)');
+    expect(tableHeaderRule).toContain('background: var(--card-table-header-bg)');
+    expect(tableCellRule).toContain('background: var(--card-table-row-bg)');
     expect(quoteRule).toContain('border-left: var(--card-blockquote-border-width) solid var(--card-accent)');
     expect(quoteRule).toContain('background:');
+    expect(quoteRule).toContain('overflow: hidden');
+    expect(quoteAccentRule).toContain('background: linear-gradient(180deg, var(--card-accent), transparent 145%)');
     expect(quoteParagraphRule).toContain('font-weight: 800');
   });
 
