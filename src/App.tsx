@@ -1,17 +1,20 @@
-import { useMemo, useRef, useState } from 'react';
+import { type ChangeEvent, type DragEvent, type RefObject, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
+  AlertCircle,
   Check,
   Clipboard,
   Download,
   FileCode2,
+  FileUp,
   ImageDown,
   LayoutTemplate,
   PanelRightOpen,
   RotateCcw,
   ShieldCheck,
   Sparkles,
+  Upload,
 } from 'lucide-react';
 import {
   cardThemes,
@@ -35,9 +38,11 @@ import {
   type TemplateId,
 } from './cardOptions';
 import { copyCard, downloadCard, downloadSvgCard } from './exportImage';
+import { validateMarkdownImportFile } from './markdownFileImport';
 
 type ExportState = 'idle' | 'copying' | 'copied' | 'downloading-png' | 'downloading-svg' | 'error';
 type StarterCopyState = 'idle' | 'copying' | 'copied' | 'error';
+type ImportState = 'idle' | 'importing' | 'success' | 'error';
 
 function firstMarkdownHeading(markdown: string): string {
   const heading = markdown
@@ -157,6 +162,67 @@ function OnboardingChecklist({
   );
 }
 
+function MarkdownFileImporter({
+  importState,
+  importMessage,
+  isDraggingImport,
+  fileInputRef,
+  onChooseFile,
+  onFileInputChange,
+  onImportDrop,
+  onImportDragOver,
+  onImportDragLeave,
+}: {
+  importState: ImportState;
+  importMessage: string;
+  isDraggingImport: boolean;
+  fileInputRef: RefObject<HTMLInputElement | null>;
+  onChooseFile: () => void;
+  onFileInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onImportDrop: (event: DragEvent<HTMLDivElement>) => void;
+  onImportDragOver: (event: DragEvent<HTMLDivElement>) => void;
+  onImportDragLeave: (event: DragEvent<HTMLDivElement>) => void;
+}) {
+  return (
+    <div
+      className={`markdown-import ${isDraggingImport ? 'dragging' : ''} ${importState}`}
+      onDrop={onImportDrop}
+      onDragOver={onImportDragOver}
+      onDragLeave={onImportDragLeave}
+    >
+      <div className="markdown-import-icon" aria-hidden="true">
+        <FileUp size={20} />
+      </div>
+      <div className="markdown-import-copy">
+        <strong>Drop a Markdown file here</strong>
+        <span>.md, .markdown, or .txt up to 1 MB</span>
+        {importMessage ? (
+          <small className="markdown-import-status">
+            {importState === 'error' ? <AlertCircle size={14} /> : <Check size={14} />}
+            {importMessage}
+          </small>
+        ) : null}
+      </div>
+      <button
+        className="ghost-button markdown-import-action"
+        type="button"
+        onClick={onChooseFile}
+        disabled={importState === 'importing'}
+      >
+        <Upload size={16} />
+        {importState === 'importing' ? 'Importing...' : 'Choose File'}
+      </button>
+      <input
+        ref={fileInputRef}
+        className="file-input"
+        type="file"
+        accept=".md,.markdown,.txt,text/markdown,text/plain"
+        onChange={onFileInputChange}
+      />
+    </div>
+  );
+}
+
 function App() {
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [presetId, setPresetId] = useState<PlatformPreset['id']>('twitter');
@@ -166,10 +232,14 @@ function App() {
   const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
   const [exportState, setExportState] = useState<ExportState>('idle');
   const [starterCopyState, setStarterCopyState] = useState<StarterCopyState>('idle');
+  const [importState, setImportState] = useState<ImportState>('idle');
+  const [importMessage, setImportMessage] = useState('');
+  const [isDraggingImport, setIsDraggingImport] = useState(false);
   const [fitMessage, setFitMessage] = useState('');
   const [message, setMessage] = useState('Ready to export.');
   const cardRef = useRef<HTMLDivElement | null>(null);
   const markdownInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const preset = useMemo(
     () => platformPresets.find((item) => item.id === presetId) ?? platformPresets[0],
@@ -184,6 +254,12 @@ function App() {
   const title = useMemo(() => firstMarkdownHeading(markdown), [markdown]);
   const canExport = !markdownGuidance.stats.isBlank;
 
+  function resetEditorFeedback() {
+    setFitMessage('');
+    setExportState('idle');
+    setStarterCopyState('idle');
+  }
+
   function applyTemplate(templateId: TemplateId) {
     const template = getMarkdownTemplate(templateId);
 
@@ -192,17 +268,17 @@ function App() {
     setThemeId(template.themeId);
     setActiveTemplateId(template.id);
     setMessage(`${template.label} loaded. Replace the text with your own Markdown when ready.`);
-    setFitMessage('');
-    setExportState('idle');
-    setStarterCopyState('idle');
+    setImportState('idle');
+    setImportMessage('');
+    resetEditorFeedback();
   }
 
   function startBlankMarkdown() {
     setMarkdown('');
     setMessage('Blank editor ready. Paste Markdown to create a card.');
-    setFitMessage('');
-    setExportState('idle');
-    setStarterCopyState('idle');
+    setImportState('idle');
+    setImportMessage('');
+    resetEditorFeedback();
     window.setTimeout(() => markdownInputRef.current?.focus(), 0);
   }
 
@@ -217,6 +293,82 @@ function App() {
     setMessage(result.note);
     setExportState('idle');
     setStarterCopyState('idle');
+    setImportState('idle');
+    setImportMessage('');
+  }
+
+  async function importMarkdownFile(file: File | undefined) {
+    setIsDraggingImport(false);
+    resetEditorFeedback();
+
+    if (!file) {
+      return;
+    }
+
+    const validation = validateMarkdownImportFile(file);
+    if (!validation.valid) {
+      setImportState('error');
+      setImportMessage(validation.message);
+      setMessage(validation.message);
+      return;
+    }
+
+    try {
+      setImportState('importing');
+      setImportMessage(`Importing ${file.name}...`);
+      setMessage(`Reading ${file.name}...`);
+
+      const importedMarkdown = (await file.text()).replace(/\r\n?/g, '\n');
+
+      if (importedMarkdown.trim().length === 0) {
+        const emptyMessage = 'This file has no Markdown content to preview.';
+        setImportState('error');
+        setImportMessage(emptyMessage);
+        setMessage(emptyMessage);
+        return;
+      }
+
+      setMarkdown(importedMarkdown);
+      setImportState('success');
+      setImportMessage(`Imported ${file.name}.`);
+      setMessage(`Imported ${file.name}. Preview updated and ready to export.`);
+      window.setTimeout(() => markdownInputRef.current?.focus(), 0);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unable to read this file.';
+      setImportState('error');
+      setImportMessage(errorMessage);
+      setMessage(errorMessage);
+    }
+  }
+
+  function handleChooseFile() {
+    fileInputRef.current?.click();
+  }
+
+  function handleFileInputChange(event: ChangeEvent<HTMLInputElement>) {
+    void importMarkdownFile(event.target.files?.[0]);
+    event.target.value = '';
+  }
+
+  function handleImportDragOver(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+
+    if (event.dataTransfer.types.includes('Files')) {
+      setIsDraggingImport(true);
+    }
+  }
+
+  function handleImportDragLeave(event: DragEvent<HTMLDivElement>) {
+    const nextTarget = event.relatedTarget;
+
+    if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
+      setIsDraggingImport(false);
+    }
+  }
+
+  function handleImportDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    void importMarkdownFile(event.dataTransfer.files[0]);
   }
 
   async function handleCopyStarterMarkdown() {
@@ -367,6 +519,17 @@ function App() {
                 </button>
               </div>
             </div>
+            <MarkdownFileImporter
+              importState={importState}
+              importMessage={importMessage}
+              isDraggingImport={isDraggingImport}
+              fileInputRef={fileInputRef}
+              onChooseFile={handleChooseFile}
+              onFileInputChange={handleFileInputChange}
+              onImportDrop={handleImportDrop}
+              onImportDragOver={handleImportDragOver}
+              onImportDragLeave={handleImportDragLeave}
+            />
             <textarea
               id="markdown-input"
               ref={markdownInputRef}
@@ -378,9 +541,9 @@ function App() {
                     ? 'Paste Markdown to preview and export a card.'
                     : 'Editing Markdown. Preview updates live.',
                 );
-                setFitMessage('');
-                setExportState('idle');
-                setStarterCopyState('idle');
+                setImportState('idle');
+                setImportMessage('');
+                resetEditorFeedback();
               }}
               placeholder={`# Paste your launch note\n\n- One clear update\n- A proof point or metric\n- A next step`}
               spellCheck="false"
@@ -533,7 +696,7 @@ function App() {
             </div>
           </div>
 
-          <div className={`status-line ${exportState === 'error' ? 'error' : ''}`} role="status">
+          <div className={`status-line ${exportState === 'error' || importState === 'error' ? 'error' : ''}`} role="status">
             <span>{message}</span>
             <span>
               {theme.label} · {preset.sizeLabel} · Export {exportPixelSize.width} x {exportPixelSize.height}px

@@ -32,7 +32,7 @@ describe('onboardingWorkflowSteps', () => {
     ]);
     expect(onboardingWorkflowSteps.map((step) => step.label)).toEqual([
       'Pick template or Start Blank',
-      'Paste Markdown',
+      'Paste or import Markdown',
       'Check length and safe area',
       'Choose platform/export quality',
       'Export PNG/SVG',

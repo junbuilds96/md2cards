@@ -100,8 +100,8 @@ export const onboardingWorkflowSteps: OnboardingWorkflowStep[] = [
   },
   {
     id: 'paste-markdown',
-    label: 'Paste Markdown',
-    detail: 'Replace the starter with your launch note, release update, or product summary.',
+    label: 'Paste or import Markdown',
+    detail: 'Replace the starter with text, or drop in a local Markdown draft.',
   },
   {
     id: 'check-fit',

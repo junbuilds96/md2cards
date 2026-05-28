@@ -211,6 +211,97 @@ h2 {
   gap: 8px;
 }
 
+.markdown-import {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  color: #26364f;
+  background: #f8fbff;
+  border: 1px dashed #b7c7dc;
+  border-radius: 8px;
+}
+
+.markdown-import.dragging {
+  background: #eef6ff;
+  border-color: #2059e8;
+  box-shadow: 0 0 0 3px rgba(32, 89, 232, 0.14);
+}
+
+.markdown-import.success {
+  background: #effaf4;
+  border-color: #9ed8b5;
+}
+
+.markdown-import.error {
+  background: #fff4f2;
+  border-color: #f5b5ae;
+}
+
+.markdown-import-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: #2059e8;
+  background: #ffffff;
+  border: 1px solid #d6deea;
+  border-radius: 8px;
+}
+
+.markdown-import-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.markdown-import-copy strong,
+.markdown-import-copy span,
+.markdown-import-copy small {
+  overflow-wrap: anywhere;
+}
+
+.markdown-import-copy strong {
+  color: #182230;
+  font-size: 0.84rem;
+  line-height: 1.18;
+}
+
+.markdown-import-copy span {
+  color: #667085;
+  font-size: 0.76rem;
+  line-height: 1.25;
+}
+
+.markdown-import-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #1f5f3e;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.markdown-import.error .markdown-import-status {
+  color: #b42318;
+}
+
+.markdown-import-action {
+  background: #ffffff;
+}
+
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 label,
 .field-label {
   color: #233044;
@@ -884,6 +975,15 @@ textarea:focus {
 
   .editor-actions {
     justify-content: flex-start;
+  }
+
+  .markdown-import {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .markdown-import-action {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
 
   .preview-toolbar,
