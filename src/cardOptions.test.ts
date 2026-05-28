@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  cardAccentOptions,
+  cardDensityOptions,
   cardTypographyScaleOptions,
   cardThemes,
   defaultCardTypographyScaleId,
@@ -14,13 +16,16 @@ import {
   getMarkdownStats,
   getPlatformFitHelper,
   getMarkdownTemplate,
+  getRecipePreset,
   getSafeAreaGuide,
   getStarterMarkdown,
   markdownTemplates,
   onboardingWorkflowSteps,
   platformFitHelpers,
   platformPresets,
+  recipePresets,
   sampleMarkdown,
+  type RecipePresetId,
   type TemplateId,
 } from './cardOptions';
 
@@ -70,6 +75,48 @@ describe('markdownTemplates', () => {
 
   it('falls back to the default starter for an unknown template id', () => {
     expect(getMarkdownTemplate('missing-template' as TemplateId)).toBe(markdownTemplates[0]);
+  });
+});
+
+describe('recipePresets', () => {
+  it('exposes curated recipe presets with valid visual settings', () => {
+    const recipeIds = new Set(recipePresets.map((recipePreset) => recipePreset.id));
+    const presetIds = new Set(platformPresets.map((preset) => preset.id));
+    const themeIds = new Set(cardThemes.map((theme) => theme.id));
+    const densityIds = new Set(cardDensityOptions.map((option) => option.id));
+    const typographyIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
+    const accentIds = new Set(cardAccentOptions.map((option) => option.id));
+
+    expect(recipeIds.size).toBe(recipePresets.length);
+    expect(recipePresets.map((recipePreset) => recipePreset.id)).toEqual([
+      'launch',
+      'changelog',
+      'tutorial',
+      'insight',
+      'quote',
+      'code-snippet',
+    ]);
+    expect(recipePresets.every((recipePreset) => presetIds.has(recipePreset.presetId))).toBe(true);
+    expect(recipePresets.every((recipePreset) => themeIds.has(recipePreset.themeId))).toBe(true);
+    expect(recipePresets.every((recipePreset) => densityIds.has(recipePreset.cardDensityId))).toBe(true);
+    expect(recipePresets.every((recipePreset) => typographyIds.has(recipePreset.cardTypographyScaleId))).toBe(true);
+    expect(recipePresets.every((recipePreset) => accentIds.has(recipePreset.cardAccentId))).toBe(true);
+    expect(recipePresets.every((recipePreset) => recipePreset.markdown.trim().startsWith('#'))).toBe(true);
+  });
+
+  it('covers meaningfully different card setups, not just color swaps', () => {
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.presetId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.themeId)).size).toBeGreaterThanOrEqual(4);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardDensityId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTypographyScaleId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.showCardLabels)).size).toBe(2);
+    expect(getRecipePreset('code-snippet').markdown).toContain('```bash');
+    expect(getRecipePreset('tutorial').markdown).toContain('1. Paste the Markdown draft');
+    expect(getRecipePreset('quote').markdown).toContain('"Design tools');
+  });
+
+  it('falls back to the default recipe for an unknown recipe id', () => {
+    expect(getRecipePreset('missing-recipe' as RecipePresetId)).toBe(recipePresets[0]);
   });
 });
 

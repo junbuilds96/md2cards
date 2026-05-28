@@ -650,11 +650,18 @@ textarea:focus {
   gap: 8px;
 }
 
+.recipe-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .segmented-control button,
 .quality-control button,
 .density-control button,
 .typography-control button,
 .accent-control button,
+.recipe-preset-grid button,
 .template-gallery button,
 .theme-option {
   min-width: 0;
@@ -699,11 +706,21 @@ textarea:focus {
   min-height: 74px;
 }
 
+.recipe-preset-grid button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 7px;
+  align-items: start;
+  min-height: 64px;
+  padding: 9px;
+}
+
 .segmented-control button span,
 .quality-control button span,
 .density-control button span,
 .typography-control button span,
 .accent-control button span:last-child,
+.recipe-preset-grid button span,
 .template-gallery button span,
 .theme-option span:last-child {
   overflow-wrap: anywhere;
@@ -713,7 +730,8 @@ textarea:focus {
   line-height: 1.15;
 }
 
-.template-gallery svg {
+.template-gallery svg,
+.recipe-preset-grid svg {
   margin-top: 1px;
   color: #2059e8;
 }
@@ -810,11 +828,23 @@ textarea:focus {
   line-height: 1.25;
 }
 
+.recipe-preset-grid small {
+  grid-column: 2;
+  display: -webkit-box;
+  overflow: hidden;
+  color: #667085;
+  font-size: 0.7rem;
+  line-height: 1.22;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .segmented-control button.active,
 .quality-control button.active,
 .density-control button.active,
 .typography-control button.active,
 .accent-control button.active,
+.recipe-preset-grid button.active,
 .template-gallery button.active,
 .theme-option.active {
   border-color: #2059e8;
@@ -1510,6 +1540,7 @@ textarea:focus {
   .density-control,
   .typography-control,
   .accent-control,
+  .recipe-preset-grid,
   .theme-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
@@ -1590,6 +1621,7 @@ textarea:focus {
   }
 
   .template-gallery button,
+  .recipe-preset-grid button,
   .segmented-control button,
   .quality-control button,
   .density-control button,

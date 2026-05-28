@@ -39,12 +39,14 @@ import {
   getExportScaleOption,
   getMarkdownFitGuidance,
   getMarkdownTemplate,
+  getRecipePreset,
   getPlatformFitHelper,
   getSafeAreaGuide,
   getStarterMarkdown,
   markdownTemplates,
   onboardingWorkflowSteps,
   platformPresets,
+  recipePresets,
   sampleMarkdown,
   type CardAccentId,
   type CardDensityId,
@@ -52,6 +54,7 @@ import {
   type CardTheme,
   type ExportScaleId,
   type PlatformPreset,
+  type RecipePresetId,
   type TemplateId,
 } from './cardOptions';
 import {
@@ -472,6 +475,31 @@ function AppearanceControls({
   );
 }
 
+function RecipePresetSelector({
+  activeRecipeId,
+  onApplyRecipePreset,
+}: {
+  activeRecipeId: RecipePresetId | null;
+  onApplyRecipePreset: (recipePresetId: RecipePresetId) => void;
+}) {
+  return (
+    <div className="recipe-preset-grid">
+      {recipePresets.map((item) => (
+        <button
+          key={item.id}
+          className={item.id === activeRecipeId ? 'active' : ''}
+          type="button"
+          onClick={() => onApplyRecipePreset(item.id)}
+        >
+          <Palette size={15} />
+          <span>{item.label}</span>
+          <small>{item.description}</small>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function App() {
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [presetId, setPresetId] = useState<PlatformPreset['id']>('twitter');
@@ -482,6 +510,7 @@ function App() {
     useState<CardTypographyScaleId>(defaultCardTypographyScaleId);
   const [cardAccentId, setCardAccentId] = useState<CardAccentId>(defaultCardAccentId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
+  const [activeRecipeId, setActiveRecipeId] = useState<RecipePresetId | null>(null);
   const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
   const [showCardLabels, setShowCardLabels] = useState(true);
   const [exportState, setExportState] = useState<ExportState>('idle');
@@ -536,7 +565,26 @@ function App() {
     setPresetId(template.presetId);
     setThemeId(template.themeId);
     setActiveTemplateId(template.id);
+    setActiveRecipeId(null);
     setMessage(`${template.label} loaded. Replace the text with your own Markdown when ready.`);
+    setImportState('idle');
+    setImportMessage('');
+    resetEditorFeedback();
+  }
+
+  function applyRecipePreset(recipePresetId: RecipePresetId) {
+    const recipePreset = getRecipePreset(recipePresetId);
+
+    setMarkdown(recipePreset.markdown);
+    setPresetId(recipePreset.presetId);
+    setThemeId(recipePreset.themeId);
+    setCardDensityId(recipePreset.cardDensityId);
+    setCardTypographyScaleId(recipePreset.cardTypographyScaleId);
+    setCardAccentId(recipePreset.cardAccentId);
+    setShowCardLabels(recipePreset.showCardLabels);
+    setActiveRecipeId(recipePreset.id);
+    setPresetName('');
+    setMessage(`${recipePreset.label} recipe applied. Preview and exports now use this visual setup.`);
     setImportState('idle');
     setImportMessage('');
     resetEditorFeedback();
@@ -544,6 +592,7 @@ function App() {
 
   function startBlankMarkdown() {
     setMarkdown('');
+    setActiveRecipeId(null);
     setMessage('Blank editor ready. Paste Markdown to create a card.');
     setImportState('idle');
     setImportMessage('');
@@ -588,6 +637,7 @@ function App() {
     setCardTypographyScaleId(savedPreset.cardTypographyScaleId);
     setCardAccentId(savedPreset.cardAccentId);
     setPresetName(savedPreset.name);
+    setActiveRecipeId(null);
     setMessage(`${savedPreset.name} loaded. Preview updated from your local preset.`);
     setImportState('idle');
     setImportMessage('');
@@ -682,6 +732,7 @@ function App() {
       setCardTypographyScaleId(importedRecipe.config.cardTypographyScaleId);
       setCardAccentId(importedRecipe.config.cardAccentId);
       setShowCardLabels(importedRecipe.config.showCardLabels);
+      setActiveRecipeId(null);
       setImportState('idle');
       setImportMessage('');
       setRecipeState('success');
@@ -710,6 +761,7 @@ function App() {
 
     if (result.changed) {
       setMarkdown(result.markdown);
+      setActiveRecipeId(null);
     }
 
     setFitMessage(result.note);
@@ -752,6 +804,7 @@ function App() {
       }
 
       setMarkdown(importedMarkdown);
+      setActiveRecipeId(null);
       setImportState('success');
       setImportMessage(`Imported ${file.name}.`);
       setMessage(`Imported ${file.name}. Preview updated and ready to export.`);
@@ -928,6 +981,7 @@ function App() {
               value={markdown}
               onChange={(event) => {
                 setMarkdown(event.target.value);
+                setActiveRecipeId(null);
                 setMessage(
                   event.target.value.trim().length === 0
                     ? 'Paste Markdown to preview and export a card.'
@@ -966,6 +1020,7 @@ function App() {
                   type="button"
                   onClick={() => {
                     setPresetId(item.id);
+                    setActiveRecipeId(null);
                     setFitMessage('');
                     setMessage(`${item.label} preset selected. Use Fit to ${item.label} for a tighter draft.`);
                   }}
@@ -985,7 +1040,11 @@ function App() {
                   key={item.id}
                   className={`theme-option ${item.className} ${item.id === theme.id ? 'active' : ''}`}
                   type="button"
-                  onClick={() => setThemeId(item.id)}
+                  onClick={() => {
+                    setThemeId(item.id);
+                    setActiveRecipeId(null);
+                    setMessage(`${item.label} theme selected. Preview and exports updated.`);
+                  }}
                   title={item.description}
                 >
                   <span className="swatch" aria-hidden="true" />
@@ -1003,16 +1062,19 @@ function App() {
               cardAccentId={cardAccent.id}
               onDensityChange={(densityId) => {
                 setCardDensityId(densityId);
+                setActiveRecipeId(null);
                 setMessage(`${getCardDensityOption(densityId).label} density selected. Preview and exports updated.`);
               }}
               onTypographyScaleChange={(typographyScaleId) => {
                 setCardTypographyScaleId(typographyScaleId);
+                setActiveRecipeId(null);
                 setMessage(
                   `${getCardTypographyScaleOption(typographyScaleId).label} typography selected. Preview and exports updated.`,
                 );
               }}
               onAccentChange={(accentId) => {
                 setCardAccentId(accentId);
+                setActiveRecipeId(null);
                 setMessage(`${getCardAccentOption(accentId).label} accent selected. Preview and exports updated.`);
               }}
             />
@@ -1079,6 +1141,11 @@ function App() {
           </div>
 
           <div className="field-group">
+            <span className="field-label">Recipe Presets</span>
+            <RecipePresetSelector activeRecipeId={activeRecipeId} onApplyRecipePreset={applyRecipePreset} />
+          </div>
+
+          <div className="field-group">
             <span className="field-label">Saved Local Presets</span>
             <SavedPresetsPanel
               presetName={presetName}
@@ -1142,6 +1209,7 @@ function App() {
                     checked={showCardLabels}
                     onChange={(event) => {
                       setShowCardLabels(event.target.checked);
+                      setActiveRecipeId(null);
                       setExportState('idle');
                       setMessage(
                         event.target.checked

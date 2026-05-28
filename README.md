@@ -12,6 +12,7 @@ MD2Cards is a local web app for turning Markdown snippets into exportable PNG an
 
 - Write once in Markdown, paste text, or import a local `.md`, `.markdown`, or `.txt` file and preview the card live.
 - Start from paste-ready examples for launch posts, GitHub releases, and Xiaohongshu-style insight cards.
+- Apply curated recipe presets for launches, changelogs, tutorials, insights, quotes, and code snippets.
 - Export landscape, portrait, or square cards for common sharing surfaces.
 - Save named card presets locally in your browser and reload them for repeat posts.
 - Export/import reusable JSON card recipes to move a finished setup between browsers or share it with a teammate.
@@ -28,7 +29,7 @@ npm install
 npm run dev
 ```
 
-Open the local Vite URL on desktop or a narrow screen, choose a starter, select **Start Blank**, paste Markdown, drop in a local `.md`/`.markdown`/`.txt` file, or import a recipe `.json`. Pick a platform preset, theme, density, and accent color, hide **Card labels** if you want to remove the header and footer text, optionally save the setup as a local preset or export the recipe JSON, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
+Open the local Vite URL on desktop or a narrow screen, choose a starter or recipe preset, select **Start Blank**, paste Markdown, drop in a local `.md`/`.markdown`/`.txt` file, or import a recipe `.json`. Pick a platform preset, theme, density, and accent color, hide **Card labels** if you want to remove the header and footer text, optionally save the setup as a local preset or export the recipe JSON, then use **Copy PNG**, **Download PNG**, or **Download SVG**.
 
 ## Common Use Cases
 
@@ -57,6 +58,7 @@ Open the local Vite URL on desktop or a narrow screen, choose a starter, select 
 - Themes for crisp launch notes, editorial posts, paper-style notes, and dark technical updates.
 - Appearance controls for Compact, Balanced, and Spacious density plus Blue, Emerald, Rose, and Amber accent swatches.
 - Starter templates that map to sensible preset/theme defaults.
+- Built-in recipe presets that apply Markdown, platform, theme, density, typography, accent, and label visibility together.
 - Browser-local saved presets for Markdown, platform, theme, appearance, and export quality.
 - Portable JSON card recipes with schema/version metadata, Markdown, platform, theme, appearance, export quality, and card-label visibility.
 - Responsive controls and preview panels for narrow laptop and mobile widths.

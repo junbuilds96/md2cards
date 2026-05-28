@@ -82,6 +82,21 @@ export type MarkdownTemplate = {
   markdown: string;
 };
 
+export type RecipePresetId = 'launch' | 'changelog' | 'tutorial' | 'insight' | 'quote' | 'code-snippet';
+
+export type RecipePreset = {
+  id: RecipePresetId;
+  label: string;
+  description: string;
+  presetId: PresetId;
+  themeId: ThemeId;
+  cardDensityId: CardDensityId;
+  cardTypographyScaleId: CardTypographyScaleId;
+  cardAccentId: CardAccentId;
+  showCardLabels: boolean;
+  markdown: string;
+};
+
 export type MarkdownStats = {
   characterCount: number;
   lineCount: number;
@@ -393,12 +408,137 @@ Try it with your next release note.`,
 
 export const sampleMarkdown = markdownTemplates[0].markdown;
 
+export const recipePresets: RecipePreset[] = [
+  {
+    id: 'launch',
+    label: 'Launch',
+    description: 'Wide announcement with proof bullets and visible product chrome.',
+    presetId: 'twitter',
+    themeId: 'signal',
+    cardDensityId: 'balanced',
+    cardTypographyScaleId: 'default',
+    cardAccentId: 'blue',
+    showCardLabels: true,
+    markdown: `# Launch faster with Markdown cards
+
+Turn a product update into a share-ready visual in one pass.
+
+- One hook for the feed
+- Three proof points for context
+- PNG or SVG export when it is ready`,
+  },
+  {
+    id: 'changelog',
+    label: 'Changelog',
+    description: 'Square technical release summary with compact type and status table.',
+    presetId: 'launch',
+    themeId: 'midnight',
+    cardDensityId: 'compact',
+    cardTypographyScaleId: 'small',
+    cardAccentId: 'emerald',
+    showCardLabels: true,
+    markdown: `# v0.4.0 Changelog
+
+## Highlights
+
+- Recipe presets for common card types
+- Cleaner appearance controls
+- Stable exact-size PNG and SVG export
+
+| Area | Status |
+| --- | --- |
+| Presets | Shipped |
+| Export | Stable |
+| Docs | Updated |`,
+  },
+  {
+    id: 'tutorial',
+    label: 'Tutorial',
+    description: 'Portrait walkthrough for saveable steps and mini-guides.',
+    presetId: 'xiaohongshu',
+    themeId: 'paper',
+    cardDensityId: 'balanced',
+    cardTypographyScaleId: 'default',
+    cardAccentId: 'amber',
+    showCardLabels: false,
+    markdown: `# Turn notes into a card
+
+## 3-step workflow
+
+1. Paste the Markdown draft
+2. Pick a recipe that matches the job
+3. Fit the copy before exporting
+
+> Keep each step short enough to scan without the caption.`,
+  },
+  {
+    id: 'insight',
+    label: 'Insight',
+    description: 'Portrait creator takeaway with larger type and editorial color.',
+    presetId: 'xiaohongshu',
+    themeId: 'editorial',
+    cardDensityId: 'spacious',
+    cardTypographyScaleId: 'large',
+    cardAccentId: 'rose',
+    showCardLabels: false,
+    markdown: `# The card is the hook
+
+People decide whether to read the caption from the first two seconds.
+
+- Lead with the outcome
+- Make the proof visual
+- Leave one clear next step`,
+  },
+  {
+    id: 'quote',
+    label: 'Quote',
+    description: 'Airy square quote card with warm editorial styling.',
+    presetId: 'launch',
+    themeId: 'paper',
+    cardDensityId: 'spacious',
+    cardTypographyScaleId: 'large',
+    cardAccentId: 'rose',
+    showCardLabels: false,
+    markdown: `# "Design tools should disappear when the idea is clear."
+
+Use Markdown for structure. Use recipes for the visual rhythm.
+
+- MD2Cards`,
+  },
+  {
+    id: 'code-snippet',
+    label: 'Code Snippet',
+    description: 'Dark landscape card tuned for short command or API examples.',
+    presetId: 'twitter',
+    themeId: 'midnight',
+    cardDensityId: 'compact',
+    cardTypographyScaleId: 'small',
+    cardAccentId: 'emerald',
+    showCardLabels: true,
+    markdown: `# Export a card from Markdown
+
+\`\`\`bash
+npm install
+npm run build
+npm run preview
+\`\`\`
+
+- React Markdown rendering
+- Exact preset dimensions
+- PNG and SVG output`,
+  },
+];
+
 export function getMarkdownTemplate(templateId: TemplateId): MarkdownTemplate {
   return markdownTemplates.find((template) => template.id === templateId) ?? markdownTemplates[0];
 }
 
 export function getStarterMarkdown(templateId: TemplateId): string {
   return getMarkdownTemplate(templateId).markdown;
+}
+
+export function getRecipePreset(recipePresetId: RecipePresetId): RecipePreset {
+  return recipePresets.find((recipePreset) => recipePreset.id === recipePresetId) ?? recipePresets[0];
 }
 
 export function getMarkdownStats(markdown: string): MarkdownStats {
