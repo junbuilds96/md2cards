@@ -348,6 +348,31 @@ textarea:focus {
   line-height: 1.35;
 }
 
+.platform-fit-helper {
+  display: grid;
+  gap: 3px;
+  margin-top: -2px;
+  padding: 10px;
+  color: #26364f;
+  background: #f8fbff;
+  border: 1px solid #d6deea;
+  border-radius: 8px;
+  line-height: 1.3;
+}
+
+.platform-fit-helper strong {
+  color: #182230;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.platform-fit-helper span,
+.platform-fit-helper small {
+  overflow-wrap: anywhere;
+  color: #667085;
+  font-size: 0.76rem;
+}
+
 .markdown-guidance {
   display: flex;
   flex-wrap: wrap;

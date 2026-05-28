@@ -12,6 +12,12 @@ export type PlatformPreset = {
   height: number;
 };
 
+export type PlatformFitHelper = {
+  presetId: PresetId;
+  bestFor: string;
+  pasteTip: string;
+};
+
 export type SafeAreaGuide = {
   marginPercent: number;
   horizontalMargin: number;
@@ -61,6 +67,7 @@ export type MarkdownFitGuidance = {
   lineLimit: number;
   tone: 'empty' | 'ready' | 'dense';
   summary: string;
+  action: string;
 };
 
 export type OnboardingWorkflowStep = {
@@ -118,6 +125,24 @@ export const platformPresets: PlatformPreset[] = [
     sizeLabel: '1200 x 1200',
     width: 1200,
     height: 1200,
+  },
+];
+
+export const platformFitHelpers: PlatformFitHelper[] = [
+  {
+    presetId: 'twitter',
+    bestFor: 'a launch hook, 2-3 proof bullets, and one clear next step.',
+    pasteTip: 'Paste the post people should understand at a glance; move details and links to the caption.',
+  },
+  {
+    presetId: 'xiaohongshu',
+    bestFor: 'a portrait checklist, mini-framework, or creator takeaway with 3-5 short points.',
+    pasteTip: 'Paste saveable advice with a strong headline; avoid wide tables and long code blocks.',
+  },
+  {
+    presetId: 'launch',
+    bestFor: 'a release note, changelog highlight, or GitHub launch summary.',
+    pasteTip: 'Paste one version/update, then keep the card to highlights, status, and a short call to action.',
   },
 ];
 
@@ -262,6 +287,28 @@ export function getMarkdownStats(markdown: string): MarkdownStats {
   };
 }
 
+export function getPlatformFitHelper(preset: PlatformPreset): PlatformFitHelper {
+  return (
+    platformFitHelpers.find((helper) => helper.presetId === preset.id) ??
+    platformFitHelpers[platformFitHelpers.length - 1]
+  );
+}
+
+function getDenseMarkdownAction(stats: MarkdownStats, lineLimit: number, characterLimit: number): string {
+  const overLineLimit = stats.nonEmptyLineCount > lineLimit;
+  const overCharacterLimit = stats.characterCount > characterLimit;
+
+  if (overLineLimit && overCharacterLimit) {
+    return 'Trim to one headline, 3-5 bullets, and one CTA, or split this into multiple cards.';
+  }
+
+  if (overLineLimit) {
+    return 'Shorten long lists, remove extra sections, or split each section into its own card.';
+  }
+
+  return 'Tighten sentences, keep one proof point, and move background detail to the caption.';
+}
+
 export function getMarkdownFitGuidance(markdown: string, preset: PlatformPreset): MarkdownFitGuidance {
   const stats = getMarkdownStats(markdown);
   const isPortrait = preset.height > preset.width;
@@ -277,6 +324,18 @@ export function getMarkdownFitGuidance(markdown: string, preset: PlatformPreset)
       lineLimit,
       tone: 'empty',
       summary: 'Paste your Markdown to start.',
+      action: getPlatformFitHelper(preset).pasteTip,
+    };
+  }
+
+  if (isDense) {
+    return {
+      stats,
+      characterLimit,
+      lineLimit,
+      tone: 'dense',
+      summary: 'This may feel crowded on export.',
+      action: getDenseMarkdownAction(stats, lineLimit, characterLimit),
     };
   }
 
@@ -284,8 +343,9 @@ export function getMarkdownFitGuidance(markdown: string, preset: PlatformPreset)
     stats,
     characterLimit,
     lineLimit,
-    tone: isDense ? 'dense' : 'ready',
-    summary: isDense ? 'This may feel crowded on export.' : 'Good length for this card.',
+    tone: 'ready',
+    summary: 'Good length for this card.',
+    action: `Fits best as ${getPlatformFitHelper(preset).bestFor}`,
   };
 }
 

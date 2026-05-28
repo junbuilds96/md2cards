@@ -21,6 +21,7 @@ import {
   getExportScaleOption,
   getMarkdownFitGuidance,
   getMarkdownTemplate,
+  getPlatformFitHelper,
   getSafeAreaGuide,
   getStarterMarkdown,
   markdownTemplates,
@@ -176,6 +177,7 @@ function App() {
   const exportScale = useMemo(() => getExportScaleOption(exportScaleId), [exportScaleId]);
   const exportPixelSize = useMemo(() => getExportPixelSize(preset, exportScale), [preset, exportScale]);
   const safeAreaGuide = useMemo(() => getSafeAreaGuide(preset), [preset]);
+  const platformFitHelper = useMemo(() => getPlatformFitHelper(preset), [preset]);
   const markdownGuidance = useMemo(() => getMarkdownFitGuidance(markdown, preset), [markdown, preset]);
   const title = useMemo(() => firstMarkdownHeading(markdown), [markdown]);
   const canExport = !markdownGuidance.stats.isBlank;
@@ -354,8 +356,14 @@ function App() {
               placeholder={`# Paste your launch note\n\n- One clear update\n- A proof point or metric\n- A next step`}
               spellCheck="false"
             />
+            <div className="platform-fit-helper">
+              <strong>{preset.label} fit</strong>
+              <span>Best for {platformFitHelper.bestFor}</span>
+              <small>{platformFitHelper.pasteTip}</small>
+            </div>
             <div className={`markdown-guidance ${markdownGuidance.tone}`}>
               <span>{markdownGuidance.summary}</span>
+              <span>{markdownGuidance.action}</span>
               <span>
                 {markdownGuidance.stats.nonEmptyLineCount}/{markdownGuidance.lineLimit} content lines ·{' '}
                 {markdownGuidance.stats.characterCount}/{markdownGuidance.characterLimit} chars

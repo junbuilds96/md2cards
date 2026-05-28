@@ -7,11 +7,13 @@ import {
   getExportScaleOption,
   getMarkdownFitGuidance,
   getMarkdownStats,
+  getPlatformFitHelper,
   getMarkdownTemplate,
   getSafeAreaGuide,
   getStarterMarkdown,
   markdownTemplates,
   onboardingWorkflowSteps,
+  platformFitHelpers,
   platformPresets,
   sampleMarkdown,
   type TemplateId,
@@ -67,6 +69,27 @@ describe('markdownTemplates', () => {
 });
 
 describe('markdown guidance', () => {
+  it('provides paste-time platform fit guidance for every preset', () => {
+    const helperPresetIds = new Set(platformFitHelpers.map((helper) => helper.presetId));
+
+    expect(platformPresets.every((preset) => helperPresetIds.has(preset.id))).toBe(true);
+    expect(getPlatformFitHelper(platformPresets[0])).toMatchObject({
+      presetId: 'twitter',
+      bestFor: expect.stringContaining('launch hook'),
+      pasteTip: expect.stringContaining('caption'),
+    });
+    expect(getPlatformFitHelper(platformPresets[1])).toMatchObject({
+      presetId: 'xiaohongshu',
+      bestFor: expect.stringContaining('portrait checklist'),
+      pasteTip: expect.stringContaining('wide tables'),
+    });
+    expect(getPlatformFitHelper(platformPresets[2])).toMatchObject({
+      presetId: 'launch',
+      bestFor: expect.stringContaining('release note'),
+      pasteTip: expect.stringContaining('highlights'),
+    });
+  });
+
   it('counts trimmed Markdown content without treating whitespace as a card', () => {
     expect(getMarkdownStats('  \n\t ')).toEqual({
       characterCount: 0,
@@ -91,6 +114,7 @@ describe('markdown guidance', () => {
       lineLimit: 12,
       characterLimit: 900,
       summary: 'Paste your Markdown to start.',
+      action: expect.stringContaining('caption'),
     });
 
     expect(getMarkdownFitGuidance('# Short update\n\n- One\n- Two', platformPresets[1])).toMatchObject({
@@ -98,6 +122,7 @@ describe('markdown guidance', () => {
       lineLimit: 16,
       characterLimit: 1100,
       summary: 'Good length for this card.',
+      action: expect.stringContaining('portrait checklist'),
     });
 
     expect(getMarkdownFitGuidance(Array.from({ length: 14 }, (_, index) => `- Item ${index + 1}`).join('\n'), platformPresets[2])).toMatchObject({
@@ -105,6 +130,19 @@ describe('markdown guidance', () => {
       lineLimit: 13,
       characterLimit: 950,
       summary: 'This may feel crowded on export.',
+      action: expect.stringContaining('Shorten long lists'),
+    });
+  });
+
+  it('makes dense fit warnings actionable based on what is too long', () => {
+    expect(getMarkdownFitGuidance(`One paragraph ${'with detail '.repeat(95)}`, platformPresets[0])).toMatchObject({
+      tone: 'dense',
+      action: expect.stringContaining('Tighten sentences'),
+    });
+
+    expect(getMarkdownFitGuidance(Array.from({ length: 30 }, (_, index) => `- Long item ${index + 1} ${'detail '.repeat(8)}`).join('\n'), platformPresets[1])).toMatchObject({
+      tone: 'dense',
+      action: expect.stringContaining('multiple cards'),
     });
   });
 });
