@@ -489,4 +489,47 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(deck?.cards.every((card) => card.note.includes('Story card'))).toBe(true);
     expect(deck?.captionText).toMatch(new RegExp(`共\\s*${deck?.cards.length}\\s*张卡`));
   });
+
+  it('keeps multi-line narrative quotes readable without leaking quote markers into prose', () => {
+    const markdown = [
+      '# 雨夜回信',
+      '',
+      '雨从傍晚一直下到深夜，窗台上的旧信封被风吹得轻轻作响。',
+      '',
+      '林夏坐在灯下，把没有寄出的信重新读了一遍。',
+      '',
+      '“你后来还会想起那条路吗？”她问。',
+      '',
+      '> 第一行：我以为告别只是把门关上。',
+      '> 第二行：后来才知道，真正难的是不再等一个脚步声。',
+      '',
+      '她把信折好，放回抽屉最深处。',
+      '',
+      '---',
+      '',
+      '第二天清晨，城市像被洗过一样安静。',
+      '',
+      '她走过便利店门口，看见热气从关东煮的锅里升起来。',
+      '',
+      '“原来生活会继续。”她对自己说。',
+      '',
+      '店员递来零钱，她忽然笑了一下。',
+      '',
+      '> 第一行：不是所有故事都需要答案。',
+      '> 第二行：有些人留下的，是你终于学会独自走路。',
+      '',
+      '阳光落在站台边缘，像一封迟到很久的回信。',
+      '',
+      '她没有回头。',
+    ].join('\n');
+
+    const result = splitMarkdownIntoCardDeck(markdown, platformPresets[0]);
+    const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+    expect(detectNarrativeMarkdown(markdown)).toBe(true);
+    expect(joinedCards).toContain('> 第一行：我以为告别只是把门关上。 第二行：后来才知道');
+    expect(joinedCards).toContain('> 第一行：不是所有故事都需要答案。 第二行：有些人留下的');
+    expect(joinedCards).not.toContain('> 第一行：我以为告别只是把门关上。 > 第二行');
+    expect(joinedCards).not.toContain('> 第一行：不是所有故事都需要答案。 > 第二行');
+  });
 });

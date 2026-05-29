@@ -646,9 +646,11 @@ function trimCaption(text: string): string {
 }
 
 function splitStoryText(markdown: string, characterLimit: number): string[] {
-  const quoteMatch = markdown.match(/^>\s?(.*)$/s);
-  const prefix = quoteMatch ? '> ' : '';
-  const text = (quoteMatch?.[1] ?? markdown).replace(/\s+/g, ' ').trim();
+  const nonEmptyLines = markdown.split('\n').filter((line) => line.trim().length > 0);
+  const isQuote = nonEmptyLines.length > 0 && nonEmptyLines.every((line) => line.trim().startsWith('>'));
+  const prefix = isQuote ? '> ' : '';
+  const rawText = isQuote ? markdown.replace(/^>\s?/gm, '') : markdown;
+  const text = rawText.replace(/\s+/g, ' ').trim();
 
   if (text.length <= characterLimit) {
     return [`${prefix}${text}`.trimEnd()];
