@@ -5,12 +5,14 @@ import {
   cardCornerRadiusOptions,
   cardDensityOptions,
   cardTextureOptions,
+  cardTypographyVoiceOptions,
   cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardBackgroundIntensityId,
   defaultCardCornerRadiusId,
   defaultCardDensityId,
   defaultCardTextureId,
+  defaultCardTypographyVoiceId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
@@ -20,6 +22,7 @@ import {
   type CardCornerRadiusId,
   type CardDensityId,
   type CardTextureId,
+  type CardTypographyVoiceId,
   type CardTypographyScaleId,
   type ExportScaleId,
   type PresetId,
@@ -39,6 +42,7 @@ export type CardConfig = {
   exportScaleId: ExportScaleId;
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
+  cardTypographyVoiceId: CardTypographyVoiceId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
@@ -53,6 +57,7 @@ export type CardConfigDraft = {
   exportScaleId: ExportScaleId;
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
+  cardTypographyVoiceId: CardTypographyVoiceId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
@@ -84,6 +89,7 @@ const validThemeIds = new Set(cardThemes.map((theme) => theme.id));
 const validExportScaleIds = new Set(exportScaleOptions.map((option) => option.id));
 const validCardDensityIds = new Set(cardDensityOptions.map((option) => option.id));
 const validCardTypographyScaleIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
+const validCardTypographyVoiceIds = new Set(cardTypographyVoiceOptions.map((option) => option.id));
 const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
 const validCardBackgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
 const validCardCornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
@@ -131,6 +137,9 @@ export function createCardConfig(draft: CardConfigDraft): CardConfig {
     cardTypographyScaleId: validCardTypographyScaleIds.has(draft.cardTypographyScaleId)
       ? draft.cardTypographyScaleId
       : defaultCardTypographyScaleId,
+    cardTypographyVoiceId: validCardTypographyVoiceIds.has(draft.cardTypographyVoiceId)
+      ? draft.cardTypographyVoiceId
+      : defaultCardTypographyVoiceId,
     cardAccentId: validCardAccentIds.has(draft.cardAccentId) ? draft.cardAccentId : defaultCardAccentId,
     cardBackgroundIntensityId: validCardBackgroundIntensityIds.has(draft.cardBackgroundIntensityId)
       ? draft.cardBackgroundIntensityId
@@ -237,6 +246,17 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
     };
   }
 
+  const cardTypographyVoiceId =
+    parsed.cardTypographyVoiceId === undefined
+      ? defaultCardTypographyVoiceId
+      : (parsed.cardTypographyVoiceId as CardTypographyVoiceId);
+  if (!validCardTypographyVoiceIds.has(cardTypographyVoiceId)) {
+    return {
+      valid: false,
+      message: 'This recipe uses an unknown typography voice.',
+    };
+  }
+
   const cardAccentId =
     parsed.cardAccentId === undefined ? defaultCardAccentId : (parsed.cardAccentId as CardAccentId);
   if (!validCardAccentIds.has(cardAccentId)) {
@@ -295,6 +315,7 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
       exportScaleId: parsed.exportScaleId as ExportScaleId,
       cardDensityId,
       cardTypographyScaleId,
+      cardTypographyVoiceId,
       cardAccentId,
       cardBackgroundIntensityId,
       cardCornerRadiusId,

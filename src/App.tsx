@@ -42,12 +42,14 @@ import {
   cardCornerRadiusOptions,
   cardDensityOptions,
   cardTextureOptions,
+  cardTypographyVoiceOptions,
   cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardBackgroundIntensityId,
   defaultCardCornerRadiusId,
   defaultCardDensityId,
   defaultCardTextureId,
+  defaultCardTypographyVoiceId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
@@ -56,6 +58,7 @@ import {
   getCardCornerRadiusOption,
   getCardDensityOption,
   getCardTextureOption,
+  getCardTypographyVoiceOption,
   getCardTypographyScaleOption,
   fitMarkdownToPreset,
   getExportPixelSize,
@@ -78,6 +81,7 @@ import {
   type CardCornerRadiusId,
   type CardDensityId,
   type CardTextureId,
+  type CardTypographyVoiceId,
   type CardTypographyScaleId,
   type CardTheme,
   type ExportScaleId,
@@ -187,6 +191,7 @@ function CardPreview({
   showCardLabels,
   cardDensityId,
   cardTypographyScaleId,
+  cardTypographyVoiceId,
   cardAccentId,
   cardBackgroundIntensityId,
   cardCornerRadiusId,
@@ -200,6 +205,7 @@ function CardPreview({
   showCardLabels: boolean;
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
+  cardTypographyVoiceId: CardTypographyVoiceId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
@@ -215,6 +221,7 @@ function CardPreview({
         showCardLabels,
         cardDensityId,
         cardTypographyScaleId,
+        cardTypographyVoiceId,
         cardBackgroundIntensityId,
         cardCornerRadiusId,
         cardTextureId,
@@ -405,6 +412,9 @@ function SavedPresetsPanel({
     const typographyLabel =
       cardTypographyScaleOptions.find((item) => item.id === savedPreset.cardTypographyScaleId)?.label ??
       savedPreset.cardTypographyScaleId;
+    const typographyVoiceLabel =
+      cardTypographyVoiceOptions.find((item) => item.id === savedPreset.cardTypographyVoiceId)?.label ??
+      savedPreset.cardTypographyVoiceId;
     const accentLabel =
       cardAccentOptions.find((item) => item.id === savedPreset.cardAccentId)?.label ?? savedPreset.cardAccentId;
     const backgroundIntensityLabel =
@@ -417,7 +427,7 @@ function SavedPresetsPanel({
       cardTextureOptions.find((item) => item.id === savedPreset.cardTextureId)?.label ?? savedPreset.cardTextureId;
     const labelVisibility = savedPreset.showCardLabels ? 'Labels on' : 'Labels off';
 
-    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${accentLabel} · ${backgroundIntensityLabel} · ${cornerRadiusLabel} · ${textureLabel} · ${labelVisibility} · ${scaleLabel}`;
+    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${typographyVoiceLabel} · ${accentLabel} · ${backgroundIntensityLabel} · ${cornerRadiusLabel} · ${textureLabel} · ${labelVisibility} · ${scaleLabel}`;
   }
 
   return (
@@ -523,12 +533,14 @@ function CardConfigTransferPanel({
 function AppearanceControls({
   cardDensityId,
   cardTypographyScaleId,
+  cardTypographyVoiceId,
   cardAccentId,
   cardBackgroundIntensityId,
   cardCornerRadiusId,
   cardTextureId,
   onDensityChange,
   onTypographyScaleChange,
+  onTypographyVoiceChange,
   onAccentChange,
   onBackgroundIntensityChange,
   onCornerRadiusChange,
@@ -536,12 +548,14 @@ function AppearanceControls({
 }: {
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
+  cardTypographyVoiceId: CardTypographyVoiceId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
   cardTextureId: CardTextureId;
   onDensityChange: (densityId: CardDensityId) => void;
   onTypographyScaleChange: (typographyScaleId: CardTypographyScaleId) => void;
+  onTypographyVoiceChange: (typographyVoiceId: CardTypographyVoiceId) => void;
   onAccentChange: (accentId: CardAccentId) => void;
   onBackgroundIntensityChange: (backgroundIntensityId: CardBackgroundIntensityId) => void;
   onCornerRadiusChange: (cornerRadiusId: CardCornerRadiusId) => void;
@@ -566,7 +580,7 @@ function AppearanceControls({
         </div>
       </div>
       <div className="appearance-control-block">
-        <span className="mini-label">Typography</span>
+        <span className="mini-label">Type Scale</span>
         <div className="typography-control">
           {cardTypographyScaleOptions.map((item) => (
             <button
@@ -574,6 +588,22 @@ function AppearanceControls({
               className={item.id === cardTypographyScaleId ? 'active' : ''}
               type="button"
               onClick={() => onTypographyScaleChange(item.id)}
+              title={item.description}
+            >
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="appearance-control-block">
+        <span className="mini-label">Typography Voice</span>
+        <div className="typography-voice-control">
+          {cardTypographyVoiceOptions.map((item) => (
+            <button
+              key={item.id}
+              className={item.id === cardTypographyVoiceId ? 'active' : ''}
+              type="button"
+              onClick={() => onTypographyVoiceChange(item.id)}
               title={item.description}
             >
               <span>{item.label}</span>
@@ -668,6 +698,7 @@ function StylePackSelector({
           const themeLabel = cardThemes.find((themeItem) => themeItem.id === item.themeId)?.label ?? item.themeId;
           const accent = getCardAccentOption(item.cardAccentId);
           const density = getCardDensityOption(item.cardDensityId);
+          const voice = getCardTypographyVoiceOption(item.cardTypographyVoiceId);
           const texture = getCardTextureOption(item.cardTextureId);
 
           return (
@@ -682,7 +713,7 @@ function StylePackSelector({
               <small>{item.description}</small>
               <span className="style-pack-setup">
                 <span className="recipe-accent-dot" style={{ background: accent.color }} aria-hidden="true" />
-                {themeLabel} · {density.label} · {accent.label} · {texture.label}
+                {themeLabel} · {density.label} · {voice.label} · {accent.label} · {texture.label}
               </span>
             </button>
           );
@@ -705,6 +736,7 @@ function RecipePresetSelector({
         const platformLabel = platformPresets.find((preset) => preset.id === item.presetId)?.label ?? item.presetId;
         const themeLabel = cardThemes.find((themeItem) => themeItem.id === item.themeId)?.label ?? item.themeId;
         const accent = getCardAccentOption(item.cardAccentId);
+        const voice = getCardTypographyVoiceOption(item.cardTypographyVoiceId);
         const texture = getCardTextureOption(item.cardTextureId);
 
         return (
@@ -719,7 +751,7 @@ function RecipePresetSelector({
             <small>{item.description}</small>
             <span className="recipe-setup">
               <span className="recipe-accent-dot" style={{ background: accent.color }} aria-hidden="true" />
-              {platformLabel} · {themeLabel} · {accent.label} · {texture.label}
+              {platformLabel} · {themeLabel} · {voice.label} · {accent.label} · {texture.label}
             </span>
           </button>
         );
@@ -736,6 +768,8 @@ function App() {
   const [cardDensityId, setCardDensityId] = useState<CardDensityId>(defaultCardDensityId);
   const [cardTypographyScaleId, setCardTypographyScaleId] =
     useState<CardTypographyScaleId>(defaultCardTypographyScaleId);
+  const [cardTypographyVoiceId, setCardTypographyVoiceId] =
+    useState<CardTypographyVoiceId>(defaultCardTypographyVoiceId);
   const [cardAccentId, setCardAccentId] = useState<CardAccentId>(defaultCardAccentId);
   const [cardBackgroundIntensityId, setCardBackgroundIntensityId] =
     useState<CardBackgroundIntensityId>(defaultCardBackgroundIntensityId);
@@ -773,6 +807,10 @@ function App() {
   const cardTypographyScale = useMemo(
     () => getCardTypographyScaleOption(cardTypographyScaleId),
     [cardTypographyScaleId],
+  );
+  const cardTypographyVoice = useMemo(
+    () => getCardTypographyVoiceOption(cardTypographyVoiceId),
+    [cardTypographyVoiceId],
   );
   const cardAccent = useMemo(() => getCardAccentOption(cardAccentId), [cardAccentId]);
   const cardBackgroundIntensity = useMemo(
@@ -820,6 +858,7 @@ function App() {
     setThemeId(recipePreset.themeId);
     setCardDensityId(recipePreset.cardDensityId);
     setCardTypographyScaleId(recipePreset.cardTypographyScaleId);
+    setCardTypographyVoiceId(recipePreset.cardTypographyVoiceId);
     setCardAccentId(recipePreset.cardAccentId);
     setCardBackgroundIntensityId(recipePreset.cardBackgroundIntensityId);
     setCardCornerRadiusId(recipePreset.cardCornerRadiusId);
@@ -841,6 +880,7 @@ function App() {
     setThemeId(appearance.themeId);
     setCardDensityId(appearance.cardDensityId);
     setCardTypographyScaleId(appearance.cardTypographyScaleId);
+    setCardTypographyVoiceId(appearance.cardTypographyVoiceId);
     setCardAccentId(appearance.cardAccentId);
     setCardBackgroundIntensityId(appearance.cardBackgroundIntensityId);
     setCardCornerRadiusId(appearance.cardCornerRadiusId);
@@ -875,6 +915,7 @@ function App() {
         exportScaleId: exportScale.id,
         cardDensityId: cardDensity.id,
         cardTypographyScaleId: cardTypographyScale.id,
+        cardTypographyVoiceId: cardTypographyVoice.id,
         cardAccentId: cardAccent.id,
         cardBackgroundIntensityId: cardBackgroundIntensity.id,
         cardCornerRadiusId: cardCornerRadius.id,
@@ -904,6 +945,7 @@ function App() {
     setExportScaleId(savedPreset.exportScaleId);
     setCardDensityId(savedPreset.cardDensityId);
     setCardTypographyScaleId(savedPreset.cardTypographyScaleId);
+    setCardTypographyVoiceId(savedPreset.cardTypographyVoiceId);
     setCardAccentId(savedPreset.cardAccentId);
     setCardBackgroundIntensityId(savedPreset.cardBackgroundIntensityId);
     setCardCornerRadiusId(savedPreset.cardCornerRadiusId);
@@ -945,6 +987,7 @@ function App() {
         exportScaleId: exportScale.id,
         cardDensityId: cardDensity.id,
         cardTypographyScaleId: cardTypographyScale.id,
+        cardTypographyVoiceId: cardTypographyVoice.id,
         cardAccentId: cardAccent.id,
         cardBackgroundIntensityId: cardBackgroundIntensity.id,
         cardCornerRadiusId: cardCornerRadius.id,
@@ -1007,6 +1050,7 @@ function App() {
       setExportScaleId(importedRecipe.config.exportScaleId);
       setCardDensityId(importedRecipe.config.cardDensityId);
       setCardTypographyScaleId(importedRecipe.config.cardTypographyScaleId);
+      setCardTypographyVoiceId(importedRecipe.config.cardTypographyVoiceId);
       setCardAccentId(importedRecipe.config.cardAccentId);
       setCardBackgroundIntensityId(importedRecipe.config.cardBackgroundIntensityId);
       setCardCornerRadiusId(importedRecipe.config.cardCornerRadiusId);
@@ -1346,6 +1390,7 @@ function App() {
             <AppearanceControls
               cardDensityId={cardDensity.id}
               cardTypographyScaleId={cardTypographyScale.id}
+              cardTypographyVoiceId={cardTypographyVoice.id}
               cardAccentId={cardAccent.id}
               cardBackgroundIntensityId={cardBackgroundIntensity.id}
               cardCornerRadiusId={cardCornerRadius.id}
@@ -1361,7 +1406,15 @@ function App() {
                 setActiveRecipeId(null);
                 setActiveStylePackId(null);
                 setMessage(
-                  `${getCardTypographyScaleOption(typographyScaleId).label} typography selected. Preview and exports updated.`,
+                  `${getCardTypographyScaleOption(typographyScaleId).label} type scale selected. Preview and exports updated.`,
+                );
+              }}
+              onTypographyVoiceChange={(typographyVoiceId) => {
+                setCardTypographyVoiceId(typographyVoiceId);
+                setActiveRecipeId(null);
+                setActiveStylePackId(null);
+                setMessage(
+                  `${getCardTypographyVoiceOption(typographyVoiceId).label} typography voice selected. Preview and exports updated.`,
                 );
               }}
               onAccentChange={(accentId) => {
@@ -1587,6 +1640,7 @@ function App() {
                   showCardLabels={showCardLabels}
                   cardDensityId={cardDensity.id}
                   cardTypographyScaleId={cardTypographyScale.id}
+                  cardTypographyVoiceId={cardTypographyVoice.id}
                   cardAccentId={cardAccent.id}
                   cardBackgroundIntensityId={cardBackgroundIntensity.id}
                   cardCornerRadiusId={cardCornerRadius.id}
@@ -1605,9 +1659,10 @@ function App() {
           >
             <span>{message}</span>
             <span>
-              {theme.label} · {cardDensity.label} · {cardTypographyScale.label} type · {cardAccent.label} ·{' '}
-              {cardBackgroundIntensity.label} · {cardCornerRadius.label} corners · {cardTexture.label} texture ·{' '}
-              {preset.sizeLabel} · Export {exportPixelSize.width} x {exportPixelSize.height}px
+              {theme.label} · {cardDensity.label} · {cardTypographyScale.label} type · {cardTypographyVoice.label} ·{' '}
+              {cardAccent.label} · {cardBackgroundIntensity.label} · {cardCornerRadius.label} corners ·{' '}
+              {cardTexture.label} texture · {preset.sizeLabel} · Export {exportPixelSize.width} x{' '}
+              {exportPixelSize.height}px
             </span>
           </div>
         </section>

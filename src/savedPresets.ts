@@ -5,12 +5,14 @@ import {
   cardCornerRadiusOptions,
   cardDensityOptions,
   cardTextureOptions,
+  cardTypographyVoiceOptions,
   cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardBackgroundIntensityId,
   defaultCardCornerRadiusId,
   defaultCardDensityId,
   defaultCardTextureId,
+  defaultCardTypographyVoiceId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
@@ -20,6 +22,7 @@ import {
   type CardCornerRadiusId,
   type CardDensityId,
   type CardTextureId,
+  type CardTypographyVoiceId,
   type CardTypographyScaleId,
   type ExportScaleId,
   type PresetId,
@@ -38,6 +41,7 @@ export type SavedCardPreset = {
   exportScaleId: ExportScaleId;
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
+  cardTypographyVoiceId: CardTypographyVoiceId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
@@ -54,6 +58,7 @@ export type SavedCardPresetDraft = {
   exportScaleId: ExportScaleId;
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
+  cardTypographyVoiceId: CardTypographyVoiceId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
@@ -74,6 +79,7 @@ const validThemeIds = new Set(cardThemes.map((theme) => theme.id));
 const validExportScaleIds = new Set(exportScaleOptions.map((option) => option.id));
 const validCardDensityIds = new Set(cardDensityOptions.map((option) => option.id));
 const validCardTypographyScaleIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
+const validCardTypographyVoiceIds = new Set(cardTypographyVoiceOptions.map((option) => option.id));
 const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
 const validCardBackgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
 const validCardCornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
@@ -114,6 +120,8 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
   const cardDensityId = value.cardDensityId === undefined ? defaultCardDensityId : value.cardDensityId;
   const cardTypographyScaleId =
     value.cardTypographyScaleId === undefined ? defaultCardTypographyScaleId : value.cardTypographyScaleId;
+  const cardTypographyVoiceId =
+    value.cardTypographyVoiceId === undefined ? defaultCardTypographyVoiceId : value.cardTypographyVoiceId;
   const cardAccentId = value.cardAccentId === undefined ? defaultCardAccentId : value.cardAccentId;
   const cardBackgroundIntensityId =
     value.cardBackgroundIntensityId === undefined
@@ -134,6 +142,7 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     !validExportScaleIds.has(exportScaleId as ExportScaleId) ||
     !validCardDensityIds.has(cardDensityId as CardDensityId) ||
     !validCardTypographyScaleIds.has(cardTypographyScaleId as CardTypographyScaleId) ||
+    !validCardTypographyVoiceIds.has(cardTypographyVoiceId as CardTypographyVoiceId) ||
     !validCardAccentIds.has(cardAccentId as CardAccentId) ||
     !validCardBackgroundIntensityIds.has(cardBackgroundIntensityId as CardBackgroundIntensityId) ||
     !validCardCornerRadiusIds.has(cardCornerRadiusId as CardCornerRadiusId) ||
@@ -152,6 +161,7 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     exportScaleId: exportScaleId as ExportScaleId,
     cardDensityId: cardDensityId as CardDensityId,
     cardTypographyScaleId: cardTypographyScaleId as CardTypographyScaleId,
+    cardTypographyVoiceId: cardTypographyVoiceId as CardTypographyVoiceId,
     cardAccentId: cardAccentId as CardAccentId,
     cardBackgroundIntensityId: cardBackgroundIntensityId as CardBackgroundIntensityId,
     cardCornerRadiusId: cardCornerRadiusId as CardCornerRadiusId,
@@ -243,6 +253,9 @@ export function saveSavedPreset(
     cardTypographyScaleId: validCardTypographyScaleIds.has(draft.cardTypographyScaleId)
       ? draft.cardTypographyScaleId
       : defaultCardTypographyScaleId,
+    cardTypographyVoiceId: validCardTypographyVoiceIds.has(draft.cardTypographyVoiceId)
+      ? draft.cardTypographyVoiceId
+      : defaultCardTypographyVoiceId,
     cardAccentId: validCardAccentIds.has(draft.cardAccentId) ? draft.cardAccentId : defaultCardAccentId,
     cardBackgroundIntensityId: validCardBackgroundIntensityIds.has(draft.cardBackgroundIntensityId)
       ? draft.cardBackgroundIntensityId

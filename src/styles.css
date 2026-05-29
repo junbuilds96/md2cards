@@ -651,6 +651,12 @@ textarea:focus {
   gap: 8px;
 }
 
+.typography-voice-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .accent-control {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -705,6 +711,7 @@ textarea:focus {
 .quality-control button,
 .density-control button,
 .typography-control button,
+.typography-voice-control button,
 .accent-control button,
 .background-intensity-control button,
 .corner-radius-control button,
@@ -739,6 +746,7 @@ textarea:focus {
 
 .density-control button,
 .typography-control button,
+.typography-voice-control button,
 .accent-control button,
 .background-intensity-control button,
 .corner-radius-control button,
@@ -780,6 +788,7 @@ textarea:focus {
 .quality-control button span,
 .density-control button span,
 .typography-control button span,
+.typography-voice-control button span,
 .accent-control button span:last-child,
 .background-intensity-control button span,
 .corner-radius-control button span,
@@ -965,6 +974,7 @@ textarea:focus {
 .quality-control button.active,
 .density-control button.active,
 .typography-control button.active,
+.typography-voice-control button.active,
 .accent-control button.active,
 .background-intensity-control button.active,
 .corner-radius-control button.active,
@@ -1310,15 +1320,23 @@ textarea:focus {
   --card-table-header-bg: linear-gradient(180deg, var(--card-surface-shine), var(--code-bg));
   --card-table-row-bg: var(--card-surface-bg);
   --card-heading-font-family: inherit;
+  --card-body-font-family: inherit;
+  --card-inline-code-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --card-heading-font-weight: 850;
+  --card-body-font-weight: 650;
   --card-heading-text-shadow: none;
+  --card-h1-line-height: 0.98;
   --card-h2-bg: transparent;
   --card-h2-padding: 0;
   --card-h2-border: 0 solid transparent;
   --card-h2-radius: 0;
   --card-h2-shadow: none;
   --card-chrome-font-family: inherit;
+  --card-chrome-font-weight: 850;
   --card-chrome-text-transform: none;
+  --card-blockquote-font-family: inherit;
+  --card-blockquote-font-style: normal;
+  --card-blockquote-font-weight: 800;
   --card-personality-layer-image: linear-gradient(transparent, transparent);
   --card-personality-layer-size: auto;
   --card-personality-layer-position: 0 0;
@@ -1476,6 +1494,47 @@ textarea:focus {
   --card-empty-body-font-size: clamp(18px, 3.1cqw, 47px);
 }
 
+.social-card.voice-editorial {
+  --card-heading-font-family: Georgia, "Times New Roman", serif;
+  --card-body-font-family: Georgia, "Times New Roman", serif;
+  --card-heading-font-weight: 700;
+  --card-body-font-weight: 560;
+  --card-h1-font-size: clamp(28px, 6.75cqw, 108px);
+  --card-h2-font-size: clamp(21px, 3.25cqw, 50px);
+  --card-h1-line-height: 0.96;
+  --card-body-line-height: 1.17;
+  --card-p-margin-bottom: 12px;
+  --card-list-margin: 8px 0 12px;
+  --card-list-item-padding-block: 0.28em;
+  --card-h2-bg: linear-gradient(180deg, transparent 58%, color-mix(in srgb, var(--card-accent) 22%, transparent) 58%);
+  --card-h2-padding: 0 0.16em 0.07em;
+  --card-h2-radius: 0;
+  --card-chrome-font-family: Georgia, "Times New Roman", serif;
+  --card-chrome-font-weight: 700;
+  --card-blockquote-font-family: Georgia, "Times New Roman", serif;
+  --card-blockquote-font-style: italic;
+  --card-blockquote-font-weight: 700;
+}
+
+.social-card.voice-mono {
+  --card-heading-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --card-body-font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --card-inline-code-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --card-heading-font-weight: 800;
+  --card-body-font-weight: 680;
+  --card-h1-line-height: 1.04;
+  --card-h2-bg: color-mix(in srgb, var(--card-accent) 14%, var(--card-surface-bg));
+  --card-h2-padding: 0.18em 0.45em;
+  --card-h2-border: 1px solid color-mix(in srgb, var(--card-accent) 32%, transparent);
+  --card-h2-radius: calc(var(--card-inline-radius) * 0.82);
+  --card-chrome-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --card-chrome-font-weight: 800;
+  --card-chrome-text-transform: uppercase;
+  --card-code-label-bg: color-mix(in srgb, var(--card-accent) 22%, var(--card-surface-bg));
+  --card-blockquote-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --card-blockquote-font-weight: 760;
+}
+
 .card-chrome,
 .card-footer {
   z-index: 1;
@@ -1487,7 +1546,7 @@ textarea:focus {
   color: var(--card-muted);
   font-family: var(--card-chrome-font-family);
   font-size: clamp(13px, 2.1cqw, 31px);
-  font-weight: 850;
+  font-weight: var(--card-chrome-font-weight);
   letter-spacing: 0;
   text-transform: var(--card-chrome-text-transform);
 }
@@ -1511,6 +1570,8 @@ textarea:focus {
   justify-content: safe center;
   padding: var(--card-body-block-padding) var(--card-body-inline-padding);
   overflow: hidden;
+  font-family: var(--card-body-font-family);
+  font-weight: var(--card-body-font-weight);
 }
 
 .markdown-card-body > * {
@@ -1532,7 +1593,7 @@ textarea:focus {
   font-family: var(--card-heading-font-family);
   font-size: var(--card-h1-font-size);
   font-weight: var(--card-heading-font-weight);
-  line-height: 0.98;
+  line-height: var(--card-h1-line-height);
   text-shadow: var(--card-heading-text-shadow);
 }
 
@@ -1659,7 +1720,7 @@ textarea:focus {
     var(--code-bg);
   border: 1px solid var(--card-surface-border);
   border-radius: var(--card-inline-radius);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--card-inline-code-font-family);
   font-size: 0.85em;
   font-weight: 750;
   line-height: 1.12;
@@ -1882,8 +1943,10 @@ textarea:focus {
 .markdown-card-body blockquote p {
   margin-bottom: 0;
   color: var(--card-heading);
+  font-family: var(--card-blockquote-font-family);
   font-size: var(--card-blockquote-font-size);
-  font-weight: 800;
+  font-style: var(--card-blockquote-font-style);
+  font-weight: var(--card-blockquote-font-weight);
   line-height: 1.18;
 }
 
@@ -2239,6 +2302,7 @@ textarea:focus {
   .quality-control,
   .density-control,
   .typography-control,
+  .typography-voice-control,
   .accent-control,
   .background-intensity-control,
   .corner-radius-control,

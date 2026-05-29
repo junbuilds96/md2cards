@@ -21,6 +21,7 @@ describe('card config recipes', () => {
       exportScaleId: 'crisp',
       cardDensityId: 'spacious',
       cardTypographyScaleId: 'large',
+      cardTypographyVoiceId: 'editorial',
       cardAccentId: 'rose',
       cardBackgroundIntensityId: 'vivid',
       cardCornerRadiusId: 'rounded',
@@ -37,6 +38,7 @@ describe('card config recipes', () => {
       exportScaleId: 'crisp',
       cardDensityId: 'spacious',
       cardTypographyScaleId: 'large',
+      cardTypographyVoiceId: 'editorial',
       cardAccentId: 'rose',
       cardBackgroundIntensityId: 'vivid',
       cardCornerRadiusId: 'rounded',
@@ -57,6 +59,7 @@ describe('card config recipes', () => {
         exportScaleId: 'fast',
         cardDensityId: 'compact',
         cardTypographyScaleId: 'small',
+        cardTypographyVoiceId: 'mono',
         cardAccentId: 'emerald',
         cardBackgroundIntensityId: 'soft',
         cardCornerRadiusId: 'subtle',
@@ -76,6 +79,7 @@ describe('card config recipes', () => {
         exportScaleId: 'fast',
         cardDensityId: 'compact',
         cardTypographyScaleId: 'small',
+        cardTypographyVoiceId: 'mono',
         cardAccentId: 'emerald',
         cardBackgroundIntensityId: 'soft',
         cardCornerRadiusId: 'subtle',
@@ -103,6 +107,7 @@ describe('card config recipes', () => {
       config: {
         cardDensityId: 'balanced',
         cardTypographyScaleId: 'default',
+        cardTypographyVoiceId: 'modern',
         cardAccentId: 'blue',
         cardBackgroundIntensityId: 'balanced',
         cardCornerRadiusId: 'sharp',
@@ -140,6 +145,7 @@ describe('card config recipes', () => {
       exportScaleId: 'fast',
       cardDensityId: 'balanced',
       cardTypographyScaleId: 'default',
+      cardTypographyVoiceId: 'modern',
       cardAccentId: 'blue',
       cardBackgroundIntensityId: 'balanced',
       cardCornerRadiusId: 'sharp',
@@ -166,6 +172,10 @@ describe('card config recipes', () => {
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardTypographyScaleId: 'missing' }))).toEqual({
       valid: false,
       message: 'This recipe uses an unknown typography scale.',
+    });
+    expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardTypographyVoiceId: 'missing' }))).toEqual({
+      valid: false,
+      message: 'This recipe uses an unknown typography voice.',
     });
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardAccentId: 'missing' }))).toEqual({
       valid: false,

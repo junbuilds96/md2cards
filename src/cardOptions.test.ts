@@ -5,10 +5,12 @@ import {
   cardCornerRadiusOptions,
   cardDensityOptions,
   cardTextureOptions,
+  cardTypographyVoiceOptions,
   cardTypographyScaleOptions,
   cardThemes,
   defaultCardCornerRadiusId,
   defaultCardTextureId,
+  defaultCardTypographyVoiceId,
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
@@ -17,6 +19,7 @@ import {
   getCardBackgroundIntensityOption,
   getCardCornerRadiusOption,
   getCardTextureOption,
+  getCardTypographyVoiceOption,
   getCardTypographyScaleOption,
   getExportPixelSize,
   getExportScaleOption,
@@ -107,6 +110,7 @@ describe('recipePresets', () => {
     const themeIds = new Set(cardThemes.map((theme) => theme.id));
     const densityIds = new Set(cardDensityOptions.map((option) => option.id));
     const typographyIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
+    const voiceIds = new Set(cardTypographyVoiceOptions.map((option) => option.id));
     const accentIds = new Set(cardAccentOptions.map((option) => option.id));
     const backgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
     const cornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
@@ -128,6 +132,7 @@ describe('recipePresets', () => {
     expect(recipePresets.every((recipePreset) => themeIds.has(recipePreset.themeId))).toBe(true);
     expect(recipePresets.every((recipePreset) => densityIds.has(recipePreset.cardDensityId))).toBe(true);
     expect(recipePresets.every((recipePreset) => typographyIds.has(recipePreset.cardTypographyScaleId))).toBe(true);
+    expect(recipePresets.every((recipePreset) => voiceIds.has(recipePreset.cardTypographyVoiceId))).toBe(true);
     expect(recipePresets.every((recipePreset) => accentIds.has(recipePreset.cardAccentId))).toBe(true);
     expect(
       recipePresets.every((recipePreset) => backgroundIntensityIds.has(recipePreset.cardBackgroundIntensityId)),
@@ -145,6 +150,7 @@ describe('recipePresets', () => {
           recipePreset.themeId,
           recipePreset.cardDensityId,
           recipePreset.cardTypographyScaleId,
+          recipePreset.cardTypographyVoiceId,
           recipePreset.cardAccentId,
           recipePreset.cardBackgroundIntensityId,
           recipePreset.cardCornerRadiusId,
@@ -159,6 +165,7 @@ describe('recipePresets', () => {
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.themeId)).size).toBeGreaterThanOrEqual(4);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardDensityId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTypographyScaleId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTypographyVoiceId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardBackgroundIntensityId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardCornerRadiusId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTextureId)).size).toBeGreaterThanOrEqual(3);
@@ -182,12 +189,15 @@ describe('recipePresets', () => {
       presetId: 'launch',
       themeId: 'midnight',
       cardDensityId: 'compact',
+      cardTypographyVoiceId: 'mono',
       cardAccentId: 'rose',
       showCardLabels: true,
     });
     expect(getRecipePreset('before-after').markdown).toContain('| Before | After |');
     expect(getRecipePreset('framework').markdown).toContain('1. Outcome people want');
     expect(getRecipePreset('bugfix').markdown).toContain('Incident resolved');
+    expect(getRecipePreset('quote').cardTypographyVoiceId).toBe('editorial');
+    expect(getRecipePreset('code-snippet').cardTypographyVoiceId).toBe('mono');
     expect(getRecipePreset('code-snippet').markdown).toContain('```bash');
     expect(getRecipePreset('tutorial').markdown).toContain('1. Paste the Markdown draft');
     expect(getRecipePreset('quote').markdown).toContain('"Design tools');
@@ -204,6 +214,7 @@ describe('stylePacks', () => {
     const themeIds = new Set(cardThemes.map((theme) => theme.id));
     const densityIds = new Set(cardDensityOptions.map((option) => option.id));
     const typographyIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
+    const voiceIds = new Set(cardTypographyVoiceOptions.map((option) => option.id));
     const accentIds = new Set(cardAccentOptions.map((option) => option.id));
     const backgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
     const cornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
@@ -221,6 +232,7 @@ describe('stylePacks', () => {
     expect(stylePacks.every((stylePack) => themeIds.has(stylePack.themeId))).toBe(true);
     expect(stylePacks.every((stylePack) => densityIds.has(stylePack.cardDensityId))).toBe(true);
     expect(stylePacks.every((stylePack) => typographyIds.has(stylePack.cardTypographyScaleId))).toBe(true);
+    expect(stylePacks.every((stylePack) => voiceIds.has(stylePack.cardTypographyVoiceId))).toBe(true);
     expect(stylePacks.every((stylePack) => accentIds.has(stylePack.cardAccentId))).toBe(true);
     expect(stylePacks.every((stylePack) => backgroundIntensityIds.has(stylePack.cardBackgroundIntensityId))).toBe(true);
     expect(stylePacks.every((stylePack) => cornerRadiusIds.has(stylePack.cardCornerRadiusId))).toBe(true);
@@ -242,6 +254,7 @@ describe('stylePacks', () => {
       themeId: 'midnight',
       cardDensityId: 'compact',
       cardTypographyScaleId: 'small',
+      cardTypographyVoiceId: 'mono',
       cardAccentId: 'emerald',
       cardBackgroundIntensityId: 'vivid',
       cardCornerRadiusId: 'sharp',
@@ -526,5 +539,29 @@ describe('cardTypographyScaleOptions', () => {
       'type-default',
       'type-large',
     ]);
+  });
+});
+
+describe('cardTypographyVoiceOptions', () => {
+  it('defaults to the modern sans voice and exposes card classes', () => {
+    expect(getCardTypographyVoiceOption(defaultCardTypographyVoiceId)).toMatchObject({
+      id: 'modern',
+      label: 'Modern Sans',
+      className: 'voice-modern',
+    });
+    expect(cardTypographyVoiceOptions.map((option) => option.id)).toEqual(['modern', 'editorial', 'mono']);
+    expect(cardTypographyVoiceOptions.map((option) => option.className)).toEqual([
+      'voice-modern',
+      'voice-editorial',
+      'voice-mono',
+    ]);
+  });
+
+  it('falls back to modern sans for unknown ids', () => {
+    expect(getCardTypographyVoiceOption('missing' as never)).toMatchObject({
+      id: 'modern',
+      label: 'Modern Sans',
+      className: 'voice-modern',
+    });
   });
 });

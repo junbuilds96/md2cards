@@ -8,6 +8,8 @@ export type CardDensityId = 'compact' | 'balanced' | 'spacious';
 
 export type CardTypographyScaleId = 'small' | 'default' | 'large';
 
+export type CardTypographyVoiceId = 'modern' | 'editorial' | 'mono';
+
 export type CardAccentId = 'blue' | 'emerald' | 'rose' | 'amber';
 
 export type CardBackgroundIntensityId = 'soft' | 'balanced' | 'vivid';
@@ -63,6 +65,13 @@ export type CardDensityOption = {
 
 export type CardTypographyScaleOption = {
   id: CardTypographyScaleId;
+  label: string;
+  description: string;
+  className: string;
+};
+
+export type CardTypographyVoiceOption = {
+  id: CardTypographyVoiceId;
   label: string;
   description: string;
   className: string;
@@ -126,6 +135,7 @@ export type CardAppearanceSettings = {
   themeId: ThemeId;
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
+  cardTypographyVoiceId: CardTypographyVoiceId;
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
@@ -289,6 +299,8 @@ export const defaultCardDensityId: CardDensityId = 'balanced';
 
 export const defaultCardTypographyScaleId: CardTypographyScaleId = 'default';
 
+export const defaultCardTypographyVoiceId: CardTypographyVoiceId = 'modern';
+
 export const defaultCardAccentId: CardAccentId = 'blue';
 
 export const defaultCardBackgroundIntensityId: CardBackgroundIntensityId = 'balanced';
@@ -353,6 +365,27 @@ export const cardTypographyScaleOptions: CardTypographyScaleOption[] = [
     label: 'Large',
     description: 'Larger type for short, poster-like cards.',
     className: 'type-large',
+  },
+];
+
+export const cardTypographyVoiceOptions: CardTypographyVoiceOption[] = [
+  {
+    id: 'modern',
+    label: 'Modern Sans',
+    description: 'Theme-driven sans behavior for clean product cards.',
+    className: 'voice-modern',
+  },
+  {
+    id: 'editorial',
+    label: 'Editorial Serif',
+    description: 'Serif headings and quote accents for magazine-like cards.',
+    className: 'voice-editorial',
+  },
+  {
+    id: 'mono',
+    label: 'Mono Technical',
+    description: 'Monospace headings, labels, and code-adjacent chrome.',
+    className: 'voice-mono',
   },
 ];
 
@@ -525,6 +558,7 @@ export const recipePresets: RecipePreset[] = [
     themeId: 'signal',
     cardDensityId: 'balanced',
     cardTypographyScaleId: 'default',
+    cardTypographyVoiceId: 'modern',
     cardAccentId: 'blue',
     cardBackgroundIntensityId: 'balanced',
     cardCornerRadiusId: 'subtle',
@@ -546,6 +580,7 @@ Turn a product update into a share-ready visual in one pass.
     themeId: 'editorial',
     cardDensityId: 'balanced',
     cardTypographyScaleId: 'large',
+    cardTypographyVoiceId: 'editorial',
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'subtle',
@@ -569,6 +604,7 @@ Ship the contrast, not the changelog.`,
     themeId: 'paper',
     cardDensityId: 'spacious',
     cardTypographyScaleId: 'default',
+    cardTypographyVoiceId: 'editorial',
     cardAccentId: 'amber',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
@@ -591,6 +627,7 @@ Ship the contrast, not the changelog.`,
     themeId: 'midnight',
     cardDensityId: 'compact',
     cardTypographyScaleId: 'small',
+    cardTypographyVoiceId: 'mono',
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
@@ -617,6 +654,7 @@ Ship the contrast, not the changelog.`,
     themeId: 'midnight',
     cardDensityId: 'compact',
     cardTypographyScaleId: 'small',
+    cardTypographyVoiceId: 'mono',
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
@@ -644,6 +682,7 @@ Ship the contrast, not the changelog.`,
     themeId: 'paper',
     cardDensityId: 'balanced',
     cardTypographyScaleId: 'default',
+    cardTypographyVoiceId: 'editorial',
     cardAccentId: 'amber',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'subtle',
@@ -667,6 +706,7 @@ Ship the contrast, not the changelog.`,
     themeId: 'editorial',
     cardDensityId: 'spacious',
     cardTypographyScaleId: 'large',
+    cardTypographyVoiceId: 'editorial',
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'rounded',
@@ -688,6 +728,7 @@ People decide whether to read the caption from the first two seconds.
     themeId: 'paper',
     cardDensityId: 'spacious',
     cardTypographyScaleId: 'large',
+    cardTypographyVoiceId: 'editorial',
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
@@ -707,6 +748,7 @@ Use Markdown for structure. Use recipes for the visual rhythm.
     themeId: 'midnight',
     cardDensityId: 'compact',
     cardTypographyScaleId: 'small',
+    cardTypographyVoiceId: 'mono',
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'balanced',
     cardCornerRadiusId: 'sharp',
@@ -734,6 +776,7 @@ export const stylePacks: StylePack[] = [
     themeId: 'signal',
     cardDensityId: 'balanced',
     cardTypographyScaleId: 'default',
+    cardTypographyVoiceId: 'modern',
     cardAccentId: 'blue',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'subtle',
@@ -747,6 +790,7 @@ export const stylePacks: StylePack[] = [
     themeId: 'editorial',
     cardDensityId: 'spacious',
     cardTypographyScaleId: 'large',
+    cardTypographyVoiceId: 'editorial',
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
@@ -760,6 +804,7 @@ export const stylePacks: StylePack[] = [
     themeId: 'midnight',
     cardDensityId: 'compact',
     cardTypographyScaleId: 'small',
+    cardTypographyVoiceId: 'mono',
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
@@ -773,6 +818,7 @@ export const stylePacks: StylePack[] = [
     themeId: 'paper',
     cardDensityId: 'spacious',
     cardTypographyScaleId: 'large',
+    cardTypographyVoiceId: 'editorial',
     cardAccentId: 'amber',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
@@ -786,6 +832,7 @@ export const stylePacks: StylePack[] = [
     themeId: 'signal',
     cardDensityId: 'balanced',
     cardTypographyScaleId: 'default',
+    cardTypographyVoiceId: 'modern',
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'sharp',
@@ -821,6 +868,7 @@ export function applyStylePackAppearance<T extends object>(
     themeId: stylePack.themeId,
     cardDensityId: stylePack.cardDensityId,
     cardTypographyScaleId: stylePack.cardTypographyScaleId,
+    cardTypographyVoiceId: stylePack.cardTypographyVoiceId,
     cardAccentId: stylePack.cardAccentId,
     cardBackgroundIntensityId: stylePack.cardBackgroundIntensityId,
     cardCornerRadiusId: stylePack.cardCornerRadiusId,
@@ -1254,6 +1302,12 @@ export function getCardTypographyScaleOption(
   cardTypographyScaleId: CardTypographyScaleId,
 ): CardTypographyScaleOption {
   return cardTypographyScaleOptions.find((option) => option.id === cardTypographyScaleId) ?? cardTypographyScaleOptions[1];
+}
+
+export function getCardTypographyVoiceOption(
+  cardTypographyVoiceId: CardTypographyVoiceId,
+): CardTypographyVoiceOption {
+  return cardTypographyVoiceOptions.find((option) => option.id === cardTypographyVoiceId) ?? cardTypographyVoiceOptions[0];
 }
 
 export function getCardAccentOption(cardAccentId: CardAccentId): CardAccentOption {

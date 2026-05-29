@@ -80,10 +80,14 @@ describe('social card CSS', () => {
 
     expect(cardRule).toContain('isolation: isolate');
     expect(cardRule).toContain('--card-heading-font-family: inherit');
+    expect(cardRule).toContain('--card-body-font-family: inherit');
+    expect(cardRule).toContain('--card-inline-code-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace');
     expect(cardRule).toContain('--card-h2-bg: transparent');
     expect(chromeRule).toContain('font-family: var(--card-chrome-font-family)');
+    expect(chromeRule).toContain('font-weight: var(--card-chrome-font-weight)');
     expect(chromeRule).toContain('text-transform: var(--card-chrome-text-transform)');
     expect(h1Rule).toContain('font-family: var(--card-heading-font-family)');
+    expect(h1Rule).toContain('line-height: var(--card-h1-line-height)');
     expect(h1Rule).toContain('text-shadow: var(--card-heading-text-shadow)');
     expect(h2Rule).toContain('background: var(--card-h2-bg)');
     expect(h2Rule).toContain('border: var(--card-h2-border)');
@@ -110,6 +114,46 @@ describe('social card CSS', () => {
     expect(codeFrameRule).toContain('grid-template-rows: auto minmax(0, 1fr)');
     expect(codeHeaderRule).toContain('background: var(--card-code-header-bg)');
     expect(codeTextRule).toContain('display: block');
+  });
+
+  it('defines typography voice classes that alter font personality through variables', () => {
+    const cardRule = getRule('.social-card');
+    const bodyRule = getRule('.markdown-card-body');
+    const h1Rule = getRule('.markdown-card-body h1');
+    const codeRule = getRule('.markdown-card-body code');
+    const quoteParagraphRule = getRule('.markdown-card-body blockquote p');
+    const editorialRule = getRule('.social-card.voice-editorial');
+    const monoRule = getRule('.social-card.voice-mono');
+
+    expect(cardRule).toContain('--card-body-font-family: inherit');
+    expect(cardRule).toContain('--card-blockquote-font-style: normal');
+    expect(bodyRule).toContain('font-family: var(--card-body-font-family)');
+    expect(bodyRule).toContain('font-weight: var(--card-body-font-weight)');
+    expect(h1Rule).toContain('line-height: var(--card-h1-line-height)');
+    expect(codeRule).toContain('font-family: var(--card-inline-code-font-family)');
+    expect(quoteParagraphRule).toContain('font-family: var(--card-blockquote-font-family)');
+    expect(quoteParagraphRule).toContain('font-style: var(--card-blockquote-font-style)');
+    expect(styles).not.toContain('.social-card.voice-modern');
+    expect(editorialRule).toContain('--card-heading-font-family: Georgia, "Times New Roman", serif');
+    expect(editorialRule).toContain('--card-body-font-family: Georgia, "Times New Roman", serif');
+    expect(editorialRule).toContain('--card-h1-font-size: clamp(28px, 6.75cqw, 108px)');
+    expect(editorialRule).toContain('--card-h2-font-size: clamp(21px, 3.25cqw, 50px)');
+    expect(editorialRule).toContain('--card-h1-line-height: 0.96');
+    expect(editorialRule).toContain('--card-body-line-height: 1.17');
+    expect(editorialRule).toContain('--card-p-margin-bottom: 12px');
+    expect(editorialRule).toContain('--card-list-margin: 8px 0 12px');
+    expect(editorialRule).toContain('--card-list-item-padding-block: 0.28em');
+    expect(editorialRule).toContain('--card-blockquote-font-style: italic');
+    expect(monoRule).toContain('--card-heading-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace');
+    expect(monoRule).toContain('--card-chrome-text-transform: uppercase');
+    expect(editorialRule).not.toMatch(/(^|\n)\s*width:/);
+    expect(editorialRule).not.toMatch(/(^|\n)\s*height:/);
+    expect(editorialRule).not.toMatch(/(^|\n)\s*aspect-ratio:/);
+    expect(editorialRule).not.toMatch(/(^|\n)\s*grid-template-rows:/);
+    expect(monoRule).not.toMatch(/(^|\n)\s*width:/);
+    expect(monoRule).not.toMatch(/(^|\n)\s*height:/);
+    expect(monoRule).not.toMatch(/(^|\n)\s*aspect-ratio:/);
+    expect(monoRule).not.toMatch(/(^|\n)\s*grid-template-rows:/);
   });
 
   it('defines texture classes that only tune decorative personality overlays', () => {
@@ -235,7 +279,7 @@ describe('social card CSS', () => {
     expect(quoteRule).toContain('overflow: hidden');
     expect(quoteAccentRule).toContain('background: linear-gradient(180deg, var(--card-accent), transparent 145%)');
     expect(quoteParagraphRule).toContain('font-size: var(--card-blockquote-font-size)');
-    expect(quoteParagraphRule).toContain('font-weight: 800');
+    expect(quoteParagraphRule).toContain('font-weight: var(--card-blockquote-font-weight)');
   });
 
   it('keeps the preview toolbar compact and grouped', () => {
