@@ -85,6 +85,7 @@ function addUnique(items: string[], item: string) {
 
 function stripMarkdownText(markdown: string): string {
   return markdown
+    .replace(/!?\[([^\]]*)\]\((?:\\.|[^)])*\)/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/^\s*(?:[-*+]|\d+[.)])\s+/gm, '')
     .replace(/[`*_~>|[\]()]/g, '')

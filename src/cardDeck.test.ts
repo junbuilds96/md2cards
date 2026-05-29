@@ -467,6 +467,31 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(new Set([twitter, xiaohongshu, launch]).size).toBe(3);
   });
 
+  it('keeps mixed-language inline Markdown readable in generated captions', () => {
+    const markdown = [
+      '# 发布复盘',
+      '',
+      '## 社交短帖',
+      '',
+      '中文长段：[路线图 Roadmap](https://example.com/roadmap) explains why **Markdown 卡片** and _English notes_ stay readable while export checks stay strict.',
+      '',
+      'Short post: ship the fix, keep the source, export safely.',
+    ].join('\n');
+
+    const result = splitMarkdownIntoCardDeck(markdown, platformPresets[2]);
+    const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+    const captionText = result.deck?.captions.map((caption) => caption.text).join('\n\n') ?? '';
+
+    expect(joinedCards).toContain('[路线图 Roadmap](https://example.com/roadmap)');
+    expect(captionText).toContain('路线图 Roadmap');
+    expect(captionText).toContain('Markdown 卡片');
+    expect(captionText).toContain('English notes');
+    expect(captionText).not.toContain('https://example.com');
+    expect(captionText).not.toContain('路线图 Roadmaphttps');
+    expect(captionText).not.toContain('**');
+    expect(captionText).not.toContain('_English');
+  });
+
   it('uses story deck splitting for Chinese narrative markdown', () => {
     const result = splitMarkdownIntoCardDeck(narrativeStory, platformPresets[0]);
     const deck = result.deck;
