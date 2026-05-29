@@ -113,8 +113,27 @@ function getHeadingText(line: string): { depth: number; title: string } | null {
   };
 }
 
+function getListMarkerIndent(line: string): number | null {
+  const match = line.match(/^(\s*)(?:[-*+]|\d+[.)])\s+\S/);
+
+  return match ? match[1].length : null;
+}
+
 function isListLine(line: string): boolean {
-  return /^\s*(?:[-*+]|\d+[.)])\s+\S/.test(line);
+  return getListMarkerIndent(line) !== null;
+}
+
+function isListContinuationLine(line: string): boolean {
+  const trimmed = line.trim();
+
+  return (
+    /^\s{2,}\S/.test(line) &&
+    trimmed.length > 0 &&
+    !getHeadingText(line) &&
+    !trimmed.startsWith('```') &&
+    !isHorizontalRuleLine(line) &&
+    !isLikelyTableLine(line)
+  );
 }
 
 function isLikelyTableLine(line: string): boolean {
@@ -206,10 +225,38 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
 
     if (isListLine(line)) {
       const items: string[] = [];
+      let currentItem = '';
+      const baseIndent = getListMarkerIndent(line) ?? 0;
 
-      while (index < lines.length && isListLine(lines[index])) {
-        items.push(lines[index].trimEnd());
-        index += 1;
+      while (index < lines.length) {
+        const markerIndent = getListMarkerIndent(lines[index]);
+
+        if (markerIndent !== null) {
+          if (currentItem && markerIndent > baseIndent) {
+            currentItem = `${currentItem}\n${lines[index].trimEnd()}`;
+            index += 1;
+            continue;
+          }
+
+          if (currentItem) {
+            items.push(currentItem);
+          }
+          currentItem = lines[index].trimEnd();
+          index += 1;
+          continue;
+        }
+
+        if (currentItem && isListContinuationLine(lines[index])) {
+          currentItem = `${currentItem}\n${lines[index].trimEnd()}`;
+          index += 1;
+          continue;
+        }
+
+        break;
+      }
+
+      if (currentItem) {
+        items.push(currentItem);
       }
 
       blocks.push({ type: 'list', items });

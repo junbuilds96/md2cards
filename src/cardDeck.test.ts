@@ -243,6 +243,36 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(result.deck?.cards[2].markdown).toContain(`- Item ${limits.bulletLimit * 2 + 1}`);
   });
 
+  it('keeps nested list details with their parent item when splitting mixed-language outlines', () => {
+    const preset = platformPresets[0];
+    const markdown = [
+      '# Mixed checklist',
+      '',
+      '## 发布前检查',
+      '',
+      '- 用户反馈：中文长段先给背景，再给动作。',
+      '  这行补充 context in English，should stay under the same point.',
+      '  - Nested proof keeps the caption claim close.',
+      '- Mixed English/中文 line stays as the second top-level item.',
+      '- Link proof: [issue 42](https://example.com/issues/42) is still visible.',
+      '- Overflow detail belongs on the next card.',
+    ].join('\n');
+
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const firstCardMarkdown = result.deck?.cards[0].markdown ?? '';
+
+    expect(firstCardMarkdown).toContain(
+      [
+        '- 用户反馈：中文长段先给背景，再给动作。',
+        '  这行补充 context in English，should stay under the same point.',
+        '  - Nested proof keeps the caption claim close.',
+      ].join('\n'),
+    );
+    expect(firstCardMarkdown).toContain('- Mixed English/中文 line stays as the second top-level item.');
+    expect(firstCardMarkdown).toContain('- Link proof: [issue 42](https://example.com/issues/42) is still visible.');
+    expect(firstCardMarkdown).not.toContain('- Overflow detail belongs on the next card.');
+  });
+
   it('creates different deterministic captions for each platform', () => {
     const twitter = splitMarkdownIntoCardDeck(longEssay, platformPresets[0]).deck?.captionText ?? '';
     const xiaohongshu = splitMarkdownIntoCardDeck(longEssay, platformPresets[1]).deck?.captionText ?? '';

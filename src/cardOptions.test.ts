@@ -558,6 +558,32 @@ More detail belongs in the caption.`;
     expect(result.markdown).not.toContain('\n\n\n');
   });
 
+  it('keeps indented list continuations attached when capping realistic mixed-language lists', () => {
+    const markdown = [
+      '# 发布清单',
+      '',
+      '- 第一条：中文 insight 先给结论，再解释 tradeoff。',
+      '  Continuation detail should remain under the same bullet.',
+      '  - Nested proof remains attached.',
+      '- 第二条保留 bold **keyword** 和 English context.',
+      '- 第三条保留链接 [issue](https://example.com/issues/42).',
+      '- 第四条应该被 Twitter landscape 的列表上限移到 caption/source.',
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+
+    expect(result.changed).toBe(true);
+    expect(result.note).toContain('capped lists at 3 items');
+    expect(result.markdown).toContain(
+      [
+        '- 第一条：中文 insight 先给结论，再解释 tradeoff。',
+        '  Continuation detail should remain under the same bullet.',
+        '  - Nested proof remains attached.',
+      ].join('\n'),
+    );
+    expect(result.markdown).toContain('- 第三条保留链接 [issue](https://example.com/issues/42).');
+    expect(result.markdown).not.toContain('第四条');
+  });
+
   it('shortens long paragraphs and keeps the fitted result inside preset limits', () => {
     const markdown = `# Big update\n\n${'This release note has too much background detail for a social card. '.repeat(35)}`;
     const result = fitMarkdownToPreset(markdown, platformPresets[2]);

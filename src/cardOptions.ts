@@ -1190,13 +1190,37 @@ function shortenText(text: string, characterLimit: number): { text: string; chan
   };
 }
 
-function compactListBlock(lines: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
+function getMarkdownListMarkerIndent(line: string): number | null {
+  const match = line.match(/^(\s*)(?:[-*+]|\d+[.)])\s+\S/);
+
+  return match ? match[1].length : null;
+}
+
+function isMarkdownListLine(line: string): boolean {
+  return getMarkdownListMarkerIndent(line) !== null;
+}
+
+function isMarkdownListContinuationLine(line: string): boolean {
+  const trimmed = line.trim();
+
+  return (
+    /^\s{2,}\S/.test(line) &&
+    trimmed.length > 0 &&
+    !/^#{1,6}\s+\S/.test(trimmed) &&
+    !trimmed.startsWith('```') &&
+    !/^-{3,}\s*$/.test(trimmed) &&
+    !line.includes('|')
+  );
+}
+
+function compactListBlock(items: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
   const changes: string[] = [];
-  const keptLines = lines.slice(0, limits.bulletLimit).map((line) => {
-    const listMatch = line.match(/^(\s*(?:[-*+]|\d+[.)])\s+)(.+)$/);
+  const keptItems = items.slice(0, limits.bulletLimit).map((item) => {
+    const [firstLine = '', ...continuationLines] = item.split('\n');
+    const listMatch = firstLine.match(/^(\s*(?:[-*+]|\d+[.)])\s+)(.+)$/);
 
     if (!listMatch) {
-      return line;
+      return item;
     }
 
     const shortened = shortenText(listMatch[2], Math.min(130, limits.paragraphCharacterLimit));
@@ -1204,15 +1228,15 @@ function compactListBlock(lines: string[], limits: MarkdownFitLimits): { block: 
       addChange(changes, 'shortened long list items');
     }
 
-    return `${listMatch[1]}${shortened.text}`;
+    return [`${listMatch[1]}${shortened.text}`, ...continuationLines].join('\n');
   });
 
-  if (lines.length > keptLines.length) {
+  if (items.length > keptItems.length) {
     addChange(changes, `capped lists at ${limits.bulletLimit} items`);
   }
 
   return {
-    block: keptLines.join('\n'),
+    block: keptItems.join('\n'),
     changes,
   };
 }
@@ -1324,15 +1348,43 @@ function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { bl
       continue;
     }
 
-    if (/^\s*(?:[-*+]|\d+[.)])\s+\S/.test(line)) {
-      const listLines: string[] = [];
+    if (isMarkdownListLine(line)) {
+      const listItems: string[] = [];
+      let currentItem = '';
+      const baseIndent = getMarkdownListMarkerIndent(line) ?? 0;
 
-      while (index < lines.length && /^\s*(?:[-*+]|\d+[.)])\s+\S/.test(lines[index])) {
-        listLines.push(lines[index]);
-        index += 1;
+      while (index < lines.length) {
+        const markerIndent = getMarkdownListMarkerIndent(lines[index]);
+
+        if (markerIndent !== null) {
+          if (currentItem && markerIndent > baseIndent) {
+            currentItem = `${currentItem}\n${lines[index]}`;
+            index += 1;
+            continue;
+          }
+
+          if (currentItem) {
+            listItems.push(currentItem);
+          }
+          currentItem = lines[index];
+          index += 1;
+          continue;
+        }
+
+        if (currentItem && isMarkdownListContinuationLine(lines[index])) {
+          currentItem = `${currentItem}\n${lines[index]}`;
+          index += 1;
+          continue;
+        }
+
+        break;
       }
 
-      const compacted = compactListBlock(listLines, limits);
+      if (currentItem) {
+        listItems.push(currentItem);
+      }
+
+      const compacted = compactListBlock(listItems, limits);
       blocks.push(compacted.block);
       compacted.changes.forEach((change) => addChange(changes, change));
       continue;
@@ -1358,7 +1410,7 @@ function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { bl
       index < lines.length &&
       lines[index].trim().length > 0 &&
       !/^#{1,6}\s+\S/.test(lines[index].trim()) &&
-      !/^\s*(?:[-*+]|\d+[.)])\s+\S/.test(lines[index]) &&
+      !isMarkdownListLine(lines[index]) &&
       !lines[index].trim().startsWith('```') &&
       !lines[index].includes('|')
     ) {
