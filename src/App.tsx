@@ -1,14 +1,17 @@
 import {
+  Children,
   type ChangeEvent,
   type ComponentPropsWithoutRef,
   type CSSProperties,
   type DragEvent,
   type RefObject,
+  isValidElement,
   useMemo,
   useRef,
   useState,
+  type ReactNode,
 } from 'react';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
   AlertCircle,
@@ -100,12 +103,64 @@ type ImportState = 'idle' | 'importing' | 'success' | 'error';
 type PresetSaveState = 'idle' | 'saved' | 'error';
 type RecipeTransferState = 'idle' | 'importing' | 'success' | 'error';
 
-const markdownComponents = {
+export function getCodeLanguageLabel(className?: string): string {
+  const languageClass = className?.split(/\s+/).find((item) => item.startsWith('language-'));
+  const language = languageClass?.replace(/^language-/, '').replace(/[^\w#+.-]/g, '').slice(0, 18);
+
+  return language ? language.toUpperCase() : 'CODE';
+}
+
+function getCodeBlockLanguageLabel(children: ReactNode): string {
+  const codeElement = Children.toArray(children).find(isValidElement);
+
+  if (
+    !codeElement ||
+    typeof codeElement.props !== 'object' ||
+    !codeElement.props ||
+    !('className' in codeElement.props)
+  ) {
+    return 'CODE';
+  }
+
+  return getCodeLanguageLabel(
+    typeof codeElement.props.className === 'string' ? codeElement.props.className : undefined,
+  );
+}
+
+const markdownComponents: Components = {
   table({ children }: ComponentPropsWithoutRef<'table'>) {
     return (
       <div className="markdown-table-scroll">
         <table>{children}</table>
       </div>
+    );
+  },
+  pre({ children }) {
+    return (
+      <figure className="markdown-code-frame">
+        <figcaption className="markdown-code-header">
+          <span className="markdown-code-window-dots" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
+          <span className="markdown-code-language">{getCodeBlockLanguageLabel(children)}</span>
+        </figcaption>
+        <pre className="markdown-code-pre">{children}</pre>
+      </figure>
+    );
+  },
+  code({ children, className, node, ...props }) {
+    void node;
+
+    return (
+      <code
+        {...props}
+        className={['markdown-code-text', className].filter(Boolean).join(' ')}
+        data-language={getCodeLanguageLabel(className)}
+      >
+        {children}
+      </code>
     );
   },
 };

@@ -74,9 +74,9 @@ describe('social card CSS', () => {
     const chromeRule = getRule('.card-chrome,\n.card-footer');
     const h1Rule = getRule('.markdown-card-body h1');
     const h2Rule = getRule('.markdown-card-body h2');
-    const preRule = getRule('.markdown-card-body pre');
-    const preChromeRule = getRule('.markdown-card-body pre::before');
-    const preCodeRule = getRule('.markdown-card-body pre code');
+    const codeFrameRule = getRule('.markdown-code-frame');
+    const codeHeaderRule = getRule('.markdown-code-header');
+    const codeTextRule = getRule('.markdown-code-frame .markdown-code-text');
 
     expect(cardRule).toContain('isolation: isolate');
     expect(cardRule).toContain('--card-heading-font-family: inherit');
@@ -100,16 +100,16 @@ describe('social card CSS', () => {
     expect(paperRule).toContain('--card-heading-font-family: Georgia, "Times New Roman", serif');
     expect(paperRule).toContain('--card-h2-bg: linear-gradient(180deg, transparent 58%');
     expect(midnightRule).toContain('radial-gradient(circle at 34px 28px, #ff5f57');
-    expect(midnightRule).toContain('--card-pre-chrome-content: ""');
     expect(midnightRule).toContain('--card-heading-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace');
     expect(midnightRule).toContain('--card-h2-border: 1px solid rgba(84, 214, 166, 0.26)');
+    expect(midnightRule).toContain('--card-code-header-bg: linear-gradient(90deg, rgba(84, 214, 166, 0.14)');
     expect(editorialRule).toContain('rgba(255, 184, 77, 0.18)');
     expect(editorialRule).toContain('rgba(28, 21, 51, 0.82)');
     expect(editorialRule).toContain('--card-heading-font-family: Georgia, "Times New Roman", serif');
     expect(editorialRule).toContain('--card-h2-bg: linear-gradient(90deg, rgba(226, 85, 121, 0.18)');
-    expect(preRule).toContain('padding: var(--card-pre-padding-top, var(--card-pre-padding))');
-    expect(preChromeRule).toContain('content: var(--card-pre-chrome-content)');
-    expect(preCodeRule).toContain('position: relative');
+    expect(codeFrameRule).toContain('grid-template-rows: auto minmax(0, 1fr)');
+    expect(codeHeaderRule).toContain('background: var(--card-code-header-bg)');
+    expect(codeTextRule).toContain('display: block');
   });
 
   it('defines texture classes that only tune decorative personality overlays', () => {
@@ -137,7 +137,7 @@ describe('social card CSS', () => {
     const subtleRule = getRule('.social-card.radius-subtle');
     const roundedRule = getRule('.social-card.radius-rounded');
     const codeRule = getRule('.markdown-card-body code');
-    const preRule = getRule('.markdown-card-body pre');
+    const codeFrameRule = getRule('.markdown-code-frame');
 
     expect(cardRule).toContain('width: 100%');
     expect(cardRule).toContain('height: 100%');
@@ -148,7 +148,7 @@ describe('social card CSS', () => {
     expect(subtleRule).toContain('--card-radius: clamp(18px, 3cqw, 42px)');
     expect(roundedRule).toContain('--card-radius: clamp(34px, 5cqw, 72px)');
     expect(codeRule).toContain('border-radius: var(--card-inline-radius)');
-    expect(preRule).toContain('border-radius: var(--card-surface-radius)');
+    expect(codeFrameRule).toContain('border-radius: var(--card-surface-radius)');
   });
 
   it('gives Markdown code, tables, lists, and quotes designed constrained surfaces', () => {
@@ -162,8 +162,11 @@ describe('social card CSS', () => {
     const orderedListRule = getRuleContaining('.markdown-card-body ol', 'counter-reset: markdown-card-list');
     const orderedItemRule = getRule('.markdown-card-body ol > li::before');
     const inlineCodeRule = getRule('.markdown-card-body code');
-    const preRule = getRule('.markdown-card-body pre');
-    const preCodeRule = getRule('.markdown-card-body pre code');
+    const codeFrameRule = getRule('.markdown-code-frame');
+    const codeHeaderRule = getRule('.markdown-code-header');
+    const codeLanguageRule = getRule('.markdown-code-language');
+    const codePreRule = getRule('.markdown-code-pre');
+    const codeTextRule = getRule('.markdown-code-frame .markdown-code-text');
     const nestedListRule = getRule('.markdown-card-body li > ul,\n.markdown-card-body li > ol');
     const nestedListItemRule = getRule('.markdown-card-body li li');
     const tableScrollRule = getRule('.markdown-table-scroll');
@@ -182,6 +185,8 @@ describe('social card CSS', () => {
     expect(cardRule).toContain('--card-table-header-bg: linear-gradient(180deg, var(--card-surface-shine), var(--code-bg))');
     expect(cardRule).toContain('--card-code-block-font-size: clamp(12px, 1.45cqw, 24px)');
     expect(cardRule).toContain('--card-pre-max-height: min(42cqh, 15lh)');
+    expect(cardRule).toContain('--card-code-header-height: clamp(26px, 3.2cqh, 38px)');
+    expect(cardRule).toContain('--card-code-label-bg: color-mix(in srgb, var(--card-accent) 14%, var(--card-surface-bg))');
     expect(cardRule).toContain('--card-table-font-size: clamp(11px, 1.28cqw, 22px)');
     expect(cardRule).toContain('--card-table-max-height: 30cqh');
     expect(textRule).toContain('overflow-wrap: anywhere');
@@ -200,15 +205,20 @@ describe('social card CSS', () => {
     expect(inlineCodeRule).toContain('border: 1px solid var(--card-surface-border)');
     expect(inlineCodeRule).toContain('overflow-wrap: anywhere');
     expect(inlineCodeRule).toContain('font-weight: 750');
-    expect(preRule).toContain('linear-gradient(180deg, var(--card-surface-shine), transparent 34%)');
-    expect(preRule).toContain('max-height: var(--card-pre-max-height)');
-    expect(preRule).toContain('border: 1px solid var(--card-surface-border)');
-    expect(preRule).toContain('font-size: var(--card-code-block-font-size)');
-    expect(preRule).toContain('overflow: hidden auto');
-    expect(preRule).toContain('scrollbar-width: thin');
-    expect(preCodeRule).toContain('white-space: pre-wrap');
-    expect(preCodeRule).toContain('overflow-wrap: anywhere');
-    expect(preCodeRule).toContain('word-break: break-word');
+    expect(codeFrameRule).toContain('linear-gradient(180deg, var(--card-surface-shine), transparent 46%)');
+    expect(codeFrameRule).toContain('max-height: var(--card-pre-max-height)');
+    expect(codeFrameRule).toContain('overflow: hidden');
+    expect(codeFrameRule).toContain('contain: paint');
+    expect(codeFrameRule).toContain('font-size: var(--card-code-block-font-size)');
+    expect(codeHeaderRule).toContain('min-height: var(--card-code-header-height)');
+    expect(codeLanguageRule).toContain('text-overflow: ellipsis');
+    expect(codeLanguageRule).toContain('font-weight: 900');
+    expect(codePreRule).toContain('max-height: calc(var(--card-pre-max-height) - var(--card-code-header-height))');
+    expect(codePreRule).toContain('overflow: hidden auto');
+    expect(codePreRule).toContain('scrollbar-width: thin');
+    expect(codeTextRule).toContain('white-space: pre-wrap');
+    expect(codeTextRule).toContain('overflow-wrap: anywhere');
+    expect(codeTextRule).toContain('word-break: break-word');
     expect(tableScrollRule).toContain('max-height: var(--card-table-max-height)');
     expect(tableScrollRule).toContain('overflow: auto');
     expect(tableScrollRule).toContain('scrollbar-width: thin');

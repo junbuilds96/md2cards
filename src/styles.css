@@ -1224,6 +1224,15 @@ textarea:focus {
   --card-pre-margin: 18px 0;
   --card-pre-padding: 20px;
   --card-pre-max-height: min(42cqh, 15lh);
+  --card-code-header-height: clamp(26px, 3.2cqh, 38px);
+  --card-code-header-padding-inline: clamp(12px, 1.4cqw, 18px);
+  --card-code-header-bg: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--card-surface-bg) 86%, var(--card-bg)),
+    color-mix(in srgb, var(--card-surface-bg) 62%, transparent)
+  );
+  --card-code-label-bg: color-mix(in srgb, var(--card-accent) 14%, var(--card-surface-bg));
+  --card-code-label-text: var(--card-accent);
   --card-table-margin-top: 18px;
   --card-table-cell-padding: 12px 14px;
   --card-table-font-size: clamp(11px, 1.28cqw, 22px);
@@ -1260,10 +1269,6 @@ textarea:focus {
   --card-personality-accent-image: linear-gradient(transparent, transparent);
   --card-personality-accent-opacity: 0;
   --card-texture-accent-opacity: var(--card-personality-accent-opacity);
-  --card-pre-chrome-content: none;
-  --card-pre-chrome-height: 0;
-  --card-pre-chrome-bg: transparent;
-  --card-pre-chrome-border: 0 solid transparent;
 }
 
 .social-card::before,
@@ -1354,6 +1359,7 @@ textarea:focus {
   --card-pre-margin: 12px 0;
   --card-pre-padding: 16px;
   --card-pre-max-height: min(38cqh, 14lh);
+  --card-code-header-height: clamp(24px, 3cqh, 34px);
   --card-table-margin-top: 12px;
   --card-table-cell-padding: 8px 10px;
   --card-table-font-size: clamp(10px, 1.08cqw, 18px);
@@ -1385,6 +1391,7 @@ textarea:focus {
   --card-pre-margin: clamp(8px, 1.4cqh, 12px) 0;
   --card-pre-padding: 24px;
   --card-pre-max-height: min(34cqh, 12lh);
+  --card-code-header-height: clamp(26px, 3.1cqh, 36px);
   --card-table-margin-top: clamp(7px, 1.3cqh, 10px);
   --card-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(8px, 0.9cqw, 14px);
   --card-table-font-size: clamp(10px, 0.95cqw, 16px);
@@ -1584,6 +1591,7 @@ textarea:focus {
 }
 
 .markdown-card-body code {
+  display: inline;
   max-width: 100%;
   padding: var(--card-code-padding);
   overflow-wrap: anywhere;
@@ -1601,49 +1609,109 @@ textarea:focus {
   -webkit-box-decoration-break: clone;
 }
 
-.markdown-card-body pre {
+.markdown-code-frame {
   position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   min-width: 0;
   max-width: 100%;
   max-height: var(--card-pre-max-height);
   margin: var(--card-pre-margin);
-  padding: var(--card-pre-padding-top, var(--card-pre-padding)) var(--card-pre-padding) var(--card-pre-padding);
-  overflow: hidden auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--card-accent) transparent;
+  overflow: hidden;
   color: var(--code-text);
   background:
-    linear-gradient(180deg, var(--card-surface-shine), transparent 34%),
+    linear-gradient(180deg, var(--card-surface-shine), transparent 46%),
     var(--card-surface-bg);
   border: 1px solid var(--card-surface-border);
   border-radius: var(--card-surface-radius);
   box-shadow: var(--card-surface-shadow);
   font-size: var(--card-code-block-font-size);
   line-height: var(--card-code-line-height);
+  contain: paint;
 }
 
-.markdown-card-body pre::-webkit-scrollbar {
+.markdown-code-header {
+  display: flex;
+  min-width: 0;
+  min-height: var(--card-code-header-height);
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 var(--card-code-header-padding-inline);
+  background: var(--card-code-header-bg);
+  border-bottom: 1px solid var(--card-surface-border);
+}
+
+.markdown-code-window-dots {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.markdown-code-window-dots span {
+  width: 0.52em;
+  min-width: 7px;
+  max-width: 11px;
+  aspect-ratio: 1;
+  background: var(--card-accent);
+  border-radius: 50%;
+  opacity: 0.72;
+}
+
+.markdown-code-window-dots span:nth-child(2) {
+  opacity: 0.44;
+}
+
+.markdown-code-window-dots span:nth-child(3) {
+  opacity: 0.28;
+}
+
+.markdown-code-language {
+  min-width: 0;
+  max-width: 58%;
+  padding: 0.22em 0.58em;
+  overflow: hidden;
+  color: var(--card-code-label-text);
+  background: var(--card-code-label-bg);
+  border: 1px solid var(--card-surface-border);
+  border-radius: 999px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.68em;
+  font-weight: 900;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.markdown-code-pre {
+  min-width: 0;
+  max-width: 100%;
+  max-height: calc(var(--card-pre-max-height) - var(--card-code-header-height));
+  margin: 0;
+  padding: var(--card-pre-padding);
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--card-accent) transparent;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font: inherit;
+}
+
+.markdown-code-pre::-webkit-scrollbar {
   width: 6px;
 }
 
-.markdown-card-body pre::-webkit-scrollbar-thumb {
+.markdown-code-pre::-webkit-scrollbar-thumb {
   background: var(--card-accent);
   border-radius: 999px;
 }
 
-.markdown-card-body pre::before {
-  content: var(--card-pre-chrome-content);
-  position: absolute;
-  inset: 0 0 auto;
-  height: var(--card-pre-chrome-height);
-  background: var(--card-pre-chrome-bg);
-  border-bottom: var(--card-pre-chrome-border);
-}
-
-.markdown-card-body pre code {
+.markdown-code-frame .markdown-code-text {
   display: block;
-  position: relative;
   padding: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -1655,6 +1723,8 @@ textarea:focus {
   font-weight: 650;
   line-height: inherit;
   white-space: pre-wrap;
+  box-decoration-break: slice;
+  -webkit-box-decoration-break: slice;
 }
 
 .markdown-card-body table {
@@ -1914,15 +1984,7 @@ textarea:focus {
     radial-gradient(circle at 74px 28px, #28c840 0 5px, transparent 6px),
     linear-gradient(180deg, rgba(4, 9, 18, 0.54) 0 72px, transparent 72px);
   --card-personality-accent-opacity: 0.78;
-  --card-pre-padding-top: calc(var(--card-pre-padding) + 16px);
-  --card-pre-chrome-content: "";
-  --card-pre-chrome-height: 24px;
-  --card-pre-chrome-bg:
-    radial-gradient(circle at 14px 12px, #ff5f57 0 4px, transparent 5px),
-    radial-gradient(circle at 30px 12px, #febc2e 0 4px, transparent 5px),
-    radial-gradient(circle at 46px 12px, #28c840 0 4px, transparent 5px),
-    linear-gradient(90deg, rgba(84, 214, 166, 0.14), rgba(255, 255, 255, 0.03));
-  --card-pre-chrome-border: 1px solid rgba(84, 214, 166, 0.18);
+  --card-code-header-bg: linear-gradient(90deg, rgba(84, 214, 166, 0.14), rgba(255, 255, 255, 0.03));
 }
 
 .theme-editorial {
