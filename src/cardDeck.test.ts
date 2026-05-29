@@ -170,6 +170,38 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('uses platform paragraph capacity when splitting a long paragraph', () => {
+    const sentence =
+      'This product note explains one practical change with enough detail to feel credible in the feed today. ';
+    const markdown = `# Capacity check\n\n${sentence.repeat(90).trim()}`;
+    const landscapePreset = platformPresets[0];
+    const portraitPreset = platformPresets[1];
+    const squarePreset = platformPresets[2];
+    const landscapeLimits = getMarkdownFitLimits(landscapePreset);
+    const portraitLimits = getMarkdownFitLimits(portraitPreset);
+    const squareLimits = getMarkdownFitLimits(squarePreset);
+    const landscapeDeck = splitMarkdownIntoCardDeck(markdown, landscapePreset).deck;
+    const portraitDeck = splitMarkdownIntoCardDeck(markdown, portraitPreset).deck;
+    const squareDeck = splitMarkdownIntoCardDeck(markdown, squarePreset).deck;
+
+    expect(portraitLimits.paragraphCharacterLimit).toBeGreaterThan(squareLimits.paragraphCharacterLimit);
+    expect(squareLimits.paragraphCharacterLimit).toBeGreaterThan(landscapeLimits.paragraphCharacterLimit);
+    expect(portraitDeck?.cards.length).toBeLessThan(squareDeck?.cards.length ?? 0);
+    expect(squareDeck?.cards.length).toBeLessThan(landscapeDeck?.cards.length ?? 0);
+
+    for (const [deck, limits] of [
+      [portraitDeck, portraitLimits],
+      [squareDeck, squareLimits],
+      [landscapeDeck, landscapeLimits],
+    ] as const) {
+      for (const card of deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('preserves H2/H3 order as card titles', () => {
     const markdown = [
       '# Source title',

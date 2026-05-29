@@ -453,7 +453,7 @@ describe('markdown guidance', () => {
     expect(getMarkdownFitGuidance('', platformPresets[0])).toMatchObject({
       tone: 'empty',
       lineLimit: 12,
-      characterLimit: 900,
+      characterLimit: 820,
       summary: 'Paste your Markdown to start.',
       action: expect.stringContaining('caption'),
     });
@@ -461,7 +461,7 @@ describe('markdown guidance', () => {
     expect(getMarkdownFitGuidance('# Short update\n\n- One\n- Two', platformPresets[1])).toMatchObject({
       tone: 'ready',
       lineLimit: 16,
-      characterLimit: 1100,
+      characterLimit: 1120,
       summary: 'Good length for this card.',
       action: expect.stringContaining('portrait checklist'),
     });
@@ -469,7 +469,7 @@ describe('markdown guidance', () => {
     expect(getMarkdownFitGuidance(Array.from({ length: 14 }, (_, index) => `- Item ${index + 1}`).join('\n'), platformPresets[2])).toMatchObject({
       tone: 'dense',
       lineLimit: 13,
-      characterLimit: 950,
+      characterLimit: 960,
       summary: 'This may feel crowded on export.',
       action: expect.stringContaining('Shorten long lists'),
     });
@@ -548,9 +548,9 @@ More detail belongs in the caption.`;
 
     expect(result.markdown.startsWith('# Primary headline')).toBe(true);
     expect(result.markdown).toContain('## Important proof');
-    expect(result.note).toContain('kept content within 12 lines and 900 chars');
+    expect(result.note).toContain('kept content within 12 lines and 820 chars');
     expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(12);
-    expect(stats.characterCount).toBeLessThanOrEqual(900);
+    expect(stats.characterCount).toBeLessThanOrEqual(820);
   });
 });
 

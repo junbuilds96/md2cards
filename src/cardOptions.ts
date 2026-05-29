@@ -1020,10 +1020,10 @@ function getDenseMarkdownAction(stats: MarkdownStats, lineLimit: number, charact
 export function getMarkdownFitLimits(preset: PlatformPreset): MarkdownFitLimits {
   if (preset.height > preset.width) {
     return {
-      characterLimit: 1100,
+      characterLimit: 1120,
       lineLimit: 16,
       bulletLimit: 5,
-      paragraphCharacterLimit: 220,
+      paragraphCharacterLimit: 240,
       tableDataRowLimit: 4,
       codeLineLimit: 6,
     };
@@ -1031,20 +1031,20 @@ export function getMarkdownFitLimits(preset: PlatformPreset): MarkdownFitLimits 
 
   if (preset.height === preset.width) {
     return {
-      characterLimit: 950,
+      characterLimit: 960,
       lineLimit: 13,
       bulletLimit: 4,
-      paragraphCharacterLimit: 190,
+      paragraphCharacterLimit: 200,
       tableDataRowLimit: 3,
       codeLineLimit: 5,
     };
   }
 
   return {
-    characterLimit: 900,
+    characterLimit: 820,
     lineLimit: 12,
     bulletLimit: 3,
-    paragraphCharacterLimit: 170,
+    paragraphCharacterLimit: 160,
     tableDataRowLimit: 2,
     codeLineLimit: 4,
   };

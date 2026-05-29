@@ -375,7 +375,7 @@ function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] 
   }
 
   if (block.type === 'paragraph') {
-    return splitParagraphIntoSegments(block.markdown, Math.min(limits.paragraphCharacterLimit, 180)).map((chunk) => ({
+    return splitParagraphIntoSegments(block.markdown, limits.paragraphCharacterLimit).map((chunk) => ({
       markdown: chunk,
     }));
   }
