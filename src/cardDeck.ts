@@ -9,6 +9,7 @@ import {
   getMarkdownCodeFenceMarker,
   isMarkdownCodeFenceClose,
   isMarkdownCodeFenceLine,
+  normalizeMarkdownCodeFenceBlock,
 } from './markdownCodeFences';
 import { isMarkdownTableRowLine, isMarkdownTableStart } from './markdownTables';
 
@@ -526,17 +527,19 @@ function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] 
 
   if (block.type === 'code') {
     const lines = block.markdown.split('\n');
-    const openingFence = getMarkdownCodeFenceMarker(lines[0] ?? '') ?? '```';
-    const firstLine = getMarkdownCodeFenceMarker(lines[0] ?? '') ? lines[0] : openingFence;
-    const lastLine = isMarkdownCodeFenceClose(lines[lines.length - 1] ?? '', openingFence)
-      ? lines[lines.length - 1]
-      : openingFence;
-    const keptCode = lines.slice(1, -1).slice(0, limits.codeLineLimit);
+    const normalized = normalizeMarkdownCodeFenceBlock(lines, limits.codeLineLimit);
+    const codeNotes = ['source contained code'];
 
     return [
       {
-        markdown: [firstLine, ...keptCode, lastLine].join('\n'),
-        note: 'source contained code; kept the first lines on-card',
+        markdown: normalized.markdown,
+        note: [
+          ...codeNotes,
+          normalized.truncated ? 'kept the first lines on-card' : '',
+          normalized.closedFence ? 'closed an unterminated code fence' : '',
+        ]
+          .filter(Boolean)
+          .join('; '),
         forceCard: true,
       },
     ];

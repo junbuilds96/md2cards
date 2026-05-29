@@ -645,6 +645,30 @@ More detail belongs in the caption.`;
     expect(result.note).toContain('kept the first 4 code lines');
   });
 
+  it('closes unterminated fenced code blocks without dropping the pasted tail across presets', () => {
+    const markdown = [
+      '# CLI repro',
+      '',
+      '```bash',
+      'npm test',
+      'node scripts/check.js --preset=xiaohongshu',
+      'echo "done 中文"',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = fitMarkdownToPreset(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const stats = getMarkdownStats(result.markdown);
+
+      expect(result.changed).toBe(true);
+      expect(result.note).toContain('closed an unterminated code fence');
+      expect(result.markdown).toContain('echo "done 中文"');
+      expect(result.markdown.endsWith('```')).toBe(true);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+    }
+  });
+
   it('keeps multi-line blockquotes as quote lines when fitting pasted Markdown', () => {
     const markdown = [
       '# Quote check',

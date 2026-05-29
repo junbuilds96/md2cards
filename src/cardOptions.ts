@@ -2,6 +2,7 @@ import {
   getMarkdownCodeFenceMarker,
   isMarkdownCodeFenceClose,
   isMarkdownCodeFenceLine,
+  normalizeMarkdownCodeFenceBlock,
 } from './markdownCodeFences';
 import {
   isMarkdownTableDelimiterLine,
@@ -1326,23 +1327,20 @@ function compactTableBlock(lines: string[], limits: MarkdownFitLimits): { block:
 }
 
 function compactCodeBlock(lines: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
-  if (lines.length <= limits.codeLineLimit + 2) {
-    return {
-      block: lines.join('\n'),
-      changes: [],
-    };
+  const normalized = normalizeMarkdownCodeFenceBlock(lines, limits.codeLineLimit);
+  const changes: string[] = [];
+
+  if (normalized.truncated) {
+    addChange(changes, `kept the first ${limits.codeLineLimit} code lines`);
   }
 
-  const openingFence = getMarkdownCodeFenceMarker(lines[0] ?? '') ?? '```';
-  const firstLine = getMarkdownCodeFenceMarker(lines[0] ?? '') ? lines[0] : openingFence;
-  const lastLine = isMarkdownCodeFenceClose(lines[lines.length - 1] ?? '', openingFence)
-    ? lines[lines.length - 1]
-    : openingFence;
-  const codeLines = lines.slice(1, -1).slice(0, limits.codeLineLimit);
+  if (normalized.closedFence) {
+    addChange(changes, 'closed an unterminated code fence');
+  }
 
   return {
-    block: [firstLine, ...codeLines, lastLine].join('\n'),
-    changes: [`kept the first ${limits.codeLineLimit} code lines`],
+    block: normalized.markdown,
+    changes,
   };
 }
 

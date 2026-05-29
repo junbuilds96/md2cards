@@ -432,6 +432,35 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(result.deck?.notes.some((note) => note.includes('code'))).toBe(true);
   });
 
+  it('keeps unterminated code fence tails in deck cards across platform presets', () => {
+    const markdown = [
+      '# CLI repro',
+      '',
+      '## Export check',
+      '',
+      '```bash',
+      'npm test',
+      'node scripts/check.js --preset=xiaohongshu',
+      'echo "done 中文"',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(joinedCards).toContain('```bash');
+      expect(joinedCards).toContain('echo "done 中文"');
+      expect(joinedCards).toContain('```');
+      expect(result.deck?.notes).toContain('source contained code; closed an unterminated code fence');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      }
+    }
+  });
+
   it('preserves multi-line blockquotes in mixed-language social posts', () => {
     const markdown = [
       '# 客户反馈复盘',
