@@ -22,6 +22,8 @@ export type CardTextureId = 'clean' | 'subtle' | 'rich';
 
 export type CardMoodId = 'calm' | 'punchy' | 'premium';
 
+export type CardShadowId = 'flat' | 'lifted' | 'dramatic';
+
 export type PlatformPreset = {
   id: PresetId;
   label: string;
@@ -127,6 +129,13 @@ export type CardMoodOption = {
   className: string;
 };
 
+export type CardShadowOption = {
+  id: CardShadowId;
+  label: string;
+  description: string;
+  className: string;
+};
+
 export type TemplateId = 'x-launch' | 'xiaohongshu-insight' | 'github-release';
 
 export type MarkdownTemplate = {
@@ -162,6 +171,7 @@ export type CardAppearanceSettings = {
   cardCompositionId: CardCompositionId;
   cardTextureId: CardTextureId;
   cardMoodId: CardMoodId;
+  cardShadowId: CardShadowId;
   showCardLabels: boolean;
 };
 
@@ -334,6 +344,8 @@ export const defaultCardCompositionId: CardCompositionId = 'standard';
 export const defaultCardTextureId: CardTextureId = 'subtle';
 
 export const defaultCardMoodId: CardMoodId = 'calm';
+
+export const defaultCardShadowId: CardShadowId = 'lifted';
 
 export const exportScaleOptions: ExportScaleOption[] = [
   {
@@ -561,6 +573,27 @@ export const cardMoodOptions: CardMoodOption[] = [
   },
 ];
 
+export const cardShadowOptions: CardShadowOption[] = [
+  {
+    id: 'flat',
+    label: 'Flat',
+    description: 'Minimal shadow for a cleaner graphic card.',
+    className: 'shadow-flat',
+  },
+  {
+    id: 'lifted',
+    label: 'Lifted',
+    description: 'Balanced shadow and inner depth for most cards.',
+    className: 'shadow-lifted',
+  },
+  {
+    id: 'dramatic',
+    label: 'Dramatic',
+    description: 'Stronger glow, surface lift, and poster-like depth.',
+    className: 'shadow-dramatic',
+  },
+];
+
 export const markdownTemplates: MarkdownTemplate[] = [
   {
     id: 'x-launch',
@@ -639,6 +672,7 @@ export const recipePresets: RecipePreset[] = [
     cardCompositionId: 'standard',
     cardTextureId: 'subtle',
     cardMoodId: 'calm',
+    cardShadowId: 'lifted',
     showCardLabels: true,
     markdown: `# Launch faster with Markdown cards
 
@@ -663,6 +697,7 @@ Turn a product update into a share-ready visual in one pass.
     cardCompositionId: 'framed',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
+    cardShadowId: 'dramatic',
     showCardLabels: false,
     markdown: `# Before -> after: onboarding cleanup
 
@@ -689,6 +724,7 @@ Ship the contrast, not the changelog.`,
     cardCompositionId: 'poster',
     cardTextureId: 'clean',
     cardMoodId: 'calm',
+    cardShadowId: 'flat',
     showCardLabels: false,
     markdown: `# The 4-part launch card
 
@@ -714,6 +750,7 @@ Ship the contrast, not the changelog.`,
     cardCompositionId: 'framed',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
+    cardShadowId: 'dramatic',
     showCardLabels: true,
     markdown: `# Incident resolved: export queue
 
@@ -743,6 +780,7 @@ Ship the contrast, not the changelog.`,
     cardCompositionId: 'framed',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
+    cardShadowId: 'lifted',
     showCardLabels: true,
     markdown: `# v0.4.0 Changelog
 
@@ -773,6 +811,7 @@ Ship the contrast, not the changelog.`,
     cardCompositionId: 'standard',
     cardTextureId: 'subtle',
     cardMoodId: 'calm',
+    cardShadowId: 'lifted',
     showCardLabels: false,
     markdown: `# Turn notes into a card
 
@@ -799,6 +838,7 @@ Ship the contrast, not the changelog.`,
     cardCompositionId: 'poster',
     cardTextureId: 'rich',
     cardMoodId: 'premium',
+    cardShadowId: 'dramatic',
     showCardLabels: false,
     markdown: `# The card is the hook
 
@@ -823,6 +863,7 @@ People decide whether to read the caption from the first two seconds.
     cardCompositionId: 'poster',
     cardTextureId: 'clean',
     cardMoodId: 'premium',
+    cardShadowId: 'lifted',
     showCardLabels: false,
     markdown: `# "Design tools should disappear when the idea is clear."
 
@@ -845,6 +886,7 @@ Use Markdown for structure. Use recipes for the visual rhythm.
     cardCompositionId: 'code',
     cardTextureId: 'subtle',
     cardMoodId: 'punchy',
+    cardShadowId: 'lifted',
     showCardLabels: true,
     markdown: `# Export a card from Markdown
 
@@ -875,6 +917,7 @@ export const stylePacks: StylePack[] = [
     cardCompositionId: 'standard',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
+    cardShadowId: 'dramatic',
     showCardLabels: true,
   },
   {
@@ -891,6 +934,7 @@ export const stylePacks: StylePack[] = [
     cardCompositionId: 'poster',
     cardTextureId: 'subtle',
     cardMoodId: 'premium',
+    cardShadowId: 'lifted',
     showCardLabels: false,
   },
   {
@@ -907,6 +951,7 @@ export const stylePacks: StylePack[] = [
     cardCompositionId: 'code',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
+    cardShadowId: 'dramatic',
     showCardLabels: true,
   },
   {
@@ -923,6 +968,7 @@ export const stylePacks: StylePack[] = [
     cardCompositionId: 'poster',
     cardTextureId: 'clean',
     cardMoodId: 'premium',
+    cardShadowId: 'lifted',
     showCardLabels: false,
   },
   {
@@ -939,6 +985,7 @@ export const stylePacks: StylePack[] = [
     cardCompositionId: 'standard',
     cardTextureId: 'clean',
     cardMoodId: 'calm',
+    cardShadowId: 'flat',
     showCardLabels: true,
   },
 ];
@@ -977,6 +1024,7 @@ export function applyStylePackAppearance<T extends object>(
     cardCompositionId: stylePack.cardCompositionId,
     cardTextureId: stylePack.cardTextureId,
     cardMoodId: stylePack.cardMoodId,
+    cardShadowId: stylePack.cardShadowId,
     showCardLabels: stylePack.showCardLabels,
   };
 }
@@ -1441,6 +1489,10 @@ export function getCardTextureOption(cardTextureId: CardTextureId): CardTextureO
 
 export function getCardMoodOption(cardMoodId: CardMoodId): CardMoodOption {
   return cardMoodOptions.find((option) => option.id === cardMoodId) ?? cardMoodOptions[0];
+}
+
+export function getCardShadowOption(cardShadowId: CardShadowId): CardShadowOption {
+  return cardShadowOptions.find((option) => option.id === cardShadowId) ?? cardShadowOptions[1];
 }
 
 export function getExportPixelSize(

@@ -17,9 +17,10 @@ describe('card label layout', () => {
         'standard',
         'subtle',
         'calm',
+        'lifted',
       ),
     ).toBe(
-      'social-card preset-twitter theme-signal density-balanced type-default voice-modern background-balanced radius-sharp composition-standard texture-subtle mood-calm',
+      'social-card preset-twitter theme-signal density-balanced type-default voice-modern background-balanced radius-sharp composition-standard texture-subtle mood-calm shadow-lifted',
     );
   });
 
@@ -38,13 +39,14 @@ describe('card label layout', () => {
         'poster',
         'clean',
         'punchy',
+        'dramatic',
       ),
     ).toBe(
-      'social-card preset-xiaohongshu theme-signal density-compact type-large voice-editorial background-vivid radius-rounded composition-poster texture-clean mood-punchy card-labels-hidden',
+      'social-card preset-xiaohongshu theme-signal density-compact type-large voice-editorial background-vivid radius-rounded composition-poster texture-clean mood-punchy shadow-dramatic card-labels-hidden',
     );
   });
 
-  it('adds the selected composition, texture depth, and mood classes to exported card markup', () => {
+  it('adds the selected composition, texture depth, mood, and shadow classes to exported card markup', () => {
     expect(
       getCardClassName(
         'theme-paper',
@@ -58,9 +60,10 @@ describe('card label layout', () => {
         'framed',
         'rich',
         'premium',
+        'flat',
       ),
     ).toBe(
-      'social-card preset-launch theme-paper density-spacious type-small voice-mono background-soft radius-subtle composition-framed texture-rich mood-premium',
+      'social-card preset-launch theme-paper density-spacious type-small voice-mono background-soft radius-subtle composition-framed texture-rich mood-premium shadow-flat',
     );
   });
 
@@ -78,9 +81,10 @@ describe('card label layout', () => {
         'code',
         'rich',
         'punchy',
+        'dramatic',
       ),
     ).toBe(
-      'social-card preset-twitter theme-midnight density-compact type-small voice-mono background-vivid radius-sharp composition-code texture-rich mood-punchy',
+      'social-card preset-twitter theme-midnight density-compact type-small voice-mono background-vivid radius-sharp composition-code texture-rich mood-punchy shadow-dramatic',
     );
   });
 

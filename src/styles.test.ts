@@ -71,7 +71,7 @@ describe('social card CSS', () => {
     expect(cardRule).toContain('linear-gradient(var(--card-intensity-overlay), var(--card-intensity-overlay))');
     expect(cardRule).toContain('radial-gradient(circle at 88% 84%, var(--card-edge-glow)');
     expect(cardRule).toContain('border: var(--card-border-width) solid var(--card-border)');
-    expect(cardRule).toContain('box-shadow: var(--card-shadow)');
+    expect(cardRule).toContain('box-shadow: var(--card-shadow), var(--card-depth-border-shadow)');
     expect(softRule).toContain('--card-intensity-overlay: var(--card-soft-overlay)');
     expect(softRule).toContain('--card-glow-stop: 21%');
     expect(vividRule).toContain('--card-intensity-overlay: var(--card-vivid-overlay)');
@@ -272,6 +272,33 @@ describe('social card CSS', () => {
     expect(calmRule).not.toMatch(/(^|\n)\s*width:/);
     expect(punchyRule).not.toMatch(/(^|\n)\s*height:/);
     expect(premiumRule).not.toMatch(/(^|\n)\s*aspect-ratio:/);
+  });
+
+  it('defines shadow classes that tune exported card depth without changing dimensions', () => {
+    const cardRule = getRule('.social-card');
+    const bodyRule = getRule('.markdown-card-body');
+    const codeFrameRule = getRule('.markdown-code-frame');
+    const flatRule = getRule('.social-card.shadow-flat');
+    const liftedRule = getRule('.social-card.shadow-lifted');
+    const dramaticRule = getRule('.social-card.shadow-dramatic');
+
+    expect(cardRule).toContain('--card-depth-border-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18)');
+    expect(cardRule).toContain('--card-depth-frame-shadow: inset 0 0 0 0 transparent');
+    expect(bodyRule).toContain(
+      'box-shadow: var(--card-body-frame-shadow), var(--card-body-frame-outline), var(--card-depth-frame-shadow)',
+    );
+    expect(codeFrameRule).toContain('box-shadow: var(--card-code-frame-shadow)');
+    expect(flatRule).toContain('--card-shadow: 0 1px 0 rgba(16, 24, 40, 0.14)');
+    expect(flatRule).toContain('--card-code-frame-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24)');
+    expect(liftedRule).toContain('--card-depth-border-shadow:');
+    expect(liftedRule).toContain('--card-surface-shadow:');
+    expect(liftedRule).toContain('--card-depth-frame-shadow:');
+    expect(dramaticRule).toContain('--card-shadow: 0 38px 110px rgba(16, 24, 40, 0.42)');
+    expect(dramaticRule).toContain('inset 0 0 64px color-mix(in srgb, var(--card-accent) 11%, transparent)');
+    expect(new Set([flatRule, liftedRule, dramaticRule]).size).toBe(3);
+    expect(flatRule).not.toMatch(/(^|\n)\s*width:/);
+    expect(liftedRule).not.toMatch(/(^|\n)\s*height:/);
+    expect(dramaticRule).not.toMatch(/(^|\n)\s*aspect-ratio:/);
   });
 
   it('defines corner radius classes without changing export sizing rules', () => {
@@ -486,5 +513,6 @@ describe('social card CSS', () => {
     expect(styles).toContain('.github-star-link,\n  .export-actions button');
     expect(styles).toContain('.corner-radius-control');
     expect(styles).toContain('.mood-control');
+    expect(styles).toContain('.shadow-control');
   });
 });

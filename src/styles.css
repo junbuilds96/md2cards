@@ -698,6 +698,12 @@ textarea:focus {
   gap: 8px;
 }
 
+.shadow-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .template-gallery {
   display: grid;
   gap: 8px;
@@ -735,6 +741,7 @@ textarea:focus {
 .composition-control button,
 .texture-control button,
 .mood-control button,
+.shadow-control button,
 .style-pack-grid button,
 .recipe-preset-grid button,
 .template-gallery button,
@@ -771,7 +778,8 @@ textarea:focus {
 .corner-radius-control button,
 .composition-control button,
 .texture-control button,
-.mood-control button {
+.mood-control button,
+.shadow-control button {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -816,6 +824,7 @@ textarea:focus {
 .composition-control button span,
 .texture-control button span,
 .mood-control button span,
+.shadow-control button span,
 .style-pack-grid button span,
 .recipe-preset-grid button span,
 .template-gallery button span,
@@ -1004,6 +1013,7 @@ textarea:focus {
 .composition-control button.active,
 .texture-control button.active,
 .mood-control button.active,
+.shadow-control button.active,
 .style-pack-grid button.active,
 .recipe-preset-grid button.active,
 .template-gallery button.active,
@@ -1359,7 +1369,7 @@ textarea:focus {
     linear-gradient(135deg, var(--card-bg), var(--card-bg-2));
   border: var(--card-border-width) solid var(--card-border);
   border-radius: var(--card-radius);
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--card-shadow), var(--card-depth-border-shadow);
   filter: saturate(var(--card-mood-saturate)) contrast(var(--card-mood-contrast));
   --card-intensity-overlay: transparent;
   --card-glow-stop: 27%;
@@ -1370,6 +1380,7 @@ textarea:focus {
   --card-surface-radius: 8px;
   --card-inline-radius: 8px;
   --card-shadow: 0 26px 70px rgba(22, 30, 44, 0.28);
+  --card-depth-border-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
   --card-mood-contrast: 1;
   --card-mood-saturate: 1;
   --card-mood-overlay-image: linear-gradient(transparent, transparent);
@@ -1438,6 +1449,7 @@ textarea:focus {
   --card-body-frame-radius: var(--card-surface-radius);
   --card-body-frame-shadow: none;
   --card-body-frame-outline: inset 0 0 0 0 transparent;
+  --card-depth-frame-shadow: inset 0 0 0 0 transparent;
   --card-frame-accent-image: linear-gradient(transparent, transparent);
   --card-frame-accent-opacity: 0;
   --card-accent-layer-opacity: var(--card-texture-accent-opacity);
@@ -1670,6 +1682,53 @@ textarea:focus {
   --card-shadow: 0 36px 94px rgba(16, 24, 40, 0.32);
 }
 
+.social-card.shadow-flat {
+  --card-shadow: 0 1px 0 rgba(16, 24, 40, 0.14);
+  --card-depth-border-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--card-border) 62%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --card-surface-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  --card-code-frame-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  --card-depth-frame-shadow: inset 0 0 0 1px color-mix(in srgb, var(--card-border) 28%, transparent);
+}
+
+.social-card.shadow-lifted {
+  --card-depth-border-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -22px 48px rgba(16, 24, 40, 0.08),
+    inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 14%, transparent);
+  --card-surface-shadow:
+    0 12px 30px color-mix(in srgb, var(--card-accent) 10%, rgba(16, 24, 40, 0.12)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.48);
+  --card-code-frame-shadow:
+    0 16px 42px color-mix(in srgb, var(--card-accent) 14%, rgba(16, 24, 40, 0.14)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+  --card-depth-frame-shadow:
+    0 18px 42px color-mix(in srgb, var(--card-accent) 10%, rgba(16, 24, 40, 0.12)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+}
+
+.social-card.shadow-dramatic {
+  --card-shadow: 0 38px 110px rgba(16, 24, 40, 0.42);
+  --card-depth-border-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.44),
+    inset 0 -34px 70px rgba(16, 24, 40, 0.16),
+    inset 0 0 0 2px color-mix(in srgb, var(--card-accent) 20%, transparent),
+    inset 0 0 64px color-mix(in srgb, var(--card-accent) 11%, transparent);
+  --card-surface-shadow:
+    0 24px 58px color-mix(in srgb, var(--card-accent) 20%, rgba(16, 24, 40, 0.18)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    inset 0 0 0 1px color-mix(in srgb, #ffffff 18%, transparent);
+  --card-code-frame-shadow:
+    0 28px 70px color-mix(in srgb, var(--card-accent) 22%, rgba(16, 24, 40, 0.22)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 16%, transparent);
+  --card-depth-frame-shadow:
+    0 30px 72px color-mix(in srgb, var(--card-accent) 18%, rgba(16, 24, 40, 0.2)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 18%, transparent);
+}
+
 .social-card.density-compact {
   --card-chrome-padding-block: 32px;
   --card-chrome-padding-inline: 46px;
@@ -1864,7 +1923,7 @@ textarea:focus {
   background: var(--card-body-frame-bg);
   border: var(--card-body-frame-border);
   border-radius: var(--card-body-frame-radius);
-  box-shadow: var(--card-body-frame-shadow), var(--card-body-frame-outline);
+  box-shadow: var(--card-body-frame-shadow), var(--card-body-frame-outline), var(--card-depth-frame-shadow);
   font-family: var(--card-body-font-family);
   font-weight: var(--card-body-font-weight);
 }
@@ -2606,6 +2665,7 @@ textarea:focus {
   .composition-control,
   .texture-control,
   .mood-control,
+  .shadow-control,
   .style-pack-grid,
   .recipe-preset-grid,
   .theme-grid {
@@ -2700,7 +2760,8 @@ textarea:focus {
   .corner-radius-control button,
   .composition-control button,
   .texture-control button,
-  .mood-control button {
+  .mood-control button,
+  .shadow-control button {
     min-height: auto;
   }
 

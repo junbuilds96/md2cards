@@ -46,6 +46,7 @@ import {
   cardCornerRadiusOptions,
   cardDensityOptions,
   cardMoodOptions,
+  cardShadowOptions,
   cardTextureOptions,
   cardTypographyVoiceOptions,
   cardTypographyScaleOptions,
@@ -55,6 +56,7 @@ import {
   defaultCardCornerRadiusId,
   defaultCardDensityId,
   defaultCardMoodId,
+  defaultCardShadowId,
   defaultCardTextureId,
   defaultCardTypographyVoiceId,
   defaultCardTypographyScaleId,
@@ -66,6 +68,7 @@ import {
   getCardCornerRadiusOption,
   getCardDensityOption,
   getCardMoodOption,
+  getCardShadowOption,
   getCardTextureOption,
   getCardTypographyVoiceOption,
   getCardTypographyScaleOption,
@@ -91,6 +94,7 @@ import {
   type CardCornerRadiusId,
   type CardDensityId,
   type CardMoodId,
+  type CardShadowId,
   type CardTextureId,
   type CardTypographyVoiceId,
   type CardTypographyScaleId,
@@ -218,6 +222,7 @@ function CardPreview({
   cardCompositionId,
   cardTextureId,
   cardMoodId,
+  cardShadowId,
 }: {
   markdown: string;
   preset: PlatformPreset;
@@ -234,6 +239,7 @@ function CardPreview({
   cardCompositionId: CardCompositionId;
   cardTextureId: CardTextureId;
   cardMoodId: CardMoodId;
+  cardShadowId: CardShadowId;
 }) {
   const labelsVisible = shouldShowCardLabels(showCardLabels);
 
@@ -252,6 +258,7 @@ function CardPreview({
         cardCompositionId,
         cardTextureId,
         cardMoodId,
+        cardShadowId,
       )}
       style={{
         ...getCardAppearanceStyle(cardAccentId),
@@ -457,9 +464,11 @@ function SavedPresetsPanel({
       cardTextureOptions.find((item) => item.id === savedPreset.cardTextureId)?.label ?? savedPreset.cardTextureId;
     const moodLabel =
       cardMoodOptions.find((item) => item.id === savedPreset.cardMoodId)?.label ?? savedPreset.cardMoodId;
+    const shadowLabel =
+      cardShadowOptions.find((item) => item.id === savedPreset.cardShadowId)?.label ?? savedPreset.cardShadowId;
     const labelVisibility = savedPreset.showCardLabels ? 'Labels on' : 'Labels off';
 
-    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${typographyVoiceLabel} · ${accentLabel} · ${backgroundIntensityLabel} · ${cornerRadiusLabel} · ${compositionLabel} · ${textureLabel} · ${moodLabel} · ${labelVisibility} · ${scaleLabel}`;
+    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${typographyVoiceLabel} · ${accentLabel} · ${backgroundIntensityLabel} · ${cornerRadiusLabel} · ${compositionLabel} · ${textureLabel} · ${moodLabel} · ${shadowLabel} depth · ${labelVisibility} · ${scaleLabel}`;
   }
 
   return (
@@ -572,6 +581,7 @@ function AppearanceControls({
   cardCompositionId,
   cardTextureId,
   cardMoodId,
+  cardShadowId,
   onDensityChange,
   onTypographyScaleChange,
   onTypographyVoiceChange,
@@ -581,6 +591,7 @@ function AppearanceControls({
   onCompositionChange,
   onTextureChange,
   onMoodChange,
+  onShadowChange,
 }: {
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
@@ -591,6 +602,7 @@ function AppearanceControls({
   cardCompositionId: CardCompositionId;
   cardTextureId: CardTextureId;
   cardMoodId: CardMoodId;
+  cardShadowId: CardShadowId;
   onDensityChange: (densityId: CardDensityId) => void;
   onTypographyScaleChange: (typographyScaleId: CardTypographyScaleId) => void;
   onTypographyVoiceChange: (typographyVoiceId: CardTypographyVoiceId) => void;
@@ -600,6 +612,7 @@ function AppearanceControls({
   onCompositionChange: (compositionId: CardCompositionId) => void;
   onTextureChange: (textureId: CardTextureId) => void;
   onMoodChange: (moodId: CardMoodId) => void;
+  onShadowChange: (shadowId: CardShadowId) => void;
 }) {
   return (
     <div className="appearance-controls">
@@ -749,6 +762,22 @@ function AppearanceControls({
           ))}
         </div>
       </div>
+      <div className="appearance-control-block">
+        <span className="mini-label">Shadow / Depth</span>
+        <div className="shadow-control">
+          {cardShadowOptions.map((item) => (
+            <button
+              key={item.id}
+              className={item.id === cardShadowId ? 'active' : ''}
+              type="button"
+              onClick={() => onShadowChange(item.id)}
+              title={item.description}
+            >
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -774,6 +803,7 @@ function StylePackSelector({
           const composition = getCardCompositionOption(item.cardCompositionId);
           const texture = getCardTextureOption(item.cardTextureId);
           const mood = getCardMoodOption(item.cardMoodId);
+          const shadow = getCardShadowOption(item.cardShadowId);
 
           return (
             <button
@@ -788,7 +818,7 @@ function StylePackSelector({
               <span className="style-pack-setup">
                 <span className="recipe-accent-dot" style={{ background: accent.color }} aria-hidden="true" />
                 {themeLabel} · {density.label} · {voice.label} · {accent.label} · {composition.label} ·{' '}
-                {texture.label} · {mood.label}
+                {texture.label} · {mood.label} · {shadow.label}
               </span>
             </button>
           );
@@ -815,6 +845,7 @@ function RecipePresetSelector({
         const composition = getCardCompositionOption(item.cardCompositionId);
         const texture = getCardTextureOption(item.cardTextureId);
         const mood = getCardMoodOption(item.cardMoodId);
+        const shadow = getCardShadowOption(item.cardShadowId);
 
         return (
           <button
@@ -829,7 +860,7 @@ function RecipePresetSelector({
             <span className="recipe-setup">
               <span className="recipe-accent-dot" style={{ background: accent.color }} aria-hidden="true" />
               {platformLabel} · {themeLabel} · {voice.label} · {accent.label} · {composition.label} ·{' '}
-              {texture.label} · {mood.label}
+              {texture.label} · {mood.label} · {shadow.label}
             </span>
           </button>
         );
@@ -855,6 +886,7 @@ function App() {
   const [cardCompositionId, setCardCompositionId] = useState<CardCompositionId>(defaultCardCompositionId);
   const [cardTextureId, setCardTextureId] = useState<CardTextureId>(defaultCardTextureId);
   const [cardMoodId, setCardMoodId] = useState<CardMoodId>(defaultCardMoodId);
+  const [cardShadowId, setCardShadowId] = useState<CardShadowId>(defaultCardShadowId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
   const [activeRecipeId, setActiveRecipeId] = useState<RecipePresetId | null>(null);
   const [activeStylePackId, setActiveStylePackId] = useState<StylePackId | null>(null);
@@ -904,6 +936,7 @@ function App() {
   const cardComposition = useMemo(() => getCardCompositionOption(cardCompositionId), [cardCompositionId]);
   const cardTexture = useMemo(() => getCardTextureOption(cardTextureId), [cardTextureId]);
   const cardMood = useMemo(() => getCardMoodOption(cardMoodId), [cardMoodId]);
+  const cardShadow = useMemo(() => getCardShadowOption(cardShadowId), [cardShadowId]);
   const exportPixelSize = useMemo(() => getExportPixelSize(preset, exportScale), [preset, exportScale]);
   const safeAreaGuide = useMemo(() => getSafeAreaGuide(preset), [preset]);
   const platformFitHelper = useMemo(() => getPlatformFitHelper(preset), [preset]);
@@ -963,6 +996,7 @@ function App() {
     setCardCompositionId(recipePreset.cardCompositionId);
     setCardTextureId(recipePreset.cardTextureId);
     setCardMoodId(recipePreset.cardMoodId);
+    setCardShadowId(recipePreset.cardShadowId);
     setShowCardLabels(recipePreset.showCardLabels);
     setActiveRecipeId(recipePreset.id);
     setActiveStylePackId(null);
@@ -988,6 +1022,7 @@ function App() {
     setCardCompositionId(appearance.cardCompositionId);
     setCardTextureId(appearance.cardTextureId);
     setCardMoodId(appearance.cardMoodId);
+    setCardShadowId(appearance.cardShadowId);
     setShowCardLabels(appearance.showCardLabels);
     setActiveStylePackId(stylePack.id);
     setActiveRecipeId(null);
@@ -1026,6 +1061,7 @@ function App() {
         cardCompositionId: cardComposition.id,
         cardTextureId: cardTexture.id,
         cardMoodId: cardMood.id,
+        cardShadowId: cardShadow.id,
         showCardLabels,
       });
 
@@ -1058,6 +1094,7 @@ function App() {
     setCardCompositionId(savedPreset.cardCompositionId);
     setCardTextureId(savedPreset.cardTextureId);
     setCardMoodId(savedPreset.cardMoodId);
+    setCardShadowId(savedPreset.cardShadowId);
     setShowCardLabels(savedPreset.showCardLabels);
     setPresetName(savedPreset.name);
     setActiveRecipeId(null);
@@ -1103,6 +1140,7 @@ function App() {
         cardCompositionId: cardComposition.id,
         cardTextureId: cardTexture.id,
         cardMoodId: cardMood.id,
+        cardShadowId: cardShadow.id,
         showCardLabels,
       });
       const blob = new Blob([recipeJson], { type: 'application/json' });
@@ -1168,6 +1206,7 @@ function App() {
       setCardCompositionId(importedRecipe.config.cardCompositionId);
       setCardTextureId(importedRecipe.config.cardTextureId);
       setCardMoodId(importedRecipe.config.cardMoodId);
+      setCardShadowId(importedRecipe.config.cardShadowId);
       setShowCardLabels(importedRecipe.config.showCardLabels);
       setActiveRecipeId(null);
       setActiveStylePackId(null);
@@ -1617,6 +1656,7 @@ function App() {
               cardCompositionId={cardComposition.id}
               cardTextureId={cardTexture.id}
               cardMoodId={cardMood.id}
+              cardShadowId={cardShadow.id}
               onDensityChange={(densityId) => {
                 setCardDensityId(densityId);
                 setActiveRecipeId(null);
@@ -1680,6 +1720,12 @@ function App() {
                 setActiveRecipeId(null);
                 setActiveStylePackId(null);
                 setMessage(`${getCardMoodOption(moodId).label} mood selected. Preview and exports updated.`);
+              }}
+              onShadowChange={(shadowId) => {
+                setCardShadowId(shadowId);
+                setActiveRecipeId(null);
+                setActiveStylePackId(null);
+                setMessage(`${getCardShadowOption(shadowId).label} depth selected. Preview and exports updated.`);
               }}
             />
           </div>
@@ -1922,6 +1968,7 @@ function App() {
                   cardCompositionId={cardComposition.id}
                   cardTextureId={cardTexture.id}
                   cardMoodId={cardMood.id}
+                  cardShadowId={cardShadow.id}
                 />
               </div>
               {showSafeAreaGuide ? <SafeAreaOverlay preset={preset} guide={safeAreaGuide} /> : null}
@@ -1958,8 +2005,8 @@ function App() {
             <span>
               {theme.label} · {cardDensity.label} · {cardTypographyScale.label} type · {cardTypographyVoice.label} ·{' '}
               {cardAccent.label} · {cardBackgroundIntensity.label} · {cardCornerRadius.label} corners ·{' '}
-              {cardComposition.label} · {cardTexture.label} texture · {cardMood.label} mood · {preset.sizeLabel} · Export{' '}
-              {exportPixelSize.width} x {exportPixelSize.height}px
+              {cardComposition.label} · {cardTexture.label} texture · {cardMood.label} mood · {cardShadow.label} depth ·{' '}
+              {preset.sizeLabel} · Export {exportPixelSize.width} x {exportPixelSize.height}px
             </span>
           </div>
         </section>

@@ -19,7 +19,7 @@ MD2Cards turns Markdown snippets into exportable PNG and SVG cards for launches,
 1. Paste Markdown, import a `.md`/`.markdown`/`.txt` file, pick a paste-ready example, or start blank.
 2. Choose a platform preset for X/Twitter, Xiaohongshu, or GitHub/launch cards.
 3. Apply a content recipe for launches, before/after proof, frameworks, bugfixes, changelogs, tutorials, insights, quotes, or code snippets.
-4. Use a visual recipe style pack to restyle the card without replacing your Markdown, or tune theme, density, type scale, typography voice, accent, background intensity, corner radius, composition/frame, texture depth, mood, and export quality manually.
+4. Use a visual recipe style pack to restyle the card without replacing your Markdown, or tune theme, density, type scale, typography voice, accent, background intensity, corner radius, composition/frame, texture depth, mood, shadow/depth, and export quality manually.
 5. Fit/check the card with line counts, character counts, safe-area guides, and exact export dimensions.
 6. Hide header/footer card labels when desired, then copy PNG, download PNG/SVG, or export/import recipe JSON.
 
@@ -30,8 +30,8 @@ The current layout keeps the control panel independently scrollable on desktop w
 - GitHub-flavored Markdown rendering with headings, lists, tables, code blocks, quotes, and links.
 - Platform presets for 1600 x 900 landscape, 1080 x 1440 portrait, and 1200 x 1200 square cards.
 - Built-in content recipes that set content, platform, theme, appearance, and card-label visibility together.
-- Appearance-only visual recipes/style packs that preserve Markdown while applying polished theme, density, type, accent, composition, texture, mood, and label combinations.
-- Appearance controls for density, type scale, typography voice, accent color, background intensity, corner radius, card composition/frame/code snippet mode, texture depth, and visual mood.
+- Appearance-only visual recipes/style packs that preserve Markdown while applying polished theme, density, type, accent, composition, texture, mood, shadow/depth, and label combinations.
+- Appearance controls for density, type scale, typography voice, accent color, background intensity, corner radius, card composition/frame/code snippet mode, texture depth, visual mood, and shadow/depth.
 - Local fitting helper for tightening dense Markdown to the selected platform.
 - Safe-area overlay for previewing platform crops without changing exports.
 - Browser-local saved presets and portable JSON card recipes.

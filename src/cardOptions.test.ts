@@ -6,6 +6,7 @@ import {
   cardCornerRadiusOptions,
   cardDensityOptions,
   cardMoodOptions,
+  cardShadowOptions,
   cardTextureOptions,
   cardTypographyVoiceOptions,
   cardTypographyScaleOptions,
@@ -13,6 +14,7 @@ import {
   defaultCardCompositionId,
   defaultCardCornerRadiusId,
   defaultCardMoodId,
+  defaultCardShadowId,
   defaultCardTextureId,
   defaultCardTypographyVoiceId,
   defaultCardTypographyScaleId,
@@ -24,6 +26,7 @@ import {
   getCardCompositionOption,
   getCardCornerRadiusOption,
   getCardMoodOption,
+  getCardShadowOption,
   getCardTextureOption,
   getCardTypographyVoiceOption,
   getCardTypographyScaleOption,
@@ -123,6 +126,7 @@ describe('recipePresets', () => {
     const compositionIds = new Set(cardCompositionOptions.map((option) => option.id));
     const textureIds = new Set(cardTextureOptions.map((option) => option.id));
     const moodIds = new Set(cardMoodOptions.map((option) => option.id));
+    const shadowIds = new Set(cardShadowOptions.map((option) => option.id));
 
     expect(recipeIds.size).toBe(recipePresets.length);
     expect(recipePresets.map((recipePreset) => recipePreset.id)).toEqual([
@@ -149,6 +153,7 @@ describe('recipePresets', () => {
     expect(recipePresets.every((recipePreset) => compositionIds.has(recipePreset.cardCompositionId))).toBe(true);
     expect(recipePresets.every((recipePreset) => textureIds.has(recipePreset.cardTextureId))).toBe(true);
     expect(recipePresets.every((recipePreset) => moodIds.has(recipePreset.cardMoodId))).toBe(true);
+    expect(recipePresets.every((recipePreset) => shadowIds.has(recipePreset.cardShadowId))).toBe(true);
     expect(recipePresets.every((recipePreset) => recipePreset.markdown.trim().startsWith('#'))).toBe(true);
   });
 
@@ -167,6 +172,7 @@ describe('recipePresets', () => {
           recipePreset.cardCompositionId,
           recipePreset.cardTextureId,
           recipePreset.cardMoodId,
+          recipePreset.cardShadowId,
           recipePreset.showCardLabels,
         ].join('/'),
       ),
@@ -183,6 +189,7 @@ describe('recipePresets', () => {
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardCompositionId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTextureId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardMoodId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardShadowId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.showCardLabels)).size).toBe(2);
     expect(getRecipePreset('before-after')).toMatchObject({
       presetId: 'twitter',
@@ -192,6 +199,7 @@ describe('recipePresets', () => {
       cardCompositionId: 'framed',
       cardTextureId: 'rich',
       cardMoodId: 'punchy',
+      cardShadowId: 'dramatic',
       showCardLabels: false,
     });
     expect(getRecipePreset('framework')).toMatchObject({
@@ -201,6 +209,7 @@ describe('recipePresets', () => {
       cardCompositionId: 'poster',
       cardTextureId: 'clean',
       cardMoodId: 'calm',
+      cardShadowId: 'flat',
       showCardLabels: false,
     });
     expect(getRecipePreset('bugfix')).toMatchObject({
@@ -242,6 +251,7 @@ describe('stylePacks', () => {
     const compositionIds = new Set(cardCompositionOptions.map((option) => option.id));
     const textureIds = new Set(cardTextureOptions.map((option) => option.id));
     const moodIds = new Set(cardMoodOptions.map((option) => option.id));
+    const shadowIds = new Set(cardShadowOptions.map((option) => option.id));
 
     expect(stylePacks).toHaveLength(5);
     expect(stylePackIds.size).toBe(stylePacks.length);
@@ -262,7 +272,9 @@ describe('stylePacks', () => {
     expect(stylePacks.every((stylePack) => compositionIds.has(stylePack.cardCompositionId))).toBe(true);
     expect(stylePacks.every((stylePack) => textureIds.has(stylePack.cardTextureId))).toBe(true);
     expect(stylePacks.every((stylePack) => moodIds.has(stylePack.cardMoodId))).toBe(true);
+    expect(stylePacks.every((stylePack) => shadowIds.has(stylePack.cardShadowId))).toBe(true);
     expect(new Set(stylePacks.map((stylePack) => stylePack.cardMoodId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(stylePacks.map((stylePack) => stylePack.cardShadowId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(stylePacks.map((stylePack) => stylePack.showCardLabels)).size).toBe(2);
   });
 
@@ -287,6 +299,7 @@ describe('stylePacks', () => {
       cardCompositionId: 'code',
       cardTextureId: 'rich',
       cardMoodId: 'punchy',
+      cardShadowId: 'dramatic',
       showCardLabels: true,
     });
   });
@@ -405,6 +418,29 @@ describe('mood options', () => {
       id: 'calm',
       label: 'Calm',
       className: 'mood-calm',
+    });
+  });
+});
+
+describe('shadow options', () => {
+  it('defaults to lifted depth and exposes exported card classes', () => {
+    expect(getCardShadowOption(defaultCardShadowId)).toMatchObject({
+      id: 'lifted',
+      className: 'shadow-lifted',
+    });
+    expect(cardShadowOptions.map((option) => option.id)).toEqual(['flat', 'lifted', 'dramatic']);
+    expect(cardShadowOptions.map((option) => option.className)).toEqual([
+      'shadow-flat',
+      'shadow-lifted',
+      'shadow-dramatic',
+    ]);
+  });
+
+  it('falls back to lifted depth for unknown ids', () => {
+    expect(getCardShadowOption('missing' as never)).toMatchObject({
+      id: 'lifted',
+      label: 'Lifted',
+      className: 'shadow-lifted',
     });
   });
 });

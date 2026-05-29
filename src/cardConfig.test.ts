@@ -28,6 +28,7 @@ describe('card config recipes', () => {
       cardCompositionId: 'poster',
       cardTextureId: 'rich',
       cardMoodId: 'premium',
+      cardShadowId: 'dramatic',
       showCardLabels: false,
     });
 
@@ -47,6 +48,7 @@ describe('card config recipes', () => {
       cardCompositionId: 'poster',
       cardTextureId: 'rich',
       cardMoodId: 'premium',
+      cardShadowId: 'dramatic',
       showCardLabels: false,
     });
     expect(json.endsWith('\n')).toBe(true);
@@ -70,6 +72,7 @@ describe('card config recipes', () => {
         cardCompositionId: 'code',
         cardTextureId: 'clean',
         cardMoodId: 'punchy',
+        cardShadowId: 'flat',
         showCardLabels: true,
       }),
     );
@@ -92,6 +95,7 @@ describe('card config recipes', () => {
         cardCompositionId: 'code',
         cardTextureId: 'clean',
         cardMoodId: 'punchy',
+        cardShadowId: 'flat',
         showCardLabels: true,
       },
     });
@@ -122,6 +126,7 @@ describe('card config recipes', () => {
         cardCompositionId: 'standard',
         cardTextureId: 'subtle',
         cardMoodId: 'calm',
+        cardShadowId: 'lifted',
       },
     });
   });
@@ -162,6 +167,7 @@ describe('card config recipes', () => {
       cardCompositionId: 'standard',
       cardTextureId: 'subtle',
       cardMoodId: 'calm',
+      cardShadowId: 'lifted',
       showCardLabels: true,
     };
 
@@ -212,6 +218,10 @@ describe('card config recipes', () => {
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardMoodId: 'missing' }))).toEqual({
       valid: false,
       message: 'This recipe uses an unknown mood setting.',
+    });
+    expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardShadowId: 'missing' }))).toEqual({
+      valid: false,
+      message: 'This recipe uses an unknown shadow setting.',
     });
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, showCardLabels: 'yes' }))).toEqual({
       valid: false,
