@@ -426,6 +426,29 @@ function splitParagraphIntoSegments(markdown: string, characterLimit: number): s
   });
 }
 
+function splitOversizedListItem(item: string, lineLimit: number): string[] {
+  const lines = item.split('\n').filter((line) => line.trim().length > 0);
+  const firstCardLineLimit = Math.max(1, lineLimit - 1);
+  const continuedCardLineLimit = Math.max(1, lineLimit - 2);
+
+  if (lines.length <= firstCardLineLimit) {
+    return [item];
+  }
+
+  const [firstLine = '', ...continuationLines] = lines;
+  const listMatch = firstLine.match(/^(\s*(?:[-*+]|\d+[.)])\s+)(.+)$/);
+  const continuedMarker = `${listMatch?.[1] ?? '- '}${shortenPlainText(stripMarkdownText(listMatch?.[2] ?? firstLine), 72)} (continued)`;
+  const chunks = [[firstLine, ...continuationLines.slice(0, firstCardLineLimit - 1)].join('\n')];
+  let index = firstCardLineLimit - 1;
+
+  while (index < continuationLines.length) {
+    chunks.push([continuedMarker, ...continuationLines.slice(index, index + continuedCardLineLimit)].join('\n'));
+    index += continuedCardLineLimit;
+  }
+
+  return chunks;
+}
+
 function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] {
   const limits = getMarkdownFitLimits(preset);
 
@@ -449,7 +472,21 @@ function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] 
     };
 
     for (const item of block.items) {
-      const itemLineCount = item.split('\n').filter((line) => line.trim().length > 0).length;
+      const itemChunks = splitOversizedListItem(item, limits.lineLimit);
+
+      if (itemChunks.length > 1) {
+        flushCurrentItems();
+        for (const itemChunk of itemChunks) {
+          chunks.push({
+            markdown: itemChunk,
+            note: 'split an oversized list item across cards',
+            forceCard: true,
+          });
+        }
+        continue;
+      }
+
+      const itemLineCount = itemChunks[0].split('\n').filter((line) => line.trim().length > 0).length;
       const exceedsItemLimit = currentItems.length >= limits.bulletLimit;
       const exceedsLineLimit = currentItems.length > 0 && currentLineCount + itemLineCount > maxListLines;
 
@@ -457,7 +494,7 @@ function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] 
         flushCurrentItems();
       }
 
-      currentItems.push(item);
+      currentItems.push(itemChunks[0]);
       currentLineCount += itemLineCount;
     }
 

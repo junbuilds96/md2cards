@@ -312,6 +312,46 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('splits oversized nested list items without overflowing platform card limits', () => {
+    const nestedDetails = [
+      '   - Paste from Notion keeps the incident summary visible.',
+      '   - Preserve the bilingual owner note: 负责人 / owner.',
+      '   - Keep the customer quote link [ticket 318](https://example.com/tickets/318).',
+      '   - Include the reproduction step with `npm run build`.',
+      '   - Capture the browser note for Safari export.',
+      '   - Keep the Xiaohongshu caption warning attached.',
+      '   - Include the launch-card safe-area reminder.',
+      '   - Preserve the table fallback decision.',
+      '   - Keep the CLI traceback summary.',
+      '   - Include the screenshot alt text note.',
+      '   - Preserve the rollback owner.',
+      '   - Keep the QA checklist handoff.',
+      '   - Include the release note paragraph.',
+      '   - Preserve the support macro update.',
+      '   - Keep the follow-up metric definition.',
+      '   - Include the final publishing checkpoint.',
+    ];
+    const markdown = ['# Incident rollout', '', '1. Production validation', ...nestedDetails].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(result.deck?.cards.length).toBeGreaterThan(1);
+      expect(result.deck?.notes).toContain('split an oversized list item across cards');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      }
+      expect(joinedCards).toContain('1. Production validation');
+      for (const line of nestedDetails) {
+        expect(joinedCards).toContain(line);
+      }
+    }
+  });
+
   it('does not lose mixed-language prose that uses pipe separators instead of a table', () => {
     const preset = platformPresets[0];
     const markdown = [
