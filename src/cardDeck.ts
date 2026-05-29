@@ -430,13 +430,37 @@ function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] 
 
   if (block.type === 'list') {
     const chunks: CardSegment[] = [];
+    const maxListLines = Math.max(1, limits.lineLimit - 1);
+    let currentItems: string[] = [];
+    let currentLineCount = 0;
 
-    for (let index = 0; index < block.items.length; index += limits.bulletLimit) {
+    const flushCurrentItems = () => {
+      if (currentItems.length === 0) {
+        return;
+      }
+
       chunks.push({
-        markdown: block.items.slice(index, index + limits.bulletLimit).join('\n'),
+        markdown: currentItems.join('\n'),
         forceCard: true,
       });
+      currentItems = [];
+      currentLineCount = 0;
+    };
+
+    for (const item of block.items) {
+      const itemLineCount = item.split('\n').filter((line) => line.trim().length > 0).length;
+      const exceedsItemLimit = currentItems.length >= limits.bulletLimit;
+      const exceedsLineLimit = currentItems.length > 0 && currentLineCount + itemLineCount > maxListLines;
+
+      if (exceedsItemLimit || exceedsLineLimit) {
+        flushCurrentItems();
+      }
+
+      currentItems.push(item);
+      currentLineCount += itemLineCount;
     }
+
+    flushCurrentItems();
 
     return chunks;
   }

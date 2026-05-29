@@ -273,6 +273,45 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(firstCardMarkdown).not.toContain('- Overflow detail belongs on the next card.');
   });
 
+  it('keeps nested ordered list cards inside each platform limit without dropping steps', () => {
+    const sourceLines = [
+      '1. Discovery',
+      '   1. Map importer errors to the exact source line.',
+      '   2. Keep fallback copy visible when metadata is missing.',
+      '   3. Preserve the customer link for follow-up.',
+      '2. Fix',
+      '   1. Patch the parser in the smallest shared helper.',
+      '   2. Keep the existing caption pipeline unchanged.',
+      '   3. Add regression coverage before expanding scope.',
+      '3. Verify',
+      '   1. Run the deck splitter against every platform preset.',
+      '   2. Confirm no generated card exceeds the line budget.',
+      '   3. Check the caption still names the rollout checklist.',
+      '4. Ship',
+      '   1. Export the cards after the build passes.',
+      '   2. Keep the source Markdown available for edits.',
+      '   3. Note any intentionally capped detail in the deck notes.',
+    ];
+    const markdown = ['# Rollout checklist', '', ...sourceLines].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(result.deck?.presetId).toBe(preset.id);
+      expect(result.deck?.captionText).toContain('Rollout checklist');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+      for (const line of sourceLines) {
+        expect(joinedCards).toContain(line);
+      }
+    }
+  });
+
   it('does not lose mixed-language prose that uses pipe separators instead of a table', () => {
     const preset = platformPresets[0];
     const markdown = [
