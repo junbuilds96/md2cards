@@ -478,16 +478,20 @@ More detail belongs in the caption.`;
 describe('getSafeAreaGuide', () => {
   it('calculates approximate platform-safe margins from preset dimensions', () => {
     expect(getSafeAreaGuide(platformPresets[0])).toMatchObject({
-      marginPercent: 7,
-      horizontalMargin: 112,
-      verticalMargin: 63,
-      contentWidth: 1376,
-      contentHeight: 774,
-      marginLabel: '~112px sides / ~63px top-bottom',
+      marginPercent: 10,
+      horizontalMarginPercent: 10,
+      verticalMarginPercent: 8,
+      horizontalMargin: 160,
+      verticalMargin: 72,
+      contentWidth: 1280,
+      contentHeight: 756,
+      marginLabel: '~160px sides / ~72px top-bottom',
     });
 
     expect(getSafeAreaGuide(platformPresets[1])).toMatchObject({
       marginPercent: 8,
+      horizontalMarginPercent: 8,
+      verticalMarginPercent: 8,
       horizontalMargin: 86,
       verticalMargin: 115,
       contentWidth: 908,
@@ -499,6 +503,8 @@ describe('getSafeAreaGuide', () => {
   it('uses the selected preset shape instead of a duplicated platform lookup', () => {
     expect(getSafeAreaGuide(platformPresets[2])).toMatchObject({
       marginPercent: 7.5,
+      horizontalMarginPercent: 7.5,
+      verticalMarginPercent: 7.5,
       horizontalMargin: 90,
       verticalMargin: 90,
       contentWidth: 1020,

@@ -34,6 +34,8 @@ export type PlatformFitHelper = {
 
 export type SafeAreaGuide = {
   marginPercent: number;
+  horizontalMarginPercent: number;
+  verticalMarginPercent: number;
   horizontalMargin: number;
   verticalMargin: number;
   contentWidth: number;
@@ -1342,6 +1344,10 @@ export function getExportPixelSize(
 }
 
 export function getSafeAreaMarginPercent(preset: PlatformPreset): number {
+  if (preset.id === 'twitter') {
+    return 10;
+  }
+
   if (preset.height > preset.width) {
     return 8;
   }
@@ -1353,13 +1359,34 @@ export function getSafeAreaMarginPercent(preset: PlatformPreset): number {
   return 7;
 }
 
-export function getSafeAreaGuide(preset: PlatformPreset): SafeAreaGuide {
+function getSafeAreaMarginPercents(preset: PlatformPreset): {
+  horizontalMarginPercent: number;
+  verticalMarginPercent: number;
+} {
+  if (preset.id === 'twitter') {
+    return {
+      horizontalMarginPercent: 10,
+      verticalMarginPercent: 8,
+    };
+  }
+
   const marginPercent = getSafeAreaMarginPercent(preset);
-  const horizontalMargin = Math.round((preset.width * marginPercent) / 100);
-  const verticalMargin = Math.round((preset.height * marginPercent) / 100);
 
   return {
-    marginPercent,
+    horizontalMarginPercent: marginPercent,
+    verticalMarginPercent: marginPercent,
+  };
+}
+
+export function getSafeAreaGuide(preset: PlatformPreset): SafeAreaGuide {
+  const { horizontalMarginPercent, verticalMarginPercent } = getSafeAreaMarginPercents(preset);
+  const horizontalMargin = Math.round((preset.width * horizontalMarginPercent) / 100);
+  const verticalMargin = Math.round((preset.height * verticalMarginPercent) / 100);
+
+  return {
+    marginPercent: horizontalMarginPercent,
+    horizontalMarginPercent,
+    verticalMarginPercent,
     horizontalMargin,
     verticalMargin,
     contentWidth: preset.width - horizontalMargin * 2,

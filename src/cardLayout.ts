@@ -6,6 +6,7 @@ import {
   getCardTextureOption,
   getCardTypographyVoiceOption,
   getCardTypographyScaleOption,
+  type PresetId,
   type CardAccentId,
   type CardBackgroundIntensityId,
   type CardCornerRadiusId,
@@ -23,6 +24,7 @@ export function shouldShowCardLabels(showCardLabels: boolean): boolean {
 
 export function getCardClassName(
   themeClassName: string,
+  presetId: PresetId,
   showCardLabels: boolean,
   cardDensityId: CardDensityId,
   cardTypographyScaleId: CardTypographyScaleId,
@@ -33,6 +35,7 @@ export function getCardClassName(
 ): string {
   return [
     'social-card',
+    `preset-${presetId}`,
     themeClassName,
     getCardDensityOption(cardDensityId).className,
     getCardTypographyScaleOption(cardTypographyScaleId).className,

@@ -4,21 +4,35 @@ import { getCardAppearanceStyle, getCardClassName, shouldShowCardLabels } from '
 describe('card label layout', () => {
   it('keeps label chrome visible by default behavior', () => {
     expect(shouldShowCardLabels(true)).toBe(true);
-    expect(getCardClassName('theme-signal', true, 'balanced', 'default', 'modern', 'balanced', 'sharp', 'subtle')).toBe(
-      'social-card theme-signal density-balanced type-default voice-modern background-balanced radius-sharp texture-subtle',
+    expect(
+      getCardClassName('theme-signal', 'twitter', true, 'balanced', 'default', 'modern', 'balanced', 'sharp', 'subtle'),
+    ).toBe(
+      'social-card preset-twitter theme-signal density-balanced type-default voice-modern background-balanced radius-sharp texture-subtle',
     );
   });
 
   it('adds only the label visibility state when labels are hidden', () => {
     expect(shouldShowCardLabels(false)).toBe(false);
-    expect(getCardClassName('theme-signal', false, 'compact', 'large', 'editorial', 'vivid', 'rounded', 'clean')).toBe(
-      'social-card theme-signal density-compact type-large voice-editorial background-vivid radius-rounded texture-clean card-labels-hidden',
+    expect(
+      getCardClassName(
+        'theme-signal',
+        'xiaohongshu',
+        false,
+        'compact',
+        'large',
+        'editorial',
+        'vivid',
+        'rounded',
+        'clean',
+      ),
+    ).toBe(
+      'social-card preset-xiaohongshu theme-signal density-compact type-large voice-editorial background-vivid radius-rounded texture-clean card-labels-hidden',
     );
   });
 
   it('adds the selected texture depth class to exported card markup', () => {
-    expect(getCardClassName('theme-paper', true, 'spacious', 'small', 'mono', 'soft', 'subtle', 'rich')).toBe(
-      'social-card theme-paper density-spacious type-small voice-mono background-soft radius-subtle texture-rich',
+    expect(getCardClassName('theme-paper', 'launch', true, 'spacious', 'small', 'mono', 'soft', 'subtle', 'rich')).toBe(
+      'social-card preset-launch theme-paper density-spacious type-small voice-mono background-soft radius-subtle texture-rich',
     );
   });
 

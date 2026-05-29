@@ -1478,6 +1478,20 @@ textarea:focus {
   --card-blockquote-border-width: 10px;
 }
 
+.social-card.preset-twitter {
+  --card-chrome-padding-block: 8cqh;
+  --card-chrome-padding-inline: 10cqw;
+  --card-body-block-padding: 8cqh;
+  --card-body-inline-padding: 10cqw;
+  --card-h1-font-size: clamp(26px, 6.3cqw, 100px);
+  --card-h1-margin-bottom: clamp(16px, 2.2cqh, 22px);
+  --card-body-font-size: clamp(15px, 2.35cqw, 37px);
+  --card-p-margin-bottom: clamp(8px, 1.5cqh, 14px);
+  --card-list-margin: clamp(6px, 1.1cqh, 10px) 0 clamp(7px, 1.2cqh, 12px);
+  --card-li-gap: clamp(4px, 0.75cqh, 7px);
+  --card-list-item-padding-block: 0.3em;
+}
+
 .social-card.type-small {
   --card-h1-font-size: clamp(24px, 5.9cqw, 94px);
   --card-h2-font-size: clamp(18px, 2.9cqw, 45px);

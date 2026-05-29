@@ -218,6 +218,7 @@ function CardPreview({
       ref={cardRef}
       className={getCardClassName(
         theme.className,
+        preset.id,
         showCardLabels,
         cardDensityId,
         cardTypographyScaleId,
@@ -267,7 +268,7 @@ function SafeAreaOverlay({
       <div
         className="safe-area-frame"
         style={{
-          inset: `${guide.marginPercent}%`,
+          inset: `${guide.verticalMarginPercent}% ${guide.horizontalMarginPercent}%`,
         }}
       >
         <div className="safe-area-label">

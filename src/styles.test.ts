@@ -47,6 +47,22 @@ describe('social card CSS', () => {
     expect(spaciousRule).toContain('--card-table-cell-padding: clamp(4px, 0.8cqh, 7px) clamp(8px, 0.9cqw, 14px)');
   });
 
+  it('keeps Twitter card content inside the larger platform safe area with adapted rhythm', () => {
+    const twitterRule = getRule('.social-card.preset-twitter');
+
+    expect(twitterRule).toContain('--card-chrome-padding-block: 8cqh');
+    expect(twitterRule).toContain('--card-chrome-padding-inline: 10cqw');
+    expect(twitterRule).toContain('--card-body-block-padding: 8cqh');
+    expect(twitterRule).toContain('--card-body-inline-padding: 10cqw');
+    expect(twitterRule).toContain('--card-h1-font-size: clamp(26px, 6.3cqw, 100px)');
+    expect(twitterRule).toContain('--card-h1-margin-bottom: clamp(16px, 2.2cqh, 22px)');
+    expect(twitterRule).toContain('--card-body-font-size: clamp(15px, 2.35cqw, 37px)');
+    expect(twitterRule).toContain('--card-p-margin-bottom: clamp(8px, 1.5cqh, 14px)');
+    expect(twitterRule).toContain('--card-list-margin: clamp(6px, 1.1cqh, 10px) 0 clamp(7px, 1.2cqh, 12px)');
+    expect(twitterRule).toContain('--card-li-gap: clamp(4px, 0.75cqh, 7px)');
+    expect(twitterRule).toContain('--card-list-item-padding-block: 0.3em');
+  });
+
   it('defines background intensity classes that alter exported card visuals', () => {
     const cardRule = getRule('.social-card');
     const softRule = getRule('.social-card.background-soft');
