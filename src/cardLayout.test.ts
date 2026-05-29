@@ -64,6 +64,26 @@ describe('card label layout', () => {
     );
   });
 
+  it('adds the code snippet composition class without changing export sizing ownership', () => {
+    expect(
+      getCardClassName(
+        'theme-midnight',
+        'twitter',
+        true,
+        'compact',
+        'small',
+        'mono',
+        'vivid',
+        'sharp',
+        'code',
+        'rich',
+        'punchy',
+      ),
+    ).toBe(
+      'social-card preset-twitter theme-midnight density-compact type-small voice-mono background-vivid radius-sharp composition-code texture-rich mood-punchy',
+    );
+  });
+
   it('generates accent CSS variables used by preview and image export', () => {
     expect(getCardAppearanceStyle('emerald')).toMatchObject({
       '--card-accent': '#15956b',

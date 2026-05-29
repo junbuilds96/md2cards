@@ -155,7 +155,7 @@ function getCodeBlockLanguageLabel(children: ReactNode): string {
   );
 }
 
-const markdownComponents: Components = {
+export const markdownComponents: Components = {
   table({ children }: ComponentPropsWithoutRef<'table'>) {
     return (
       <div className="markdown-table-scroll">

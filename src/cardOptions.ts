@@ -16,7 +16,7 @@ export type CardBackgroundIntensityId = 'soft' | 'balanced' | 'vivid';
 
 export type CardCornerRadiusId = 'sharp' | 'subtle' | 'rounded';
 
-export type CardCompositionId = 'standard' | 'framed' | 'poster';
+export type CardCompositionId = 'standard' | 'framed' | 'poster' | 'code';
 
 export type CardTextureId = 'clean' | 'subtle' | 'rich';
 
@@ -511,6 +511,12 @@ export const cardCompositionOptions: CardCompositionOption[] = [
     description: 'Creates an inset poster panel with stronger edge chrome.',
     className: 'composition-poster',
   },
+  {
+    id: 'code',
+    label: 'Code Snippet',
+    description: 'Tight editor-like layout for cards built around fenced code blocks.',
+    className: 'composition-code',
+  },
 ];
 
 export const cardTextureOptions: CardTextureOption[] = [
@@ -834,23 +840,23 @@ Use Markdown for structure. Use recipes for the visual rhythm.
     cardTypographyScaleId: 'small',
     cardTypographyVoiceId: 'mono',
     cardAccentId: 'emerald',
-    cardBackgroundIntensityId: 'balanced',
+    cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
-    cardCompositionId: 'framed',
+    cardCompositionId: 'code',
     cardTextureId: 'subtle',
     cardMoodId: 'punchy',
     showCardLabels: true,
     markdown: `# Export a card from Markdown
 
-\`\`\`bash
-npm install
-npm run build
-npm run preview
+\`\`\`tsx
+await exportCard({
+  preset: "twitter",
+  scale: 2,
+  format: "png",
+});
 \`\`\`
 
-- React Markdown rendering
-- Exact preset dimensions
-- PNG and SVG output`,
+Inline \`react-markdown\` content stays readable while the snippet becomes the visual anchor.`,
   },
 ];
 
@@ -898,7 +904,7 @@ export const stylePacks: StylePack[] = [
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
-    cardCompositionId: 'framed',
+    cardCompositionId: 'code',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
     showCardLabels: true,

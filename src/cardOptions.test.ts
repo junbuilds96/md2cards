@@ -217,7 +217,9 @@ describe('recipePresets', () => {
     expect(getRecipePreset('bugfix').markdown).toContain('Incident resolved');
     expect(getRecipePreset('quote').cardTypographyVoiceId).toBe('editorial');
     expect(getRecipePreset('code-snippet').cardTypographyVoiceId).toBe('mono');
-    expect(getRecipePreset('code-snippet').markdown).toContain('```bash');
+    expect(getRecipePreset('code-snippet').cardCompositionId).toBe('code');
+    expect(getRecipePreset('code-snippet').markdown).toContain('```tsx');
+    expect(getStylePack('terminal-proof').cardCompositionId).toBe('code');
     expect(getRecipePreset('tutorial').markdown).toContain('1. Paste the Markdown draft');
     expect(getRecipePreset('quote').markdown).toContain('"Design tools');
   });
@@ -282,7 +284,7 @@ describe('stylePacks', () => {
       cardAccentId: 'emerald',
       cardBackgroundIntensityId: 'vivid',
       cardCornerRadiusId: 'sharp',
-      cardCompositionId: 'framed',
+      cardCompositionId: 'code',
       cardTextureId: 'rich',
       cardMoodId: 'punchy',
       showCardLabels: true,
@@ -339,12 +341,17 @@ describe('composition options', () => {
       id: 'standard',
       className: 'composition-standard',
     });
-    expect(cardCompositionOptions.map((option) => option.id)).toEqual(['standard', 'framed', 'poster']);
+    expect(cardCompositionOptions.map((option) => option.id)).toEqual(['standard', 'framed', 'poster', 'code']);
     expect(cardCompositionOptions.map((option) => option.className)).toEqual([
       'composition-standard',
       'composition-framed',
       'composition-poster',
+      'composition-code',
     ]);
+    expect(getCardCompositionOption('code')).toMatchObject({
+      label: 'Code Snippet',
+      description: expect.stringContaining('fenced code blocks'),
+    });
   });
 
   it('falls back to standard composition for unknown ids', () => {

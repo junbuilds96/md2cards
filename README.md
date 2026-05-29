@@ -31,7 +31,7 @@ The current layout keeps the control panel independently scrollable on desktop w
 - Platform presets for 1600 x 900 landscape, 1080 x 1440 portrait, and 1200 x 1200 square cards.
 - Built-in content recipes that set content, platform, theme, appearance, and card-label visibility together.
 - Appearance-only visual recipes/style packs that preserve Markdown while applying polished theme, density, type, accent, composition, texture, mood, and label combinations.
-- Appearance controls for density, type scale, typography voice, accent color, background intensity, corner radius, card composition/frame, texture depth, and visual mood.
+- Appearance controls for density, type scale, typography voice, accent color, background intensity, corner radius, card composition/frame/code snippet mode, texture depth, and visual mood.
 - Local fitting helper for tightening dense Markdown to the selected platform.
 - Safe-area overlay for previewing platform crops without changing exports.
 - Browser-local saved presets and portable JSON card recipes.

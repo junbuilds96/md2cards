@@ -196,9 +196,11 @@ describe('social card CSS', () => {
     const bodyRule = getRule('.markdown-card-body');
     const framedRule = getRule('.social-card.composition-framed');
     const posterRule = getRule('.social-card.composition-poster');
+    const codeRule = getRule('.social-card.composition-code');
     const twitterStandardRule = getRule('.social-card.preset-twitter.composition-standard');
     const twitterFramedRule = getRule('.social-card.preset-twitter.composition-framed');
     const twitterPosterRule = getRule('.social-card.preset-twitter.composition-poster');
+    const twitterCodeRule = getRule('.social-card.preset-twitter.composition-code');
     const afterRule = getRuleContaining('.social-card::after', 'background-image');
 
     expect(cardRule).toContain('--card-body-frame-margin: 0');
@@ -217,6 +219,12 @@ describe('social card CSS', () => {
     expect(posterRule).toContain('--card-body-frame-border: 2px solid');
     expect(posterRule).toContain('--card-frame-accent-opacity: 0.34');
     expect(posterRule).toContain('--card-accent-layer-opacity: 0.58');
+    expect(codeRule).toContain('--card-body-frame-margin: 0 clamp(12px, 2.2cqw, 30px)');
+    expect(codeRule).toContain('--card-code-block-font-size: clamp(12px, 1.5cqw, 23px)');
+    expect(codeRule).toContain('--card-pre-max-height: min(46cqh, 18lh)');
+    expect(codeRule).toContain('--card-code-frame-bg:');
+    expect(codeRule).toContain('--card-code-label-text: color-mix(in srgb, var(--card-accent) 72%, #ffffff)');
+    expect(codeRule).toContain('--card-frame-accent-opacity: 0.44');
     expect(twitterStandardRule).toContain('--card-body-block-padding: clamp(28px, 7.8cqh, 32px)');
     expect(twitterFramedRule).toContain('--card-body-frame-margin: 0 clamp(12px, 2cqw, 28px)');
     expect(twitterFramedRule).toContain('--card-body-block-padding: clamp(24px, 7cqh, 30px)');
@@ -224,12 +232,18 @@ describe('social card CSS', () => {
     expect(twitterPosterRule).toContain('--card-body-frame-margin: 0 clamp(12px, 2cqw, 28px)');
     expect(twitterPosterRule).toContain('--card-body-block-padding: clamp(24px, 6cqh, 30px)');
     expect(twitterPosterRule).toContain('--card-body-inline-padding: clamp(34px, 5.8cqw, 52px)');
+    expect(twitterCodeRule).toContain('--card-body-frame-margin: 0 clamp(10px, 1.8cqw, 24px)');
+    expect(twitterCodeRule).toContain('--card-pre-max-height: min(48cqh, 18lh)');
     expect(framedRule).not.toMatch(/(^|\n)\s*width:/);
     expect(framedRule).not.toMatch(/(^|\n)\s*height:/);
     expect(posterRule).not.toMatch(/(^|\n)\s*aspect-ratio:/);
+    expect(codeRule).not.toMatch(/(^|\n)\s*width:/);
+    expect(codeRule).not.toMatch(/(^|\n)\s*height:/);
+    expect(codeRule).not.toMatch(/(^|\n)\s*aspect-ratio:/);
     expect(twitterStandardRule).not.toMatch(/(^|\n)\s*width:/);
     expect(twitterFramedRule).not.toMatch(/(^|\n)\s*width:/);
     expect(twitterPosterRule).not.toMatch(/(^|\n)\s*height:/);
+    expect(twitterCodeRule).not.toMatch(/(^|\n)\s*height:/);
   });
 
   it('defines mood classes that tune exported card tone through distinct variables', () => {
@@ -317,6 +331,7 @@ describe('social card CSS', () => {
     expect(cardRule).toContain('--card-table-header-bg: linear-gradient(180deg, var(--card-surface-shine), var(--code-bg))');
     expect(cardRule).toContain('--card-code-block-font-size: clamp(12px, 1.45cqw, 24px)');
     expect(cardRule).toContain('--card-pre-max-height: min(42cqh, 15lh)');
+    expect(cardRule).toContain('--card-code-frame-bg:');
     expect(cardRule).toContain('--card-code-header-height: clamp(26px, 3.2cqh, 38px)');
     expect(cardRule).toContain('--card-code-label-bg: color-mix(in srgb, var(--card-accent) 14%, var(--card-surface-bg))');
     expect(cardRule).toContain('--card-table-font-size: clamp(11px, 1.28cqw, 22px)');
@@ -337,8 +352,11 @@ describe('social card CSS', () => {
     expect(inlineCodeRule).toContain('max-width: 100%');
     expect(inlineCodeRule).toContain('border: 1px solid var(--card-surface-border)');
     expect(inlineCodeRule).toContain('overflow-wrap: anywhere');
+    expect(inlineCodeRule).toContain('word-break: break-word');
     expect(inlineCodeRule).toContain('font-weight: 750');
-    expect(codeFrameRule).toContain('linear-gradient(180deg, var(--card-surface-shine), transparent 46%)');
+    expect(codeFrameRule).toContain('background: var(--card-code-frame-bg)');
+    expect(codeFrameRule).toContain('border: 1px solid var(--card-code-frame-border)');
+    expect(codeFrameRule).toContain('box-shadow: var(--card-code-frame-shadow)');
     expect(codeFrameRule).toContain('max-height: var(--card-pre-max-height)');
     expect(codeFrameRule).toContain('overflow: hidden');
     expect(codeFrameRule).toContain('contain: paint');
