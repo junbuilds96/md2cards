@@ -1,4 +1,5 @@
 import { toBlob, toPng, toSvg } from 'html-to-image';
+import JSZip from 'jszip';
 import {
   defaultExportScaleId,
   getExportScaleOption,
@@ -7,6 +8,11 @@ import {
 } from './cardOptions';
 
 export type ExportFileFormat = 'png' | 'svg';
+
+export type SvgDeckFile = {
+  fileName: string;
+  svg: string;
+};
 
 type SizedExportNode = {
   node: HTMLElement;
@@ -27,6 +33,28 @@ export function getExportFileName(
     .slice(0, 64);
 
   return `${baseName || 'md2cards'}-${preset.id}.${format}`;
+}
+
+function slugifyExportTitle(title: string): string {
+  return title
+    .replace(/^#+\s*/, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 64);
+}
+
+export function getDeckExportFileName(title: string, index: number, format: ExportFileFormat = 'svg'): string {
+  const baseName = slugifyExportTitle(title) || 'md2cards';
+
+  return `${baseName}-${String(index + 1).padStart(2, '0')}.${format}`;
+}
+
+export function getDeckZipFileName(title: string): string {
+  const baseName = slugifyExportTitle(title) || 'md2cards';
+
+  return `${baseName}-deck.zip`;
 }
 
 export function getSizedExportNodeStyle(preset: PlatformPreset): Partial<CSSStyleDeclaration> {
@@ -155,6 +183,51 @@ export async function downloadSvgCard(
   link.download = getExportFileName(preset, title, 'svg');
   link.href = dataUrl;
   link.click();
+}
+
+export async function renderCardToSvgDataUrl(node: HTMLElement, preset: PlatformPreset): Promise<string> {
+  return withSizedExportNode(node, preset, (exportNode) => toSvg(exportNode, getSvgExportOptions(preset)));
+}
+
+function svgFromDataUrl(svg: string): string {
+  if (!svg.startsWith('data:image/svg+xml')) {
+    return svg;
+  }
+
+  const [, payload = ''] = svg.split(',', 2);
+
+  if (svg.includes(';base64,')) {
+    return atob(payload);
+  }
+
+  return decodeURIComponent(payload);
+}
+
+export async function createSvgDeckZip(files: SvgDeckFile[]): Promise<Blob> {
+  const zip = new JSZip();
+
+  for (const file of files) {
+    zip.file(file.fileName, svgFromDataUrl(file.svg));
+  }
+
+  const bytes = await zip.generateAsync({
+    type: 'uint8array',
+  });
+  const buffer = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(buffer).set(bytes);
+
+  return new Blob([buffer], { type: 'application/zip' });
+}
+
+export async function downloadSvgDeckZip(files: SvgDeckFile[], title: string): Promise<void> {
+  const blob = await createSvgDeckZip(files);
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.download = getDeckZipFileName(title);
+  link.href = url;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 export async function copyCard(

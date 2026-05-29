@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { exportScaleOptions, platformPresets } from './cardOptions';
 import {
+  createSvgDeckZip,
   createSizedExportNode,
+  getDeckExportFileName,
   getExportFileName,
   getExportHostStyle,
   getExportOptions,
@@ -64,6 +66,27 @@ describe('getExportFileName', () => {
 
   it('falls back when the title has no usable characters', () => {
     expect(getExportFileName(platformPresets[2], '### ✨')).toBe('md2cards-launch.png');
+  });
+});
+
+describe('deck SVG export helpers', () => {
+  it('creates stable numbered deck filenames', () => {
+    expect(getDeckExportFileName('# Launch: MD2Cards v0.1!', 0, 'svg')).toBe(
+      'launch-md2cards-v0-1-01.svg',
+    );
+    expect(getDeckExportFileName('### ✨', 11, 'png')).toBe('md2cards-12.png');
+  });
+
+  it('creates a zip blob with every SVG entry', async () => {
+    const blob = await createSvgDeckZip([
+      { fileName: 'deck-01.svg', svg: '<svg><text>One</text></svg>' },
+      { fileName: 'deck-02.svg', svg: '<svg><text>Two</text></svg>' },
+    ]);
+    const { default: JSZip } = await import('jszip');
+    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
+
+    expect(Object.keys(zip.files).sort()).toEqual(['deck-01.svg', 'deck-02.svg']);
+    await expect(zip.file('deck-02.svg')?.async('string')).resolves.toContain('Two');
   });
 });
 

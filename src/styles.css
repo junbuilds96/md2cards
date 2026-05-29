@@ -420,6 +420,11 @@ textarea:focus {
   border-color: #2059e8;
 }
 
+.editor-actions .split-deck-button.primary-button {
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
 .saved-presets-panel {
   display: grid;
   gap: 10px;
@@ -1039,7 +1044,7 @@ textarea:focus {
 
 .preview-panel {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
   align-self: stretch;
   width: 100%;
   height: 100%;
@@ -1059,7 +1064,54 @@ textarea:focus {
 }
 
 .preview-heading {
+  display: grid;
+  gap: 6px;
   min-width: 0;
+}
+
+.deck-navigator {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.deck-count {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 4px 8px;
+  color: #1f5f3e;
+  background: #effaf4;
+  border: 1px solid #b9e4c9;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1.1;
+}
+
+.deck-card-note {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #667085;
+  font-size: 0.75rem;
+  font-weight: 750;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.deck-navigation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.deck-navigation-actions .secondary-button,
+.deck-navigation-actions .ghost-button {
+  min-height: 34px;
+  padding: 7px 9px;
+  font-size: 0.78rem;
 }
 
 .preview-controls {
@@ -1204,6 +1256,34 @@ textarea:focus {
     linear-gradient(rgba(47, 63, 84, 0.08) 1px, transparent 1px),
     #dfe5ee;
   background-size: 28px 28px;
+}
+
+.caption-panel {
+  display: grid;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f8fbff;
+  border-top: 1px solid rgba(23, 32, 42, 0.1);
+}
+
+.caption-panel-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.caption-panel-header h2 {
+  font-size: 1rem;
+}
+
+.caption-textarea {
+  min-height: 112px;
+  max-height: 180px;
+  resize: vertical;
+  background: #ffffff;
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
 .preview-scaler {

@@ -15,6 +15,8 @@ import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
   AlertCircle,
+  ChevronLeft,
+  ChevronRight,
   Check,
   Clipboard,
   FolderOpen,
@@ -24,6 +26,7 @@ import {
   Github,
   ImageDown,
   LayoutTemplate,
+  Layers,
   Palette,
   PanelRightOpen,
   RotateCcw,
@@ -104,7 +107,15 @@ import {
   validateCardConfigImportFile,
 } from './cardConfig';
 import { getCardAppearanceStyle, getCardClassName, shouldShowCardLabels } from './cardLayout';
-import { copyCard, downloadCard, downloadSvgCard } from './exportImage';
+import {
+  copyCard,
+  downloadCard,
+  downloadSvgCard,
+  downloadSvgDeckZip,
+  getDeckExportFileName,
+  renderCardToSvgDataUrl,
+} from './exportImage';
+import { splitMarkdownIntoCardDeck, type CardDeck } from './cardDeck';
 import { validateMarkdownImportFile } from './markdownFileImport';
 import {
   deleteSavedPreset,
@@ -113,8 +124,9 @@ import {
   type SavedCardPreset,
 } from './savedPresets';
 
-type ExportState = 'idle' | 'copying' | 'copied' | 'downloading-png' | 'downloading-svg' | 'error';
+type ExportState = 'idle' | 'copying' | 'copied' | 'downloading-png' | 'downloading-svg' | 'downloading-deck' | 'error';
 type StarterCopyState = 'idle' | 'copying' | 'copied' | 'error';
+type CaptionCopyState = 'idle' | 'copying' | 'copied' | 'error';
 type ImportState = 'idle' | 'importing' | 'success' | 'error';
 type PresetSaveState = 'idle' | 'saved' | 'error';
 type RecipeTransferState = 'idle' | 'importing' | 'success' | 'error';
@@ -850,6 +862,7 @@ function App() {
   const [showCardLabels, setShowCardLabels] = useState(true);
   const [exportState, setExportState] = useState<ExportState>('idle');
   const [starterCopyState, setStarterCopyState] = useState<StarterCopyState>('idle');
+  const [captionCopyState, setCaptionCopyState] = useState<CaptionCopyState>('idle');
   const [importState, setImportState] = useState<ImportState>('idle');
   const [importMessage, setImportMessage] = useState('');
   const [isDraggingImport, setIsDraggingImport] = useState(false);
@@ -859,6 +872,8 @@ function App() {
   const [presetSaveState, setPresetSaveState] = useState<PresetSaveState>('idle');
   const [recipeState, setRecipeState] = useState<RecipeTransferState>('idle');
   const [recipeMessage, setRecipeMessage] = useState('');
+  const [deck, setDeck] = useState<CardDeck | null>(null);
+  const [activeDeckCardIndex, setActiveDeckCardIndex] = useState(0);
   const [message, setMessage] = useState('Ready to export.');
   const cardRef = useRef<HTMLDivElement | null>(null);
   const markdownInputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -893,16 +908,28 @@ function App() {
   const safeAreaGuide = useMemo(() => getSafeAreaGuide(preset), [preset]);
   const platformFitHelper = useMemo(() => getPlatformFitHelper(preset), [preset]);
   const markdownGuidance = useMemo(() => getMarkdownFitGuidance(markdown, preset), [markdown, preset]);
+  const activeDeckCard = deck?.cards[activeDeckCardIndex] ?? null;
+  const previewMarkdown = activeDeckCard?.markdown ?? markdown;
+  const previewGuidance = useMemo(() => getMarkdownFitGuidance(previewMarkdown, preset), [previewMarkdown, preset]);
   const title = useMemo(() => firstMarkdownHeading(markdown), [markdown]);
-  const canExport = !markdownGuidance.stats.isBlank;
+  const previewTitle = activeDeckCard ? activeDeckCard.title : title;
+  const exportTitle = activeDeckCard && deck ? `${deck.title}-${activeDeckCard.index + 1}-${activeDeckCard.title}` : title;
+  const canExport = !previewGuidance.stats.isBlank;
 
   function resetEditorFeedback() {
     setFitMessage('');
     setExportState('idle');
     setStarterCopyState('idle');
+    setCaptionCopyState('idle');
     setPresetSaveState('idle');
     setRecipeState('idle');
     setRecipeMessage('');
+  }
+
+  function clearDeckPreview() {
+    setDeck(null);
+    setActiveDeckCardIndex(0);
+    setCaptionCopyState('idle');
   }
 
   function applyTemplate(templateId: TemplateId) {
@@ -914,6 +941,7 @@ function App() {
     setActiveTemplateId(template.id);
     setActiveRecipeId(null);
     setActiveStylePackId(null);
+    clearDeckPreview();
     setMessage(`${template.label} loaded. Replace the text with your own Markdown when ready.`);
     setImportState('idle');
     setImportMessage('');
@@ -939,6 +967,7 @@ function App() {
     setActiveRecipeId(recipePreset.id);
     setActiveStylePackId(null);
     setPresetName('');
+    clearDeckPreview();
     setMessage(`${recipePreset.label} recipe applied. Preview and exports now use this visual setup.`);
     setImportState('idle');
     setImportMessage('');
@@ -972,6 +1001,7 @@ function App() {
   function startBlankMarkdown() {
     setMarkdown('');
     setActiveRecipeId(null);
+    clearDeckPreview();
     setMessage('Blank editor ready. Paste Markdown to create a card.');
     setImportState('idle');
     setImportMessage('');
@@ -1032,6 +1062,7 @@ function App() {
     setPresetName(savedPreset.name);
     setActiveRecipeId(null);
     setActiveStylePackId(null);
+    clearDeckPreview();
     setMessage(`${savedPreset.name} loaded. Preview updated from your local preset.`);
     setImportState('idle');
     setImportMessage('');
@@ -1140,6 +1171,7 @@ function App() {
       setShowCardLabels(importedRecipe.config.showCardLabels);
       setActiveRecipeId(null);
       setActiveStylePackId(null);
+      clearDeckPreview();
       setImportState('idle');
       setImportMessage('');
       setRecipeState('success');
@@ -1169,6 +1201,7 @@ function App() {
     if (result.changed) {
       setMarkdown(result.markdown);
       setActiveRecipeId(null);
+      clearDeckPreview();
     }
 
     setFitMessage(result.note);
@@ -1177,6 +1210,57 @@ function App() {
     setStarterCopyState('idle');
     setImportState('idle');
     setImportMessage('');
+  }
+
+  function handleSplitIntoDeck() {
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+
+    if (!result.deck) {
+      clearDeckPreview();
+      setMessage(result.note);
+      setFitMessage(result.note);
+      return;
+    }
+
+    setDeck(result.deck);
+    setActiveDeckCardIndex(0);
+    setCaptionCopyState('idle');
+    setFitMessage(result.deck.note);
+    setMessage(`${result.deck.note} Preview is showing card 1 of ${result.deck.cards.length}.`);
+    setExportState('idle');
+    setImportState('idle');
+    setImportMessage('');
+  }
+
+  async function handleCopyCaption() {
+    if (!deck) {
+      return;
+    }
+
+    if (!navigator.clipboard?.writeText) {
+      setCaptionCopyState('error');
+      setMessage('Text clipboard support is not available. The generated caption is still selectable.');
+      return;
+    }
+
+    try {
+      setCaptionCopyState('copying');
+      await navigator.clipboard.writeText(deck.captionText);
+      setCaptionCopyState('copied');
+      setMessage('Caption copied.');
+      window.setTimeout(() => setCaptionCopyState('idle'), 1800);
+    } catch (error) {
+      setCaptionCopyState('error');
+      setMessage(error instanceof Error ? error.message : 'Unable to copy caption.');
+    }
+  }
+
+  function waitForPreviewPaint(): Promise<void> {
+    return new Promise((resolve) => {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => resolve());
+      });
+    });
   }
 
   async function importMarkdownFile(file: File | undefined) {
@@ -1212,6 +1296,7 @@ function App() {
 
       setMarkdown(importedMarkdown);
       setActiveRecipeId(null);
+      clearDeckPreview();
       setImportState('success');
       setImportMessage(`Imported ${file.name}.`);
       setMessage(`Imported ${file.name}. Preview updated and ready to export.`);
@@ -1309,7 +1394,7 @@ function App() {
     try {
       setExportState('downloading-png');
       setMessage(`Rendering ${exportScale.label} PNG download...`);
-      await downloadCard(cardRef.current, preset, title, exportScale);
+      await downloadCard(cardRef.current, preset, exportTitle, exportScale);
       setExportState('idle');
       setMessage(`${exportScale.label} PNG download started.`);
     } catch (error) {
@@ -1331,12 +1416,53 @@ function App() {
     try {
       setExportState('downloading-svg');
       setMessage(`Rendering ${exportScale.label} SVG download...`);
-      await downloadSvgCard(cardRef.current, preset, title, exportScale);
+      await downloadSvgCard(cardRef.current, preset, exportTitle, exportScale);
       setExportState('idle');
       setMessage(`${exportScale.label} SVG download started.`);
     } catch (error) {
       setExportState('error');
       setMessage(error instanceof Error ? error.message : 'SVG download failed.');
+    }
+  }
+
+  async function handleDownloadDeck() {
+    if (!deck) {
+      return;
+    }
+
+    if (!cardRef.current) return;
+
+    const previousIndex = activeDeckCardIndex;
+
+    try {
+      setExportState('downloading-deck');
+      setMessage(`Rendering ${deck.cards.length} SVG cards into a zip...`);
+
+      const files = [];
+
+      for (const card of deck.cards) {
+        setActiveDeckCardIndex(card.index);
+        await waitForPreviewPaint();
+
+        if (!cardRef.current) {
+          throw new Error('Card preview is not available for deck export.');
+        }
+
+        files.push({
+          fileName: getDeckExportFileName(deck.title, card.index, 'svg'),
+          svg: await renderCardToSvgDataUrl(cardRef.current, preset),
+        });
+      }
+
+      setActiveDeckCardIndex(previousIndex);
+      await waitForPreviewPaint();
+      await downloadSvgDeckZip(files, deck.title);
+      setExportState('idle');
+      setMessage(`Deck SVG zip download started with ${files.length} cards.`);
+    } catch (error) {
+      setActiveDeckCardIndex(previousIndex);
+      setExportState('error');
+      setMessage(error instanceof Error ? error.message : 'Deck export failed.');
     }
   }
 
@@ -1376,6 +1502,16 @@ function App() {
                   <Sparkles size={16} />
                   Fit to {preset.label}
                 </button>
+                <button
+                  className={markdownGuidance.tone === 'dense' ? 'primary-button split-deck-button' : 'ghost-button split-deck-button'}
+                  type="button"
+                  onClick={handleSplitIntoDeck}
+                  disabled={markdownGuidance.stats.isBlank}
+                  aria-label="Split into deck"
+                >
+                  <Layers size={16} />
+                  Split into deck
+                </button>
                 <button className="ghost-button" type="button" onClick={() => applyTemplate(activeTemplateId)}>
                   <RotateCcw size={16} />
                   Reset Starter
@@ -1389,6 +1525,7 @@ function App() {
               onChange={(event) => {
                 setMarkdown(event.target.value);
                 setActiveRecipeId(null);
+                clearDeckPreview();
                 setMessage(
                   event.target.value.trim().length === 0
                     ? 'Paste Markdown to preview and export a card.'
@@ -1428,6 +1565,7 @@ function App() {
                   onClick={() => {
                     setPresetId(item.id);
                     setActiveRecipeId(null);
+                    clearDeckPreview();
                     setFitMessage('');
                     setMessage(`${item.label} preset selected. Use Fit to ${item.label} for a tighter draft.`);
                   }}
@@ -1643,8 +1781,41 @@ function App() {
         <section className="preview-panel" aria-label="Live card preview">
           <div className="preview-toolbar">
             <div className="preview-heading">
-              <p className="eyebrow">Live Preview</p>
-              <h2>{title}</h2>
+              <p className="eyebrow">{deck ? 'Deck Preview' : 'Live Preview'}</p>
+              <h2>{previewTitle}</h2>
+              {deck && activeDeckCard ? (
+                <div className="deck-navigator" aria-label="Deck navigation">
+                  <span className="deck-count">
+                    Card {activeDeckCard.index + 1}/{deck.cards.length}
+                  </span>
+                  <span className="deck-card-note">{activeDeckCard.note}</span>
+                  <div className="deck-navigation-actions">
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      onClick={() => setActiveDeckCardIndex((index) => Math.max(0, index - 1))}
+                      disabled={activeDeckCard.index === 0}
+                      aria-label="Previous card"
+                    >
+                      <ChevronLeft size={16} />
+                      Previous
+                    </button>
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      onClick={() => setActiveDeckCardIndex((index) => Math.min(deck.cards.length - 1, index + 1))}
+                      disabled={activeDeckCard.index === deck.cards.length - 1}
+                      aria-label="Next card"
+                    >
+                      Next
+                      <ChevronRight size={16} />
+                    </button>
+                    <button className="ghost-button" type="button" onClick={clearDeckPreview}>
+                      Exit deck / Back to source
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
             <div className="preview-controls" aria-label="Preview controls">
               <div className="preview-toggles" aria-label="Preview guides">
@@ -1717,6 +1888,12 @@ function App() {
                   {exportState === 'downloading-svg' ? <FileCode2 size={18} /> : <Download size={18} />}
                   {exportState === 'downloading-svg' ? 'Exporting...' : 'Download SVG'}
                 </button>
+                {deck ? (
+                  <button className="primary-button" type="button" onClick={handleDownloadDeck}>
+                    {exportState === 'downloading-deck' ? <FileCode2 size={18} /> : <Layers size={18} />}
+                    {exportState === 'downloading-deck' ? 'Exporting deck...' : 'Download deck SVG zip'}
+                  </button>
+                ) : null}
               </div>
             </div>
           </div>
@@ -1730,10 +1907,10 @@ function App() {
             >
               <div className="preview-zoom">
                 <CardPreview
-                  markdown={markdown}
+                  markdown={previewMarkdown}
                   preset={preset}
                   theme={theme}
-                  isBlank={markdownGuidance.stats.isBlank}
+                  isBlank={previewGuidance.stats.isBlank}
                   cardRef={cardRef}
                   showCardLabels={showCardLabels}
                   cardDensityId={cardDensity.id}
@@ -1750,6 +1927,26 @@ function App() {
               {showSafeAreaGuide ? <SafeAreaOverlay preset={preset} guide={safeAreaGuide} /> : null}
             </div>
           </div>
+
+          {deck ? (
+            <section className="caption-panel" aria-label="Caption / thread">
+              <div className="caption-panel-header">
+                <div>
+                  <p className="eyebrow">Caption / thread</p>
+                  <h2>{deck.captions[0]?.label ?? 'Generated caption'}</h2>
+                </div>
+                <button className="secondary-button" type="button" onClick={handleCopyCaption}>
+                  {captionCopyState === 'copied' ? <Check size={16} /> : <Clipboard size={16} />}
+                  {captionCopyState === 'copying'
+                    ? 'Copying...'
+                    : captionCopyState === 'copied'
+                      ? 'Copied'
+                      : 'Copy caption'}
+                </button>
+              </div>
+              <textarea className="caption-textarea" value={deck.captionText} readOnly aria-label="Generated caption" />
+            </section>
+          ) : null}
 
           <div
             className={`status-line ${
