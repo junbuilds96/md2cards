@@ -273,6 +273,29 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(firstCardMarkdown).not.toContain('- Overflow detail belongs on the next card.');
   });
 
+  it('does not lose mixed-language prose that uses pipe separators instead of a table', () => {
+    const preset = platformPresets[0];
+    const markdown = [
+      '# 双语复盘',
+      '',
+      '背景 | Background.',
+      '问题 | Problem: `a | b` is prose.',
+      '证据 | Evidence: [spec](https://e.co/s).',
+      '处理 | Action.',
+      '结果 | Result.',
+    ].join('\n');
+
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+    expect(joinedCards).toContain('背景 | Background');
+    expect(joinedCards).toContain('`a | b`');
+    expect(joinedCards).toContain('[spec](https://e.co/s)');
+    expect(joinedCards).toContain('处理 | Action');
+    expect(joinedCards).toContain('结果 | Result');
+    expect(result.deck?.notes.some((note) => note.includes('table'))).toBe(false);
+  });
+
   it('creates different deterministic captions for each platform', () => {
     const twitter = splitMarkdownIntoCardDeck(longEssay, platformPresets[0]).deck?.captionText ?? '';
     const xiaohongshu = splitMarkdownIntoCardDeck(longEssay, platformPresets[1]).deck?.captionText ?? '';

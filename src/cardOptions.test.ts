@@ -584,6 +584,46 @@ More detail belongs in the caption.`;
     expect(result.markdown).not.toContain('第四条');
   });
 
+  it('does not compact prose with pipe separators as table rows', () => {
+    const markdown = [
+      '# 双语复盘',
+      '',
+      '背景 | Background.',
+      '问题 | Problem: `a | b` is prose.',
+      '证据 | Evidence: [spec](https://e.co/s).',
+      '处理 | Action.',
+      '结果 | Result.',
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+
+    expect(result.markdown).toContain('背景 | Background');
+    expect(result.markdown).toContain('`a | b`');
+    expect(result.markdown).toContain('[spec](https://e.co/s)');
+    expect(result.markdown).toContain('处理 | Action');
+    expect(result.markdown).toContain('结果 | Result');
+    expect(result.note).not.toContain('table');
+  });
+
+  it('still caps real GFM tables using the table row limit', () => {
+    const markdown = [
+      '# Table check',
+      '',
+      '| 字段 | Field |',
+      '| --- | --- |',
+      '| 标题 | Title |',
+      '| 摘要 | Summary |',
+      '| 链接 | Link |',
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+
+    expect(result.markdown).toContain('| 字段 | Field |');
+    expect(result.markdown).toContain('| --- | --- |');
+    expect(result.markdown).toContain('| 标题 | Title |');
+    expect(result.markdown).toContain('| 摘要 | Summary |');
+    expect(result.markdown).not.toContain('| 链接 | Link |');
+    expect(result.note).toContain('kept the first 2 table rows');
+  });
+
   it('shortens long paragraphs and keeps the fitted result inside preset limits', () => {
     const markdown = `# Big update\n\n${'This release note has too much background detail for a social card. '.repeat(35)}`;
     const result = fitMarkdownToPreset(markdown, platformPresets[2]);

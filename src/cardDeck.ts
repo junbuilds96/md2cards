@@ -5,6 +5,7 @@ import {
   type PlatformPreset,
   type PresetId,
 } from './cardOptions';
+import { isMarkdownTableRowLine, isMarkdownTableStart } from './markdownTables';
 
 export type CardDeckCard = {
   id: string;
@@ -132,12 +133,8 @@ function isListContinuationLine(line: string): boolean {
     !getHeadingText(line) &&
     !trimmed.startsWith('```') &&
     !isHorizontalRuleLine(line) &&
-    !isLikelyTableLine(line)
+    !isMarkdownTableRowLine(line)
   );
-}
-
-function isLikelyTableLine(line: string): boolean {
-  return line.includes('|') && line.trim().length > 0;
 }
 
 function isHorizontalRuleLine(line: string): boolean {
@@ -263,10 +260,11 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       continue;
     }
 
-    if (isLikelyTableLine(line)) {
-      const tableLines: string[] = [];
+    if (isMarkdownTableStart(lines, index)) {
+      const tableLines: string[] = [lines[index].trimEnd(), lines[index + 1].trimEnd()];
+      index += 2;
 
-      while (index < lines.length && isLikelyTableLine(lines[index])) {
+      while (index < lines.length && lines[index].trim().length > 0 && isMarkdownTableRowLine(lines[index])) {
         tableLines.push(lines[index].trimEnd());
         index += 1;
       }
@@ -283,7 +281,7 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       !getHeadingText(lines[index]) &&
       !isListLine(lines[index]) &&
       !lines[index].trim().startsWith('```') &&
-      !isLikelyTableLine(lines[index])
+      !isMarkdownTableStart(lines, index)
     ) {
       paragraphLines.push(lines[index].trim());
       index += 1;

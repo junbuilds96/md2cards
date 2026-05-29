@@ -1,3 +1,5 @@
+import { isMarkdownTableRowLine, isMarkdownTableStart } from './markdownTables';
+
 export type PresetId = 'twitter' | 'xiaohongshu' | 'launch';
 
 export type ThemeId = 'signal' | 'paper' | 'midnight' | 'editorial';
@@ -1209,7 +1211,7 @@ function isMarkdownListContinuationLine(line: string): boolean {
     !/^#{1,6}\s+\S/.test(trimmed) &&
     !trimmed.startsWith('```') &&
     !/^-{3,}\s*$/.test(trimmed) &&
-    !line.includes('|')
+    !isMarkdownTableRowLine(line)
   );
 }
 
@@ -1390,10 +1392,11 @@ function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { bl
       continue;
     }
 
-    if (line.includes('|')) {
-      const tableLines: string[] = [];
+    if (isMarkdownTableStart(lines, index)) {
+      const tableLines: string[] = [lines[index], lines[index + 1]];
+      index += 2;
 
-      while (index < lines.length && lines[index].includes('|') && lines[index].trim().length > 0) {
+      while (index < lines.length && lines[index].trim().length > 0 && isMarkdownTableRowLine(lines[index])) {
         tableLines.push(lines[index]);
         index += 1;
       }
@@ -1412,7 +1415,7 @@ function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { bl
       !/^#{1,6}\s+\S/.test(lines[index].trim()) &&
       !isMarkdownListLine(lines[index]) &&
       !lines[index].trim().startsWith('```') &&
-      !lines[index].includes('|')
+      !isMarkdownTableStart(lines, index)
     ) {
       paragraphLines.push(lines[index]);
       index += 1;
