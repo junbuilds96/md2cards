@@ -67,6 +67,10 @@ type CardSegment = {
   forceCard?: boolean;
 };
 
+type StorySegment = {
+  markdown: string;
+};
+
 function addUnique(items: string[], item: string) {
   if (item && !items.includes(item)) {
     items.push(item);
@@ -115,6 +119,44 @@ function isListLine(line: string): boolean {
 
 function isLikelyTableLine(line: string): boolean {
   return line.includes('|') && line.trim().length > 0;
+}
+
+function isHorizontalRuleLine(line: string): boolean {
+  return /^-{3,}\s*$/.test(line.trim());
+}
+
+export function detectNarrativeMarkdown(markdown: string): boolean {
+  const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
+  const nonEmptyLines = lines.map((line) => line.trim()).filter(Boolean);
+  const plainText = stripMarkdownText(markdown);
+  const chineseCharacterCount = plainText.match(/[\u4e00-\u9fff]/g)?.length ?? 0;
+
+  if (nonEmptyLines.length < 8 || chineseCharacterCount < 40) {
+    return false;
+  }
+
+  const headingCount = nonEmptyLines.filter((line) => /^#{1,6}\s+/.test(line)).length;
+  const h2H3Count = nonEmptyLines.filter((line) => /^#{2,3}\s+/.test(line)).length;
+  const listLineCount = nonEmptyLines.filter(isListLine).length;
+  const quoteLineCount = nonEmptyLines.filter((line) => /^>\s*/.test(line)).length;
+  const sceneBreakCount = nonEmptyLines.filter(isHorizontalRuleLine).length;
+  const dialogueLineCount = nonEmptyLines.filter((line) => /[“”"「」『』]/.test(line)).length;
+  const shortLineCount = nonEmptyLines.filter((line) => stripMarkdownText(line).length <= 56).length;
+  const paragraphLikeCount = nonEmptyLines.filter(
+    (line) => !/^#{1,6}\s+/.test(line) && !isListLine(line) && !isHorizontalRuleLine(line),
+  ).length;
+
+  let score = 0;
+
+  if (shortLineCount / nonEmptyLines.length >= 0.55) score += 1;
+  if (paragraphLikeCount >= 10) score += 1;
+  if (dialogueLineCount >= 3) score += 1;
+  if (quoteLineCount >= 1) score += 1;
+  if (sceneBreakCount >= 1) score += 1;
+  if (h2H3Count <= 2 && headingCount <= 3) score += 1;
+  if (listLineCount / nonEmptyLines.length <= 0.12) score += 1;
+
+  return score >= 5;
 }
 
 function parseSourceBlocks(markdown: string): { title: string | null; blocks: SourceBlock[] } {
@@ -457,6 +499,244 @@ function trimCaption(text: string): string {
   return shortenPlainText(text, 900);
 }
 
+function splitStoryText(markdown: string, characterLimit: number): string[] {
+  const quoteMatch = markdown.match(/^>\s?(.*)$/s);
+  const prefix = quoteMatch ? '> ' : '';
+  const text = (quoteMatch?.[1] ?? markdown).replace(/\s+/g, ' ').trim();
+
+  if (text.length <= characterLimit) {
+    return [`${prefix}${text}`.trimEnd()];
+  }
+
+  return splitParagraphIntoSegments(text, characterLimit).map((segment) => `${prefix}${segment}`.trimEnd());
+}
+
+function parseStorySegments(markdown: string): { title: string | null; segments: Array<StorySegment | 'break'> } {
+  const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
+  const segments: Array<StorySegment | 'break'> = [];
+  let title: string | null = null;
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index];
+    const trimmed = line.trim();
+
+    if (trimmed.length === 0) {
+      index += 1;
+      continue;
+    }
+
+    const heading = getHeadingText(line);
+    if (heading?.depth === 1) {
+      if (!title) {
+        title = heading.title;
+      }
+      index += 1;
+      continue;
+    }
+
+    if (isHorizontalRuleLine(line)) {
+      segments.push('break');
+      index += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith('```')) {
+      const codeLines = [line.trimEnd()];
+      index += 1;
+
+      while (index < lines.length) {
+        codeLines.push(lines[index].trimEnd());
+        const closesFence = lines[index].trim().startsWith('```');
+        index += 1;
+        if (closesFence) break;
+      }
+
+      segments.push({ markdown: codeLines.join('\n') });
+      continue;
+    }
+
+    if (trimmed.startsWith('>')) {
+      const quoteLines: string[] = [];
+
+      while (index < lines.length && lines[index].trim().startsWith('>')) {
+        quoteLines.push(lines[index].trimEnd());
+        index += 1;
+      }
+
+      for (const chunk of splitStoryText(quoteLines.join('\n'), 180)) {
+        segments.push({ markdown: chunk });
+      }
+      continue;
+    }
+
+    const paragraphLines: string[] = [];
+
+    while (
+      index < lines.length &&
+      lines[index].trim().length > 0 &&
+      !isHorizontalRuleLine(lines[index]) &&
+      !lines[index].trim().startsWith('```') &&
+      !lines[index].trim().startsWith('>') &&
+      getHeadingText(lines[index])?.depth !== 1
+    ) {
+      paragraphLines.push(lines[index].trim());
+      index += 1;
+    }
+
+    for (const chunk of splitStoryText(paragraphLines.join(' '), 180)) {
+      segments.push({ markdown: chunk });
+    }
+  }
+
+  return { title, segments };
+}
+
+function getStoryCardLimits(preset: PlatformPreset): { characterLimit: number; targetLineLimit: number; maxLineLimit: number } {
+  const limits = getMarkdownFitLimits(preset);
+
+  return {
+    characterLimit: Math.min(limits.characterLimit, 420),
+    targetLineLimit: preset.id === 'twitter' ? 4 : 5,
+    maxLineLimit: Math.min(limits.lineLimit, preset.id === 'twitter' ? 7 : 8),
+  };
+}
+
+function buildStoryCardMarkdown(title: string, segments: StorySegment[], includeTitle: boolean): string {
+  return [includeTitle ? `# ${shortenPlainText(title, 90)}` : '', ...segments.map((segment) => segment.markdown)]
+    .filter(Boolean)
+    .join('\n\n')
+    .trim();
+}
+
+function storyCandidateFits(
+  title: string,
+  segments: StorySegment[],
+  includeTitle: boolean,
+  characterLimit: number,
+  lineLimit: number,
+): boolean {
+  const stats = getMarkdownStats(buildStoryCardMarkdown(title, segments, includeTitle));
+
+  return stats.characterCount <= characterLimit && stats.nonEmptyLineCount <= lineLimit;
+}
+
+function createStoryCaptions(title: string, cards: CardDeckCard[], activePresetId: PresetId): CardDeckCaption[] {
+  const totalText = `共 ${cards.length} 张卡`;
+  const firstLine = summarizeCard(cards[0]);
+  const lastLine = summarizeCard(cards[cards.length - 1]);
+  const captions: CardDeckCaption[] = [
+    {
+      presetId: 'twitter',
+      label: 'Twitter/X thread',
+      text: trimCaption(`《${title}》\n\n${totalText}，一段适合慢慢翻完的短篇故事。\n\n开场：${firstLine}\n收束：${lastLine}`),
+    },
+    {
+      presetId: 'xiaohongshu',
+      label: 'Xiaohongshu caption',
+      text: trimCaption(`《${title}》\n\n${totalText}。把这一段告别拆成连载卡片，适合一张张读完。\n\n开场：${firstLine}`),
+    },
+    {
+      presetId: 'launch',
+      label: 'GitHub/Launch caption',
+      text: trimCaption(`《${title}》\n\n${totalText}。Story deck for a serialized short narrative.\n\nOpening: ${firstLine}`),
+    },
+  ];
+
+  return captions.sort((a, b) => (a.presetId === activePresetId ? -1 : b.presetId === activePresetId ? 1 : 0));
+}
+
+function createStoryDeck(markdown: string, preset: PlatformPreset, options: CardDeckSplitOptions): CardDeckSplitResult {
+  const parsed = parseStorySegments(markdown);
+  const sourceTitle = parsed.title || titleFromBlocks(parseSourceBlocks(markdown).blocks);
+  const limits = getStoryCardLimits(preset);
+  const rawCards: Omit<CardDeckCard, 'id' | 'index'>[] = [];
+  let currentSegments: StorySegment[] = [];
+
+  const flushCard = () => {
+    if (currentSegments.length === 0) {
+      return;
+    }
+
+    const includeTitle = rawCards.length === 0;
+    rawCards.push({
+      title: sourceTitle,
+      markdown: buildStoryCardMarkdown(sourceTitle, currentSegments, includeTitle),
+      note: `Story card for ${preset.label}.`,
+    });
+    currentSegments = [];
+  };
+
+  for (const segment of parsed.segments) {
+    if (segment === 'break') {
+      flushCard();
+      continue;
+    }
+
+    const candidateSegments = [...currentSegments, segment];
+    const includeTitle = rawCards.length === 0;
+    const targetFits = storyCandidateFits(
+      sourceTitle,
+      candidateSegments,
+      includeTitle,
+      limits.characterLimit,
+      limits.targetLineLimit,
+    );
+    const maxFits = storyCandidateFits(
+      sourceTitle,
+      candidateSegments,
+      includeTitle,
+      limits.characterLimit,
+      limits.maxLineLimit,
+    );
+
+    if (currentSegments.length === 0 || targetFits || (maxFits && getMarkdownStats(segment.markdown).nonEmptyLineCount > 1)) {
+      currentSegments = candidateSegments;
+    } else {
+      flushCard();
+      currentSegments = [segment];
+    }
+  }
+
+  flushCard();
+
+  const maxCards = options.maxCards ?? Number.POSITIVE_INFINITY;
+  const cards = rawCards.slice(0, maxCards).map((card, index) => ({
+    ...card,
+    id: `${deckIdFromTitle(sourceTitle)}-${String(index + 1).padStart(2, '0')}`,
+    index,
+  }));
+  const deckNotes = ['Story deck split with short narrative pacing.'];
+
+  if (options.maxCards && rawCards.length > options.maxCards) {
+    addUnique(deckNotes, `deck capped at ${options.maxCards} cards`);
+  }
+
+  if (cards.length === 0) {
+    return {
+      deck: null,
+      note: 'No card-sized content was found in this Markdown.',
+    };
+  }
+
+  const captions = createStoryCaptions(sourceTitle, cards, preset.id);
+  const note = `Story deck created with ${cards.length} cards for ${preset.label}.`;
+
+  return {
+    deck: {
+      id: deckIdFromTitle(sourceTitle),
+      title: sourceTitle,
+      presetId: preset.id,
+      cards,
+      captions,
+      captionText: captions[0]?.text ?? '',
+      note,
+      notes: deckNotes,
+    },
+    note,
+  };
+}
+
 function createCaptions(title: string, cards: CardDeckCard[], activePresetId: PresetId, notes: string[]): CardDeckCaption[] {
   const summaries = cards.slice(0, 6).map((card) => `${card.index + 1}. ${card.title}: ${summarizeCard(card)}`);
   const bulletSummaries = cards.slice(0, 6).map((card) => `- ${card.title}: ${summarizeCard(card)}`);
@@ -506,6 +786,10 @@ export function splitMarkdownIntoCardDeck(
       deck: null,
       note: 'Paste Markdown before splitting it into a deck.',
     };
+  }
+
+  if (detectNarrativeMarkdown(markdown)) {
+    return createStoryDeck(markdown, preset, options);
   }
 
   const parsed = parseSourceBlocks(markdown);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getMarkdownFitLimits, getMarkdownStats, platformPresets } from './cardOptions';
-import { splitMarkdownIntoCardDeck } from './cardDeck';
+import { detectNarrativeMarkdown, splitMarkdownIntoCardDeck } from './cardDeck';
 
 const longEssay = [
   '# Long-form launch notes',
@@ -18,6 +18,134 @@ const longEssay = [
   '## Rollout',
   '',
   'Creators can split the draft, preview card by card, copy the generated caption, and export the deck. The source remains editable so the workflow is reversible.',
+].join('\n');
+
+const narrativeStory = [
+  '# 完美的分手',
+  '',
+  '雨停在晚上九点。',
+  '',
+  '林夏把钥匙放在玄关的瓷盘里，声音很轻，像怕吵醒一段已经睡着的关系。',
+  '',
+  '陈屿坐在餐桌旁，面前摆着两杯温水。',
+  '',
+  '“你还是来了。”他说。',
+  '',
+  '“我答应过今天把话说完。”',
+  '',
+  '> 她后来想，真正的告别不是摔门，是两个人都开始使用礼貌。',
+  '',
+  '他们之间隔着一张旧餐桌，也隔着七年的春夏秋冬。',
+  '',
+  '第一年，他们在凌晨的便利店分一只关东煮。',
+  '',
+  '第二年，他们搬进这间小屋，买了不配套的椅子。',
+  '',
+  '第三年，他们开始为谁洗碗沉默。',
+  '',
+  '第四年，他们学会把委屈咽下去。',
+  '',
+  '第五年，陈屿的项目越来越忙。',
+  '',
+  '第六年，林夏的画展越来越远。',
+  '',
+  '第七年，他们终于在同一个屋檐下变成了客人。',
+  '',
+  '---',
+  '',
+  '“你想好了吗？”陈屿问。',
+  '',
+  '林夏点头。',
+  '',
+  '“不是因为那次吵架。”她说，“也不是因为谁错得更多。”',
+  '',
+  '窗外有车灯扫过墙面，像一条短暂的河。',
+  '',
+  '陈屿低头看杯子。',
+  '',
+  '“那是因为什么？”',
+  '',
+  '“因为我们已经很努力地不伤害对方了。”',
+  '',
+  '这句话落下后，屋子安静得过分。',
+  '',
+  '他们都知道，努力不伤害，有时就是爱已经转身。',
+  '',
+  '> 陈屿第一次发现，原来体面也会疼。',
+  '',
+  '他笑了一下，没有成功。',
+  '',
+  '“我以为只要不提分开，就还能继续。”',
+  '',
+  '“我也这么以为。”林夏说。',
+  '',
+  '---',
+  '',
+  '他们开始分东西。',
+  '',
+  '书架上的小说归林夏。',
+  '',
+  '咖啡机归陈屿。',
+  '',
+  '那盆快死的薄荷没人要。',
+  '',
+  '“它一直是你浇的。”陈屿说。',
+  '',
+  '“但每次都是你把它搬到有太阳的地方。”',
+  '',
+  '于是薄荷被留在窗台，像最后一个不肯签字的证人。',
+  '',
+  '林夏把围巾叠进纸袋。',
+  '',
+  '陈屿把她落下的画册递过去。',
+  '',
+  '“这本你拿走吧。”',
+  '',
+  '“你不是说看不懂吗？”',
+  '',
+  '“后来懂了一点。”',
+  '',
+  '> 有些爱来得太慢，只能赶上离别。',
+  '',
+  '林夏接过画册，指尖碰到他的手。',
+  '',
+  '两个人都没有躲。',
+  '',
+  '---',
+  '',
+  '凌晨一点，门口只剩下一个行李箱。',
+  '',
+  '陈屿说：“我送你下楼。”',
+  '',
+  '“不用。”',
+  '',
+  '“那我看着你走。”',
+  '',
+  '林夏拉开门，又停住。',
+  '',
+  '“陈屿。”',
+  '',
+  '“嗯？”',
+  '',
+  '“以后别总把晚饭拖到十点。”',
+  '',
+  '他点头。',
+  '',
+  '“你也是，画完画记得关窗。”',
+  '',
+  '她笑了。',
+  '',
+  '这大概就是他们能给彼此的最后温柔。',
+  '',
+  '没有拥抱，没有眼泪，没有挽留。',
+  '',
+  '只有门轻轻合上。',
+  '',
+  '楼道的声控灯亮了一次，又暗下去。',
+  '',
+  '陈屿站在屋里，忽然听见雨重新落下。',
+  '',
+  '> 分手并不完美，完美的是他们终于没有把爱变成恨。',
 ].join('\n');
 
 describe('splitMarkdownIntoCardDeck', () => {
@@ -95,5 +223,28 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(launch).toContain('Highlights');
     expect(launch).toContain('Repo/update');
     expect(new Set([twitter, xiaohongshu, launch]).size).toBe(3);
+  });
+
+  it('uses story deck splitting for Chinese narrative markdown', () => {
+    const result = splitMarkdownIntoCardDeck(narrativeStory, platformPresets[0]);
+    const deck = result.deck;
+
+    expect(detectNarrativeMarkdown(narrativeStory)).toBe(true);
+    expect(deck).not.toBeNull();
+    expect(deck?.cards.length).toBeGreaterThanOrEqual(16);
+
+    const firstCardStats = getMarkdownStats(deck?.cards[0].markdown ?? '');
+    expect(firstCardStats.nonEmptyLineCount).toBeLessThanOrEqual(7);
+    expect(firstCardStats.characterCount).toBeLessThanOrEqual(420);
+    for (const card of deck?.cards ?? []) {
+      const stats = getMarkdownStats(card.markdown);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(7);
+      expect(stats.characterCount).toBeLessThanOrEqual(420);
+    }
+    expect(deck?.cards.some((card) => card.markdown.includes('>'))).toBe(true);
+    expect(deck?.cards.some((card) => card.markdown.includes('---'))).toBe(false);
+    expect(deck?.note).toContain('Story deck');
+    expect(deck?.cards.every((card) => card.note.includes('Story card'))).toBe(true);
+    expect(deck?.captionText).toMatch(new RegExp(`共\\s*${deck?.cards.length}\\s*张卡`));
   });
 });
