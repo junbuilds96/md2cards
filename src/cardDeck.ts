@@ -302,6 +302,7 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       lines[index].trim().length > 0 &&
       !getHeadingText(lines[index]) &&
       !isListLine(lines[index]) &&
+      !isMarkdownQuoteLine(lines[index]) &&
       !isMarkdownCodeFenceLine(lines[index]) &&
       !isMarkdownTableStart(lines, index)
     ) {

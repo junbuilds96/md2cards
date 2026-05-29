@@ -667,6 +667,27 @@ More detail belongs in the caption.`;
     expect(result.markdown).not.toContain('语气。 > 第二行');
   });
 
+  it('keeps tightly pasted paragraph-to-quote transitions as blockquotes', () => {
+    const markdown = [
+      '# 客户原话',
+      '',
+      'Context: this social post was pasted without a blank line before the quote.',
+      '> 第一行：中文反馈要保留原始语气。',
+      '> 第二行：Mixed English, **emphasis**, and [links](https://example.com) should stay quoted.',
+      'Action: summarize the next step outside the quote.',
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[1]);
+
+    expect(result.markdown).toContain(
+      [
+        '> 第一行：中文反馈要保留原始语气。',
+        '> 第二行：Mixed English, **emphasis**, and [links](https://example.com) should stay quoted.',
+      ].join('\n'),
+    );
+    expect(result.markdown).toContain('Action: summarize the next step outside the quote.');
+    expect(result.markdown).not.toContain('quote. > 第一行');
+  });
+
   it('shortens long paragraphs and keeps the fitted result inside preset limits', () => {
     const markdown = `# Big update\n\n${'This release note has too much background detail for a social card. '.repeat(35)}`;
     const result = fitMarkdownToPreset(markdown, platformPresets[2]);

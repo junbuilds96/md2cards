@@ -1469,6 +1469,7 @@ function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { bl
       lines[index].trim().length > 0 &&
       !/^#{1,6}\s+\S/.test(lines[index].trim()) &&
       !isMarkdownListLine(lines[index]) &&
+      !isMarkdownQuoteLine(lines[index]) &&
       !isMarkdownCodeFenceLine(lines[index]) &&
       !isMarkdownTableStart(lines, index)
     ) {

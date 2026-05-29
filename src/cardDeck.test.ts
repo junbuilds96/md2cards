@@ -388,6 +388,31 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(joinedCards).not.toContain('卡片。 > 第二行');
   });
 
+  it('keeps tightly pasted paragraph-to-quote transitions quoted in deck cards', () => {
+    const markdown = [
+      '# 客户反馈复盘',
+      '',
+      '## 原话摘录',
+      '',
+      'Context: pasted social drafts do not always include a blank line before quoted feedback.',
+      '> 第一行：我知道这个工具能把 Markdown 变成卡片。',
+      '> 第二行：但我更想确认英文 links, **emphasis**, and context will not be flattened.',
+      'Action: keep the quote shape, then summarize the next step.',
+    ].join('\n');
+
+    const result = splitMarkdownIntoCardDeck(markdown, platformPresets[1]);
+    const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+    expect(joinedCards).toContain(
+      [
+        '> 第一行：我知道这个工具能把 Markdown 变成卡片。',
+        '> 第二行：但我更想确认英文 links, **emphasis**, and context will not be flattened.',
+      ].join('\n'),
+    );
+    expect(joinedCards).toContain('Action: keep the quote shape, then summarize the next step.');
+    expect(joinedCards).not.toContain('feedback. > 第一行');
+  });
+
   it('creates different deterministic captions for each platform', () => {
     const twitter = splitMarkdownIntoCardDeck(longEssay, platformPresets[0]).deck?.captionText ?? '';
     const xiaohongshu = splitMarkdownIntoCardDeck(longEssay, platformPresets[1]).deck?.captionText ?? '';
