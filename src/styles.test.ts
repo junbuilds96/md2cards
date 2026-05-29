@@ -191,6 +191,34 @@ describe('social card CSS', () => {
     expect(richRule).not.toContain('--card-body');
   });
 
+  it('defines mood classes that tune exported card tone through distinct variables', () => {
+    const cardRule = getRule('.social-card');
+    const h1Rule = getRule('.markdown-card-body h1');
+    const calmRule = getRule('.social-card.mood-calm');
+    const punchyRule = getRule('.social-card.mood-punchy');
+    const premiumRule = getRule('.social-card.mood-premium');
+
+    expect(cardRule).toContain('var(--card-mood-overlay-image)');
+    expect(cardRule).toContain('filter: saturate(var(--card-mood-saturate)) contrast(var(--card-mood-contrast))');
+    expect(cardRule).toContain('--card-mood-surface-mix: 76%');
+    expect(cardRule).toContain('--card-heading-text-shadow: var(--card-mood-heading-shadow)');
+    expect(cardRule).toContain('var(--card-mood-surface-mix)');
+    expect(h1Rule).toContain('text-shadow: var(--card-heading-text-shadow)');
+    expect(calmRule).toContain('--card-mood-contrast: 0.98');
+    expect(calmRule).toContain('--card-mood-saturate: 0.92');
+    expect(calmRule).toContain('--card-mood-surface-mix: 72%');
+    expect(punchyRule).toContain('--card-mood-contrast: 1.08');
+    expect(punchyRule).toContain('--card-mood-saturate: 1.14');
+    expect(punchyRule).toContain('--card-border-width: 2px');
+    expect(premiumRule).toContain('--card-mood-contrast: 1.03');
+    expect(premiumRule).toContain('--card-mood-saturate: 0.98');
+    expect(premiumRule).toContain('--card-surface-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62)');
+    expect(new Set([calmRule, punchyRule, premiumRule]).size).toBe(3);
+    expect(calmRule).not.toMatch(/(^|\n)\s*width:/);
+    expect(punchyRule).not.toMatch(/(^|\n)\s*height:/);
+    expect(premiumRule).not.toMatch(/(^|\n)\s*aspect-ratio:/);
+  });
+
   it('defines corner radius classes without changing export sizing rules', () => {
     const cardRule = getRule('.social-card');
     const sharpRule = getRule('.social-card.radius-sharp');
@@ -241,7 +269,9 @@ describe('social card CSS', () => {
     expect(cardRule).toContain('--card-surface-bg: var(--code-bg)');
     expect(cardRule).toContain('--card-surface-border: var(--table-rule)');
     expect(cardRule).toContain('--card-surface-soft-bg: var(--card-surface-bg)');
-    expect(cardRule).toContain('--card-surface-strong-bg: color-mix(in srgb, var(--card-surface-bg) 76%, var(--card-bg))');
+    expect(cardRule).toContain(
+      '--card-surface-strong-bg: color-mix(in srgb, var(--card-surface-bg) var(--card-mood-surface-mix), var(--card-bg))',
+    );
     expect(cardRule).toContain('--card-table-header-bg: linear-gradient(180deg, var(--card-surface-shine), var(--code-bg))');
     expect(cardRule).toContain('--card-code-block-font-size: clamp(12px, 1.45cqw, 24px)');
     expect(cardRule).toContain('--card-pre-max-height: min(42cqh, 15lh)');
@@ -379,5 +409,6 @@ describe('social card CSS', () => {
     expect(styles).toContain('grid-template-rows: auto minmax(320px, 54dvh) auto');
     expect(styles).toContain('.github-star-link,\n  .export-actions button');
     expect(styles).toContain('.corner-radius-control');
+    expect(styles).toContain('.mood-control');
   });
 });

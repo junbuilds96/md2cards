@@ -18,6 +18,8 @@ export type CardCornerRadiusId = 'sharp' | 'subtle' | 'rounded';
 
 export type CardTextureId = 'clean' | 'subtle' | 'rich';
 
+export type CardMoodId = 'calm' | 'punchy' | 'premium';
+
 export type PlatformPreset = {
   id: PresetId;
   label: string;
@@ -109,6 +111,13 @@ export type CardTextureOption = {
   className: string;
 };
 
+export type CardMoodOption = {
+  id: CardMoodId;
+  label: string;
+  description: string;
+  className: string;
+};
+
 export type TemplateId = 'x-launch' | 'xiaohongshu-insight' | 'github-release';
 
 export type MarkdownTemplate = {
@@ -142,6 +151,7 @@ export type CardAppearanceSettings = {
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
   cardTextureId: CardTextureId;
+  cardMoodId: CardMoodId;
   showCardLabels: boolean;
 };
 
@@ -310,6 +320,8 @@ export const defaultCardBackgroundIntensityId: CardBackgroundIntensityId = 'bala
 export const defaultCardCornerRadiusId: CardCornerRadiusId = 'sharp';
 
 export const defaultCardTextureId: CardTextureId = 'subtle';
+
+export const defaultCardMoodId: CardMoodId = 'calm';
 
 export const exportScaleOptions: ExportScaleOption[] = [
   {
@@ -489,6 +501,27 @@ export const cardTextureOptions: CardTextureOption[] = [
   },
 ];
 
+export const cardMoodOptions: CardMoodOption[] = [
+  {
+    id: 'calm',
+    label: 'Calm',
+    description: 'Softer contrast, quieter glow, and relaxed heading treatment.',
+    className: 'mood-calm',
+  },
+  {
+    id: 'punchy',
+    label: 'Punchy',
+    description: 'Stronger contrast, brighter surfaces, and a sharper feed-ready headline.',
+    className: 'mood-punchy',
+  },
+  {
+    id: 'premium',
+    label: 'Premium',
+    description: 'Deeper shadow, refined highlight, and polished editorial emphasis.',
+    className: 'mood-premium',
+  },
+];
+
 export const markdownTemplates: MarkdownTemplate[] = [
   {
     id: 'x-launch',
@@ -565,6 +598,7 @@ export const recipePresets: RecipePreset[] = [
     cardBackgroundIntensityId: 'balanced',
     cardCornerRadiusId: 'subtle',
     cardTextureId: 'subtle',
+    cardMoodId: 'calm',
     showCardLabels: true,
     markdown: `# Launch faster with Markdown cards
 
@@ -587,6 +621,7 @@ Turn a product update into a share-ready visual in one pass.
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'subtle',
     cardTextureId: 'rich',
+    cardMoodId: 'punchy',
     showCardLabels: false,
     markdown: `# Before -> after: onboarding cleanup
 
@@ -611,6 +646,7 @@ Ship the contrast, not the changelog.`,
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
     cardTextureId: 'clean',
+    cardMoodId: 'calm',
     showCardLabels: false,
     markdown: `# The 4-part launch card
 
@@ -634,6 +670,7 @@ Ship the contrast, not the changelog.`,
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
     cardTextureId: 'rich',
+    cardMoodId: 'punchy',
     showCardLabels: true,
     markdown: `# Incident resolved: export queue
 
@@ -661,6 +698,7 @@ Ship the contrast, not the changelog.`,
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
     cardTextureId: 'rich',
+    cardMoodId: 'punchy',
     showCardLabels: true,
     markdown: `# v0.4.0 Changelog
 
@@ -689,6 +727,7 @@ Ship the contrast, not the changelog.`,
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'subtle',
     cardTextureId: 'subtle',
+    cardMoodId: 'calm',
     showCardLabels: false,
     markdown: `# Turn notes into a card
 
@@ -713,6 +752,7 @@ Ship the contrast, not the changelog.`,
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'rounded',
     cardTextureId: 'rich',
+    cardMoodId: 'premium',
     showCardLabels: false,
     markdown: `# The card is the hook
 
@@ -735,6 +775,7 @@ People decide whether to read the caption from the first two seconds.
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
     cardTextureId: 'clean',
+    cardMoodId: 'premium',
     showCardLabels: false,
     markdown: `# "Design tools should disappear when the idea is clear."
 
@@ -755,6 +796,7 @@ Use Markdown for structure. Use recipes for the visual rhythm.
     cardBackgroundIntensityId: 'balanced',
     cardCornerRadiusId: 'sharp',
     cardTextureId: 'subtle',
+    cardMoodId: 'punchy',
     showCardLabels: true,
     markdown: `# Export a card from Markdown
 
@@ -783,6 +825,7 @@ export const stylePacks: StylePack[] = [
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'subtle',
     cardTextureId: 'rich',
+    cardMoodId: 'punchy',
     showCardLabels: true,
   },
   {
@@ -797,6 +840,7 @@ export const stylePacks: StylePack[] = [
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
     cardTextureId: 'subtle',
+    cardMoodId: 'premium',
     showCardLabels: false,
   },
   {
@@ -811,6 +855,7 @@ export const stylePacks: StylePack[] = [
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
     cardTextureId: 'rich',
+    cardMoodId: 'punchy',
     showCardLabels: true,
   },
   {
@@ -825,6 +870,7 @@ export const stylePacks: StylePack[] = [
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
     cardTextureId: 'clean',
+    cardMoodId: 'premium',
     showCardLabels: false,
   },
   {
@@ -839,6 +885,7 @@ export const stylePacks: StylePack[] = [
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'sharp',
     cardTextureId: 'clean',
+    cardMoodId: 'calm',
     showCardLabels: true,
   },
 ];
@@ -875,6 +922,7 @@ export function applyStylePackAppearance<T extends object>(
     cardBackgroundIntensityId: stylePack.cardBackgroundIntensityId,
     cardCornerRadiusId: stylePack.cardCornerRadiusId,
     cardTextureId: stylePack.cardTextureId,
+    cardMoodId: stylePack.cardMoodId,
     showCardLabels: stylePack.showCardLabels,
   };
 }
@@ -1331,6 +1379,10 @@ export function getCardCornerRadiusOption(cardCornerRadiusId: CardCornerRadiusId
 
 export function getCardTextureOption(cardTextureId: CardTextureId): CardTextureOption {
   return cardTextureOptions.find((option) => option.id === cardTextureId) ?? cardTextureOptions[1];
+}
+
+export function getCardMoodOption(cardMoodId: CardMoodId): CardMoodOption {
+  return cardMoodOptions.find((option) => option.id === cardMoodId) ?? cardMoodOptions[0];
 }
 
 export function getExportPixelSize(

@@ -26,6 +26,7 @@ describe('card config recipes', () => {
       cardBackgroundIntensityId: 'vivid',
       cardCornerRadiusId: 'rounded',
       cardTextureId: 'rich',
+      cardMoodId: 'premium',
       showCardLabels: false,
     });
 
@@ -43,6 +44,7 @@ describe('card config recipes', () => {
       cardBackgroundIntensityId: 'vivid',
       cardCornerRadiusId: 'rounded',
       cardTextureId: 'rich',
+      cardMoodId: 'premium',
       showCardLabels: false,
     });
     expect(json.endsWith('\n')).toBe(true);
@@ -64,6 +66,7 @@ describe('card config recipes', () => {
         cardBackgroundIntensityId: 'soft',
         cardCornerRadiusId: 'subtle',
         cardTextureId: 'clean',
+        cardMoodId: 'punchy',
         showCardLabels: true,
       }),
     );
@@ -84,6 +87,7 @@ describe('card config recipes', () => {
         cardBackgroundIntensityId: 'soft',
         cardCornerRadiusId: 'subtle',
         cardTextureId: 'clean',
+        cardMoodId: 'punchy',
         showCardLabels: true,
       },
     });
@@ -112,6 +116,7 @@ describe('card config recipes', () => {
         cardBackgroundIntensityId: 'balanced',
         cardCornerRadiusId: 'sharp',
         cardTextureId: 'subtle',
+        cardMoodId: 'calm',
       },
     });
   });
@@ -150,6 +155,7 @@ describe('card config recipes', () => {
       cardBackgroundIntensityId: 'balanced',
       cardCornerRadiusId: 'sharp',
       cardTextureId: 'subtle',
+      cardMoodId: 'calm',
       showCardLabels: true,
     };
 
@@ -192,6 +198,10 @@ describe('card config recipes', () => {
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardTextureId: 'missing' }))).toEqual({
       valid: false,
       message: 'This recipe uses an unknown texture setting.',
+    });
+    expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardMoodId: 'missing' }))).toEqual({
+      valid: false,
+      message: 'This recipe uses an unknown mood setting.',
     });
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, showCardLabels: 'yes' }))).toEqual({
       valid: false,

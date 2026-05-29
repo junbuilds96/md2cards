@@ -4,6 +4,7 @@ import {
   cardBackgroundIntensityOptions,
   cardCornerRadiusOptions,
   cardDensityOptions,
+  cardMoodOptions,
   cardTextureOptions,
   cardTypographyVoiceOptions,
   cardTypographyScaleOptions,
@@ -11,6 +12,7 @@ import {
   defaultCardBackgroundIntensityId,
   defaultCardCornerRadiusId,
   defaultCardDensityId,
+  defaultCardMoodId,
   defaultCardTextureId,
   defaultCardTypographyVoiceId,
   defaultCardTypographyScaleId,
@@ -21,6 +23,7 @@ import {
   type CardBackgroundIntensityId,
   type CardCornerRadiusId,
   type CardDensityId,
+  type CardMoodId,
   type CardTextureId,
   type CardTypographyVoiceId,
   type CardTypographyScaleId,
@@ -47,6 +50,7 @@ export type CardConfig = {
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
   cardTextureId: CardTextureId;
+  cardMoodId: CardMoodId;
   showCardLabels: boolean;
 };
 
@@ -62,6 +66,7 @@ export type CardConfigDraft = {
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
   cardTextureId: CardTextureId;
+  cardMoodId: CardMoodId;
   showCardLabels: boolean;
 };
 
@@ -94,6 +99,7 @@ const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id))
 const validCardBackgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
 const validCardCornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
 const validCardTextureIds = new Set(cardTextureOptions.map((option) => option.id));
+const validCardMoodIds = new Set(cardMoodOptions.map((option) => option.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -148,6 +154,7 @@ export function createCardConfig(draft: CardConfigDraft): CardConfig {
       ? draft.cardCornerRadiusId
       : defaultCardCornerRadiusId,
     cardTextureId: validCardTextureIds.has(draft.cardTextureId) ? draft.cardTextureId : defaultCardTextureId,
+    cardMoodId: validCardMoodIds.has(draft.cardMoodId) ? draft.cardMoodId : defaultCardMoodId,
     showCardLabels: draft.showCardLabels,
   };
 }
@@ -297,6 +304,15 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
     };
   }
 
+  const cardMoodId =
+    parsed.cardMoodId === undefined ? defaultCardMoodId : (parsed.cardMoodId as CardMoodId);
+  if (!validCardMoodIds.has(cardMoodId)) {
+    return {
+      valid: false,
+      message: 'This recipe uses an unknown mood setting.',
+    };
+  }
+
   if (typeof parsed.showCardLabels !== 'boolean') {
     return {
       valid: false,
@@ -320,6 +336,7 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
       cardBackgroundIntensityId,
       cardCornerRadiusId,
       cardTextureId,
+      cardMoodId,
       showCardLabels: parsed.showCardLabels,
     },
   };
