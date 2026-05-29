@@ -1220,6 +1220,10 @@ function isMarkdownListContinuationLine(line: string): boolean {
   );
 }
 
+function isMarkdownQuoteLine(line: string): boolean {
+  return line.trim().startsWith('>');
+}
+
 function compactListBlock(items: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
   const changes: string[] = [];
   const keptItems = items.slice(0, limits.bulletLimit).map((item) => {
@@ -1283,6 +1287,34 @@ function compactCodeBlock(lines: string[], limits: MarkdownFitLimits): { block: 
   return {
     block: [firstLine, ...codeLines, lastLine].join('\n'),
     changes: [`kept the first ${limits.codeLineLimit} code lines`],
+  };
+}
+
+function compactQuoteBlock(lines: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
+  const changes: string[] = [];
+  const maxLines = Math.max(1, limits.lineLimit - 1);
+  const keptLines = lines.slice(0, maxLines).map((line) => {
+    const quoteMatch = line.match(/^(\s*>\s?)(.*)$/);
+
+    if (!quoteMatch) {
+      return line;
+    }
+
+    const shortened = shortenText(quoteMatch[2], limits.paragraphCharacterLimit);
+    if (shortened.changed) {
+      addChange(changes, 'shortened long quotes');
+    }
+
+    return `${quoteMatch[1]}${shortened.text}`;
+  });
+
+  if (lines.length > keptLines.length) {
+    addChange(changes, `capped quotes at ${maxLines} lines`);
+  }
+
+  return {
+    block: keptLines.join('\n'),
+    changes,
   };
 }
 
@@ -1396,6 +1428,20 @@ function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { bl
       }
 
       const compacted = compactListBlock(listItems, limits);
+      blocks.push(compacted.block);
+      compacted.changes.forEach((change) => addChange(changes, change));
+      continue;
+    }
+
+    if (isMarkdownQuoteLine(line)) {
+      const quoteLines: string[] = [];
+
+      while (index < lines.length && isMarkdownQuoteLine(lines[index])) {
+        quoteLines.push(lines[index]);
+        index += 1;
+      }
+
+      const compacted = compactQuoteBlock(quoteLines, limits);
       blocks.push(compacted.block);
       compacted.changes.forEach((change) => addChange(changes, change));
       continue;

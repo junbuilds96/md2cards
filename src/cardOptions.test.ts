@@ -645,6 +645,28 @@ More detail belongs in the caption.`;
     expect(result.note).toContain('kept the first 4 code lines');
   });
 
+  it('keeps multi-line blockquotes as quote lines when fitting pasted Markdown', () => {
+    const markdown = [
+      '# Quote check',
+      '',
+      '> 第一行：中文反馈要保留原始语气。',
+      '> 第二行：Mixed English, **emphasis**, and [links](https://example.com) should stay quoted.',
+      '> 第三行：不要压平成普通段落。',
+      '',
+      'Follow-up belongs outside the quote.',
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[1]);
+
+    expect(result.markdown).toContain(
+      [
+        '> 第一行：中文反馈要保留原始语气。',
+        '> 第二行：Mixed English, **emphasis**, and [links](https://example.com) should stay quoted.',
+        '> 第三行：不要压平成普通段落。',
+      ].join('\n'),
+    );
+    expect(result.markdown).not.toContain('语气。 > 第二行');
+  });
+
   it('shortens long paragraphs and keeps the fitted result inside preset limits', () => {
     const markdown = `# Big update\n\n${'This release note has too much background detail for a social card. '.repeat(35)}`;
     const result = fitMarkdownToPreset(markdown, platformPresets[2]);

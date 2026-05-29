@@ -54,7 +54,7 @@ type SourceBlock =
       markdown: string;
     }
   | {
-      type: 'paragraph' | 'code' | 'table';
+      type: 'paragraph' | 'quote' | 'code' | 'table';
       markdown: string;
     }
   | {
@@ -146,6 +146,10 @@ function isHorizontalRuleLine(line: string): boolean {
   return /^-{3,}\s*$/.test(line.trim());
 }
 
+function isMarkdownQuoteLine(line: string): boolean {
+  return line.trim().startsWith('>');
+}
+
 export function detectNarrativeMarkdown(markdown: string): boolean {
   const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
   const nonEmptyLines = lines.map((line) => line.trim()).filter(Boolean);
@@ -159,7 +163,7 @@ export function detectNarrativeMarkdown(markdown: string): boolean {
   const headingCount = nonEmptyLines.filter((line) => /^#{1,6}\s+/.test(line)).length;
   const h2H3Count = nonEmptyLines.filter((line) => /^#{2,3}\s+/.test(line)).length;
   const listLineCount = nonEmptyLines.filter(isListLine).length;
-  const quoteLineCount = nonEmptyLines.filter((line) => /^>\s*/.test(line)).length;
+  const quoteLineCount = nonEmptyLines.filter(isMarkdownQuoteLine).length;
   const sceneBreakCount = nonEmptyLines.filter(isHorizontalRuleLine).length;
   const dialogueLineCount = nonEmptyLines.filter((line) => /[“”"「」『』]/.test(line)).length;
   const shortLineCount = nonEmptyLines.filter((line) => stripMarkdownText(line).length <= 56).length;
@@ -263,6 +267,18 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       }
 
       blocks.push({ type: 'list', items });
+      continue;
+    }
+
+    if (isMarkdownQuoteLine(line)) {
+      const quoteLines: string[] = [];
+
+      while (index < lines.length && isMarkdownQuoteLine(lines[index])) {
+        quoteLines.push(lines[index].trimEnd());
+        index += 1;
+      }
+
+      blocks.push({ type: 'quote', markdown: quoteLines.join('\n') });
       continue;
     }
 
@@ -429,6 +445,20 @@ function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] 
     return splitParagraphIntoSegments(block.markdown, limits.paragraphCharacterLimit).map((chunk) => ({
       markdown: chunk,
     }));
+  }
+
+  if (block.type === 'quote') {
+    const quoteLines = block.markdown.split('\n');
+    const maxQuoteLines = Math.max(1, limits.lineLimit - 1);
+    const chunks: CardSegment[] = [];
+
+    for (let index = 0; index < quoteLines.length; index += maxQuoteLines) {
+      chunks.push({
+        markdown: quoteLines.slice(index, index + maxQuoteLines).join('\n'),
+      });
+    }
+
+    return chunks;
   }
 
   if (block.type === 'code') {

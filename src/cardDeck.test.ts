@@ -321,6 +321,34 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(result.deck?.notes.some((note) => note.includes('code'))).toBe(true);
   });
 
+  it('preserves multi-line blockquotes in mixed-language social posts', () => {
+    const markdown = [
+      '# 客户反馈复盘',
+      '',
+      '## 原话摘录',
+      '',
+      'Before changing the onboarding copy, the quoted feedback should stay visibly quoted.',
+      '',
+      '> 第一行：我知道这个工具能把 Markdown 变成卡片。',
+      '> 第二行：但我更想确认英文 links, **emphasis**, and context will not be flattened.',
+      '> 第三行：发到小红书之前，我需要保留这段真实语气。',
+      '',
+      'Action: keep the quote shape, then summarize the next step.',
+    ].join('\n');
+
+    const result = splitMarkdownIntoCardDeck(markdown, platformPresets[1]);
+    const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+    expect(joinedCards).toContain(
+      [
+        '> 第一行：我知道这个工具能把 Markdown 变成卡片。',
+        '> 第二行：但我更想确认英文 links, **emphasis**, and context will not be flattened.',
+        '> 第三行：发到小红书之前，我需要保留这段真实语气。',
+      ].join('\n'),
+    );
+    expect(joinedCards).not.toContain('卡片。 > 第二行');
+  });
+
   it('creates different deterministic captions for each platform', () => {
     const twitter = splitMarkdownIntoCardDeck(longEssay, platformPresets[0]).deck?.captionText ?? '';
     const xiaohongshu = splitMarkdownIntoCardDeck(longEssay, platformPresets[1]).deck?.captionText ?? '';
