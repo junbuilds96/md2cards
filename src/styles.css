@@ -1813,6 +1813,7 @@ textarea:focus {
 }
 
 .markdown-card-body > * {
+  flex-shrink: 0;
   max-width: 100%;
 }
 

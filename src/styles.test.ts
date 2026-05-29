@@ -282,6 +282,7 @@ describe('social card CSS', () => {
 
   it('gives Markdown code, tables, lists, and quotes designed constrained surfaces', () => {
     const cardRule = getRule('.social-card');
+    const bodyChildRule = getRule('.markdown-card-body > *');
     const textRule = getRule(
       '.markdown-card-body p,\n.markdown-card-body li,\n.markdown-card-body td,\n.markdown-card-body th',
     );
@@ -320,6 +321,7 @@ describe('social card CSS', () => {
     expect(cardRule).toContain('--card-code-label-bg: color-mix(in srgb, var(--card-accent) 14%, var(--card-surface-bg))');
     expect(cardRule).toContain('--card-table-font-size: clamp(11px, 1.28cqw, 22px)');
     expect(cardRule).toContain('--card-table-max-height: 30cqh');
+    expect(bodyChildRule).toContain('flex-shrink: 0');
     expect(textRule).toContain('overflow-wrap: anywhere');
     expect(listRule).toContain('display: grid');
     expect(listRule).toContain('list-style: none');
@@ -364,9 +366,24 @@ describe('social card CSS', () => {
     expect(quoteRule).toContain('max-height: 32cqh');
     expect(quoteRule).toContain('background:');
     expect(quoteRule).toContain('overflow: hidden');
+    expect(bodyChildRule).toContain('flex-shrink: 0');
     expect(quoteAccentRule).toContain('background: linear-gradient(180deg, var(--card-accent), transparent 145%)');
     expect(quoteParagraphRule).toContain('font-size: var(--card-blockquote-font-size)');
     expect(quoteParagraphRule).toContain('font-weight: var(--card-blockquote-font-weight)');
+  });
+
+  it('prevents markdown blocks from being squeezed by the card body flex column', () => {
+    const bodyRule = getRule('.markdown-card-body');
+    const bodyChildRule = getRule('.markdown-card-body > *');
+    const quoteRule = getRule('.markdown-card-body blockquote');
+
+    expect(bodyRule).toContain('display: flex');
+    expect(bodyRule).toContain('flex-direction: column');
+    expect(bodyRule).toContain('overflow: hidden');
+    expect(bodyChildRule).toContain('flex-shrink: 0');
+    expect(bodyChildRule).toContain('max-width: 100%');
+    expect(quoteRule).toContain('padding: var(--card-blockquote-padding-block) var(--card-blockquote-padding-left)');
+    expect(quoteRule).toContain('overflow: hidden');
   });
 
   it('keeps the preview toolbar compact and grouped', () => {
