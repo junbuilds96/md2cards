@@ -3,7 +3,12 @@ import {
   isMarkdownCodeFenceClose,
   isMarkdownCodeFenceLine,
 } from './markdownCodeFences';
-import { isMarkdownTableRowLine, isMarkdownTableStart } from './markdownTables';
+import {
+  isMarkdownTableDelimiterLine,
+  isMarkdownTableRowLine,
+  isMarkdownTableStart,
+  splitMarkdownTableCells,
+} from './markdownTables';
 
 export type PresetId = 'twitter' | 'xiaohongshu' | 'launch';
 
@@ -1252,20 +1257,71 @@ function compactListBlock(items: string[], limits: MarkdownFitLimits): { block: 
   };
 }
 
+function simplifyTableCellLinks(cell: string): string {
+  return cell
+    .replace(/!\[([^\]]*)\]\((?:\\.|[^)])*\)/g, '$1')
+    .replace(/\[([^\]]+)\]\((?:\\.|[^)])*\)/g, '$1');
+}
+
+function getTableCellCharacterLimit(lines: string[], limits: MarkdownFitLimits): number {
+  const bodyLines = lines.filter((line) => !isMarkdownTableDelimiterLine(line));
+  const columnCount = Math.max(1, ...bodyLines.map((line) => splitMarkdownTableCells(line).length));
+  const cellCount = Math.max(1, bodyLines.length * columnCount);
+  const sharedBudget = Math.floor((limits.characterLimit * 0.72) / cellCount) - 4;
+
+  return Math.max(28, Math.min(96, limits.paragraphCharacterLimit, sharedBudget));
+}
+
+function compactTableLine(line: string, cellCharacterLimit: number): { line: string; changed: boolean } {
+  if (isMarkdownTableDelimiterLine(line)) {
+    return { line, changed: false };
+  }
+
+  const cells = splitMarkdownTableCells(line);
+
+  if (cells.length < 2) {
+    return { line, changed: false };
+  }
+
+  let changed = false;
+  const compactedCells = cells.map((cell) => {
+    const normalizedCell = cell.replace(/\s+/g, ' ').trim();
+    const linkSimplifiedCell =
+      normalizedCell.length > cellCharacterLimit ? simplifyTableCellLinks(normalizedCell) : normalizedCell;
+    const shortened = shortenText(linkSimplifiedCell, cellCharacterLimit);
+
+    if (shortened.changed || linkSimplifiedCell !== normalizedCell || normalizedCell !== cell) {
+      changed = true;
+    }
+
+    return shortened.text;
+  });
+
+  return {
+    line: changed ? `| ${compactedCells.join(' | ')} |` : line,
+    changed,
+  };
+}
+
 function compactTableBlock(lines: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
   const requiredHeaderRows = 2;
   const maxRows = requiredHeaderRows + limits.tableDataRowLimit;
+  const keptLines = lines.slice(0, maxRows);
+  const cellCharacterLimit = getTableCellCharacterLimit(keptLines, limits);
+  const compactedLines = keptLines.map((line) => compactTableLine(line, cellCharacterLimit));
+  const changes: string[] = [];
 
-  if (lines.length <= maxRows) {
-    return {
-      block: lines.join('\n'),
-      changes: [],
-    };
+  if (lines.length > keptLines.length) {
+    addChange(changes, `kept the first ${limits.tableDataRowLimit} table rows`);
+  }
+
+  if (compactedLines.some((line) => line.changed)) {
+    addChange(changes, 'shortened wide table cells');
   }
 
   return {
-    block: lines.slice(0, maxRows).join('\n'),
-    changes: [`kept the first ${limits.tableDataRowLimit} table rows`],
+    block: compactedLines.map((line) => line.line).join('\n'),
+    changes,
   };
 }
 

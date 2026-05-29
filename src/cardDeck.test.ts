@@ -375,6 +375,38 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(result.deck?.notes.some((note) => note.includes('table'))).toBe(false);
   });
 
+  it('keeps wide mixed-language tables inside each platform limit without dropping the table', () => {
+    const longEvidence =
+      '[incident dashboard](https://example.com/incidents/2026/05/29/platform-capacity-regression-with-a-very-long-query-string?owner=card-splitting&surface=xiaohongshu) shows 中文字段 and English owner notes need a compact card-safe summary. ';
+    const markdown = [
+      '# Capacity table',
+      '',
+      '## 发布风险',
+      '',
+      '| 信号 | Evidence |',
+      '| --- | --- |',
+      `| 用户投诉 | ${longEvidence.repeat(4)} |`,
+      `| 导出校验 | ${longEvidence.repeat(3)} |`,
+      '| Caption | Keep the generated caption readable and move raw detail back to source. |',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(joinedCards).toContain('| 信号 | Evidence |');
+      expect(joinedCards).toContain('| 用户投诉 | incident dashboard');
+      expect(joinedCards).not.toContain('https://example.com/incidents/2026/05/29');
+      expect(result.deck?.cards.some((card) => card.note.includes('shortened wide table cells'))).toBe(true);
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('preserves tilde-fenced code blocks as code cards', () => {
     const markdown = [
       '# Code note',
