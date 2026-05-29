@@ -296,6 +296,31 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(result.deck?.notes.some((note) => note.includes('table'))).toBe(false);
   });
 
+  it('preserves tilde-fenced code blocks as code cards', () => {
+    const markdown = [
+      '# Code note',
+      '',
+      '## 修复步骤',
+      '',
+      'The implementation detail should stay readable beside 中文 context.',
+      '',
+      '~~~ts',
+      'const title = "混合 Markdown";',
+      'const lines = markdown.split("\\n");',
+      'return lines.filter(Boolean);',
+      '~~~',
+      '',
+      'Ship the caption after verifying the preview.',
+    ].join('\n');
+    const result = splitMarkdownIntoCardDeck(markdown, platformPresets[0]);
+    const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+    expect(joinedCards).toContain('~~~ts');
+    expect(joinedCards).toContain('const title = "混合 Markdown";');
+    expect(joinedCards).toContain('~~~');
+    expect(result.deck?.notes.some((note) => note.includes('code'))).toBe(true);
+  });
+
   it('creates different deterministic captions for each platform', () => {
     const twitter = splitMarkdownIntoCardDeck(longEssay, platformPresets[0]).deck?.captionText ?? '';
     const xiaohongshu = splitMarkdownIntoCardDeck(longEssay, platformPresets[1]).deck?.captionText ?? '';

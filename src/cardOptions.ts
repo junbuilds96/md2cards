@@ -1,3 +1,8 @@
+import {
+  getMarkdownCodeFenceMarker,
+  isMarkdownCodeFenceClose,
+  isMarkdownCodeFenceLine,
+} from './markdownCodeFences';
 import { isMarkdownTableRowLine, isMarkdownTableStart } from './markdownTables';
 
 export type PresetId = 'twitter' | 'xiaohongshu' | 'launch';
@@ -1209,7 +1214,7 @@ function isMarkdownListContinuationLine(line: string): boolean {
     /^\s{2,}\S/.test(line) &&
     trimmed.length > 0 &&
     !/^#{1,6}\s+\S/.test(trimmed) &&
-    !trimmed.startsWith('```') &&
+    !isMarkdownCodeFenceLine(line) &&
     !/^-{3,}\s*$/.test(trimmed) &&
     !isMarkdownTableRowLine(line)
   );
@@ -1268,8 +1273,11 @@ function compactCodeBlock(lines: string[], limits: MarkdownFitLimits): { block: 
     };
   }
 
-  const firstLine = lines[0];
-  const lastLine = lines[lines.length - 1]?.startsWith('```') ? lines[lines.length - 1] : '```';
+  const openingFence = getMarkdownCodeFenceMarker(lines[0] ?? '') ?? '```';
+  const firstLine = getMarkdownCodeFenceMarker(lines[0] ?? '') ? lines[0] : openingFence;
+  const lastLine = isMarkdownCodeFenceClose(lines[lines.length - 1] ?? '', openingFence)
+    ? lines[lines.length - 1]
+    : openingFence;
   const codeLines = lines.slice(1, -1).slice(0, limits.codeLineLimit);
 
   return {
@@ -1333,13 +1341,14 @@ function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { bl
       continue;
     }
 
-    if (line.trim().startsWith('```')) {
+    const openingFence = getMarkdownCodeFenceMarker(line);
+    if (openingFence) {
       const codeLines = [line];
       index += 1;
 
       while (index < lines.length) {
         codeLines.push(lines[index]);
-        const closesFence = lines[index].trim().startsWith('```');
+        const closesFence = isMarkdownCodeFenceClose(lines[index], openingFence);
         index += 1;
         if (closesFence) break;
       }
@@ -1414,7 +1423,7 @@ function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { bl
       lines[index].trim().length > 0 &&
       !/^#{1,6}\s+\S/.test(lines[index].trim()) &&
       !isMarkdownListLine(lines[index]) &&
-      !lines[index].trim().startsWith('```') &&
+      !isMarkdownCodeFenceLine(lines[index]) &&
       !isMarkdownTableStart(lines, index)
     ) {
       paragraphLines.push(lines[index]);

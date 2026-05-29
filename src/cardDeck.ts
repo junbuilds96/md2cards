@@ -5,6 +5,11 @@ import {
   type PlatformPreset,
   type PresetId,
 } from './cardOptions';
+import {
+  getMarkdownCodeFenceMarker,
+  isMarkdownCodeFenceClose,
+  isMarkdownCodeFenceLine,
+} from './markdownCodeFences';
 import { isMarkdownTableRowLine, isMarkdownTableStart } from './markdownTables';
 
 export type CardDeckCard = {
@@ -131,7 +136,7 @@ function isListContinuationLine(line: string): boolean {
     /^\s{2,}\S/.test(line) &&
     trimmed.length > 0 &&
     !getHeadingText(line) &&
-    !trimmed.startsWith('```') &&
+    !isMarkdownCodeFenceLine(line) &&
     !isHorizontalRuleLine(line) &&
     !isMarkdownTableRowLine(line)
   );
@@ -189,13 +194,14 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       continue;
     }
 
-    if (line.trim().startsWith('```')) {
+    const openingFence = getMarkdownCodeFenceMarker(line);
+    if (openingFence) {
       const codeLines = [line.trimEnd()];
       index += 1;
 
       while (index < lines.length) {
         codeLines.push(lines[index].trimEnd());
-        const closesFence = lines[index].trim().startsWith('```');
+        const closesFence = isMarkdownCodeFenceClose(lines[index], openingFence);
         index += 1;
         if (closesFence) break;
       }
@@ -280,7 +286,7 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       lines[index].trim().length > 0 &&
       !getHeadingText(lines[index]) &&
       !isListLine(lines[index]) &&
-      !lines[index].trim().startsWith('```') &&
+      !isMarkdownCodeFenceLine(lines[index]) &&
       !isMarkdownTableStart(lines, index)
     ) {
       paragraphLines.push(lines[index].trim());
@@ -427,8 +433,11 @@ function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] 
 
   if (block.type === 'code') {
     const lines = block.markdown.split('\n');
-    const firstLine = lines[0]?.startsWith('```') ? lines[0] : '```';
-    const lastLine = lines[lines.length - 1]?.trim().startsWith('```') ? lines[lines.length - 1] : '```';
+    const openingFence = getMarkdownCodeFenceMarker(lines[0] ?? '') ?? '```';
+    const firstLine = getMarkdownCodeFenceMarker(lines[0] ?? '') ? lines[0] : openingFence;
+    const lastLine = isMarkdownCodeFenceClose(lines[lines.length - 1] ?? '', openingFence)
+      ? lines[lines.length - 1]
+      : openingFence;
     const keptCode = lines.slice(1, -1).slice(0, limits.codeLineLimit);
 
     return [
@@ -586,13 +595,14 @@ function parseStorySegments(markdown: string): { title: string | null; segments:
       continue;
     }
 
-    if (trimmed.startsWith('```')) {
+    const openingFence = getMarkdownCodeFenceMarker(line);
+    if (openingFence) {
       const codeLines = [line.trimEnd()];
       index += 1;
 
       while (index < lines.length) {
         codeLines.push(lines[index].trimEnd());
-        const closesFence = lines[index].trim().startsWith('```');
+        const closesFence = isMarkdownCodeFenceClose(lines[index], openingFence);
         index += 1;
         if (closesFence) break;
       }
@@ -621,7 +631,7 @@ function parseStorySegments(markdown: string): { title: string | null; segments:
       index < lines.length &&
       lines[index].trim().length > 0 &&
       !isHorizontalRuleLine(lines[index]) &&
-      !lines[index].trim().startsWith('```') &&
+      !isMarkdownCodeFenceLine(lines[index]) &&
       !lines[index].trim().startsWith('>') &&
       getHeadingText(lines[index])?.depth !== 1
     ) {

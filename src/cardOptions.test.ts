@@ -624,6 +624,27 @@ More detail belongs in the caption.`;
     expect(result.note).toContain('kept the first 2 table rows');
   });
 
+  it('caps tilde-fenced code blocks without flattening them into prose', () => {
+    const markdown = [
+      '# Code check',
+      '',
+      '~~~tsx',
+      'const title = "中文 launch";',
+      'const cards = split(markdown);',
+      'const first = cards[0];',
+      'const second = cards[1];',
+      'const third = cards[2];',
+      '~~~',
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+
+    expect(result.markdown).toContain('~~~tsx');
+    expect(result.markdown).toContain('const second = cards[1];');
+    expect(result.markdown).not.toContain('const third = cards[2];');
+    expect(result.markdown).toContain('~~~');
+    expect(result.note).toContain('kept the first 4 code lines');
+  });
+
   it('shortens long paragraphs and keeps the fitted result inside preset limits', () => {
     const markdown = `# Big update\n\n${'This release note has too much background detail for a social card. '.repeat(35)}`;
     const result = fitMarkdownToPreset(markdown, platformPresets[2]);
