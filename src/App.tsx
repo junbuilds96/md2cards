@@ -35,6 +35,7 @@ import {
   Upload,
 } from 'lucide-react';
 import {
+  applyStylePackAppearance,
   cardThemes,
   cardAccentOptions,
   cardBackgroundIntensityOptions,
@@ -62,6 +63,7 @@ import {
   getMarkdownFitGuidance,
   getMarkdownTemplate,
   getRecipePreset,
+  getStylePack,
   getPlatformFitHelper,
   getSafeAreaGuide,
   getStarterMarkdown,
@@ -70,6 +72,7 @@ import {
   platformPresets,
   recipePresets,
   sampleMarkdown,
+  stylePacks,
   type CardAccentId,
   type CardBackgroundIntensityId,
   type CardCornerRadiusId,
@@ -80,6 +83,7 @@ import {
   type ExportScaleId,
   type PlatformPreset,
   type RecipePresetId,
+  type StylePackId,
   type TemplateId,
 } from './cardOptions';
 import {
@@ -411,8 +415,9 @@ function SavedPresetsPanel({
       savedPreset.cardCornerRadiusId;
     const textureLabel =
       cardTextureOptions.find((item) => item.id === savedPreset.cardTextureId)?.label ?? savedPreset.cardTextureId;
+    const labelVisibility = savedPreset.showCardLabels ? 'Labels on' : 'Labels off';
 
-    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${accentLabel} · ${backgroundIntensityLabel} · ${cornerRadiusLabel} · ${textureLabel} · ${scaleLabel}`;
+    return `${platformLabel} · ${themeLabel} · ${densityLabel} · ${typographyLabel} · ${accentLabel} · ${backgroundIntensityLabel} · ${cornerRadiusLabel} · ${textureLabel} · ${labelVisibility} · ${scaleLabel}`;
   }
 
   return (
@@ -646,6 +651,47 @@ function AppearanceControls({
   );
 }
 
+function StylePackSelector({
+  activeStylePackId,
+  onApplyStylePack,
+}: {
+  activeStylePackId: StylePackId | null;
+  onApplyStylePack: (stylePackId: StylePackId) => void;
+}) {
+  return (
+    <div className="style-pack-selector">
+      <p className="field-hint">
+        Visual recipes change appearance only. Your Markdown, platform, and export quality stay intact.
+      </p>
+      <div className="style-pack-grid">
+        {stylePacks.map((item) => {
+          const themeLabel = cardThemes.find((themeItem) => themeItem.id === item.themeId)?.label ?? item.themeId;
+          const accent = getCardAccentOption(item.cardAccentId);
+          const density = getCardDensityOption(item.cardDensityId);
+          const texture = getCardTextureOption(item.cardTextureId);
+
+          return (
+            <button
+              key={item.id}
+              className={item.id === activeStylePackId ? 'active' : ''}
+              type="button"
+              onClick={() => onApplyStylePack(item.id)}
+            >
+              <Palette size={15} />
+              <span>{item.label}</span>
+              <small>{item.description}</small>
+              <span className="style-pack-setup">
+                <span className="recipe-accent-dot" style={{ background: accent.color }} aria-hidden="true" />
+                {themeLabel} · {density.label} · {accent.label} · {texture.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function RecipePresetSelector({
   activeRecipeId,
   onApplyRecipePreset,
@@ -697,6 +743,7 @@ function App() {
   const [cardTextureId, setCardTextureId] = useState<CardTextureId>(defaultCardTextureId);
   const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('x-launch');
   const [activeRecipeId, setActiveRecipeId] = useState<RecipePresetId | null>(null);
+  const [activeStylePackId, setActiveStylePackId] = useState<StylePackId | null>(null);
   const [showSafeAreaGuide, setShowSafeAreaGuide] = useState(true);
   const [showCardLabels, setShowCardLabels] = useState(true);
   const [exportState, setExportState] = useState<ExportState>('idle');
@@ -758,6 +805,7 @@ function App() {
     setThemeId(template.themeId);
     setActiveTemplateId(template.id);
     setActiveRecipeId(null);
+    setActiveStylePackId(null);
     setMessage(`${template.label} loaded. Replace the text with your own Markdown when ready.`);
     setImportState('idle');
     setImportMessage('');
@@ -778,8 +826,30 @@ function App() {
     setCardTextureId(recipePreset.cardTextureId);
     setShowCardLabels(recipePreset.showCardLabels);
     setActiveRecipeId(recipePreset.id);
+    setActiveStylePackId(null);
     setPresetName('');
     setMessage(`${recipePreset.label} recipe applied. Preview and exports now use this visual setup.`);
+    setImportState('idle');
+    setImportMessage('');
+    resetEditorFeedback();
+  }
+
+  function applyStylePack(stylePackId: StylePackId) {
+    const stylePack = getStylePack(stylePackId);
+    const appearance = applyStylePackAppearance({}, stylePack.id);
+
+    setThemeId(appearance.themeId);
+    setCardDensityId(appearance.cardDensityId);
+    setCardTypographyScaleId(appearance.cardTypographyScaleId);
+    setCardAccentId(appearance.cardAccentId);
+    setCardBackgroundIntensityId(appearance.cardBackgroundIntensityId);
+    setCardCornerRadiusId(appearance.cardCornerRadiusId);
+    setCardTextureId(appearance.cardTextureId);
+    setShowCardLabels(appearance.showCardLabels);
+    setActiveStylePackId(stylePack.id);
+    setActiveRecipeId(null);
+    setPresetName('');
+    setMessage(`${stylePack.label} style pack applied. Your Markdown, platform, and export quality stayed unchanged.`);
     setImportState('idle');
     setImportMessage('');
     resetEditorFeedback();
@@ -809,6 +879,7 @@ function App() {
         cardBackgroundIntensityId: cardBackgroundIntensity.id,
         cardCornerRadiusId: cardCornerRadius.id,
         cardTextureId: cardTexture.id,
+        showCardLabels,
       });
 
       setSavedPresets(result.presets);
@@ -837,8 +908,10 @@ function App() {
     setCardBackgroundIntensityId(savedPreset.cardBackgroundIntensityId);
     setCardCornerRadiusId(savedPreset.cardCornerRadiusId);
     setCardTextureId(savedPreset.cardTextureId);
+    setShowCardLabels(savedPreset.showCardLabels);
     setPresetName(savedPreset.name);
     setActiveRecipeId(null);
+    setActiveStylePackId(null);
     setMessage(`${savedPreset.name} loaded. Preview updated from your local preset.`);
     setImportState('idle');
     setImportMessage('');
@@ -940,6 +1013,7 @@ function App() {
       setCardTextureId(importedRecipe.config.cardTextureId);
       setShowCardLabels(importedRecipe.config.showCardLabels);
       setActiveRecipeId(null);
+      setActiveStylePackId(null);
       setImportState('idle');
       setImportMessage('');
       setRecipeState('success');
@@ -1250,6 +1324,7 @@ function App() {
                   onClick={() => {
                     setThemeId(item.id);
                     setActiveRecipeId(null);
+                    setActiveStylePackId(null);
                     setMessage(`${item.label} theme selected. Preview and exports updated.`);
                   }}
                   title={item.description}
@@ -1259,6 +1334,11 @@ function App() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="field-group">
+            <span className="field-label">Visual Recipe</span>
+            <StylePackSelector activeStylePackId={activeStylePackId} onApplyStylePack={applyStylePack} />
           </div>
 
           <div className="field-group">
@@ -1273,11 +1353,13 @@ function App() {
               onDensityChange={(densityId) => {
                 setCardDensityId(densityId);
                 setActiveRecipeId(null);
+                setActiveStylePackId(null);
                 setMessage(`${getCardDensityOption(densityId).label} density selected. Preview and exports updated.`);
               }}
               onTypographyScaleChange={(typographyScaleId) => {
                 setCardTypographyScaleId(typographyScaleId);
                 setActiveRecipeId(null);
+                setActiveStylePackId(null);
                 setMessage(
                   `${getCardTypographyScaleOption(typographyScaleId).label} typography selected. Preview and exports updated.`,
                 );
@@ -1285,11 +1367,13 @@ function App() {
               onAccentChange={(accentId) => {
                 setCardAccentId(accentId);
                 setActiveRecipeId(null);
+                setActiveStylePackId(null);
                 setMessage(`${getCardAccentOption(accentId).label} accent selected. Preview and exports updated.`);
               }}
               onBackgroundIntensityChange={(backgroundIntensityId) => {
                 setCardBackgroundIntensityId(backgroundIntensityId);
                 setActiveRecipeId(null);
+                setActiveStylePackId(null);
                 setMessage(
                   `${getCardBackgroundIntensityOption(backgroundIntensityId).label} background intensity selected. Preview and exports updated.`,
                 );
@@ -1297,6 +1381,7 @@ function App() {
               onCornerRadiusChange={(cornerRadiusId) => {
                 setCardCornerRadiusId(cornerRadiusId);
                 setActiveRecipeId(null);
+                setActiveStylePackId(null);
                 setMessage(
                   `${getCardCornerRadiusOption(cornerRadiusId).label} corners selected. Preview and exports updated.`,
                 );
@@ -1304,6 +1389,7 @@ function App() {
               onTextureChange={(textureId) => {
                 setCardTextureId(textureId);
                 setActiveRecipeId(null);
+                setActiveStylePackId(null);
                 setMessage(`${getCardTextureOption(textureId).label} texture selected. Preview and exports updated.`);
               }}
             />
@@ -1439,6 +1525,7 @@ function App() {
                     onChange={(event) => {
                       setShowCardLabels(event.target.checked);
                       setActiveRecipeId(null);
+                      setActiveStylePackId(null);
                       setExportState('idle');
                       setMessage(
                         event.target.checked

@@ -120,11 +120,9 @@ export type RecipePresetId =
   | 'quote'
   | 'code-snippet';
 
-export type RecipePreset = {
-  id: RecipePresetId;
-  label: string;
-  description: string;
-  presetId: PresetId;
+export type StylePackId = 'launch-glow' | 'editorial-note' | 'terminal-proof' | 'warm-quote' | 'clean-brief';
+
+export type CardAppearanceSettings = {
   themeId: ThemeId;
   cardDensityId: CardDensityId;
   cardTypographyScaleId: CardTypographyScaleId;
@@ -133,7 +131,20 @@ export type RecipePreset = {
   cardCornerRadiusId: CardCornerRadiusId;
   cardTextureId: CardTextureId;
   showCardLabels: boolean;
+};
+
+export type RecipePreset = CardAppearanceSettings & {
+  id: RecipePresetId;
+  label: string;
+  description: string;
+  presetId: PresetId;
   markdown: string;
+};
+
+export type StylePack = CardAppearanceSettings & {
+  id: StylePackId;
+  label: string;
+  description: string;
 };
 
 export type MarkdownStats = {
@@ -715,6 +726,74 @@ npm run preview
   },
 ];
 
+export const stylePacks: StylePack[] = [
+  {
+    id: 'launch-glow',
+    label: 'Launch Glow',
+    description: 'Bright product-card contrast with polished launch energy.',
+    themeId: 'signal',
+    cardDensityId: 'balanced',
+    cardTypographyScaleId: 'default',
+    cardAccentId: 'blue',
+    cardBackgroundIntensityId: 'vivid',
+    cardCornerRadiusId: 'subtle',
+    cardTextureId: 'rich',
+    showCardLabels: true,
+  },
+  {
+    id: 'editorial-note',
+    label: 'Editorial Note',
+    description: 'Magazine-like panels for creator updates and short essays.',
+    themeId: 'editorial',
+    cardDensityId: 'spacious',
+    cardTypographyScaleId: 'large',
+    cardAccentId: 'rose',
+    cardBackgroundIntensityId: 'soft',
+    cardCornerRadiusId: 'rounded',
+    cardTextureId: 'subtle',
+    showCardLabels: false,
+  },
+  {
+    id: 'terminal-proof',
+    label: 'Terminal Proof',
+    description: 'Dark technical surface for changelogs, fixes, and code notes.',
+    themeId: 'midnight',
+    cardDensityId: 'compact',
+    cardTypographyScaleId: 'small',
+    cardAccentId: 'emerald',
+    cardBackgroundIntensityId: 'vivid',
+    cardCornerRadiusId: 'sharp',
+    cardTextureId: 'rich',
+    showCardLabels: true,
+  },
+  {
+    id: 'warm-quote',
+    label: 'Warm Quote',
+    description: 'Soft paper texture for quotes, reflections, and advice.',
+    themeId: 'paper',
+    cardDensityId: 'spacious',
+    cardTypographyScaleId: 'large',
+    cardAccentId: 'amber',
+    cardBackgroundIntensityId: 'soft',
+    cardCornerRadiusId: 'rounded',
+    cardTextureId: 'clean',
+    showCardLabels: false,
+  },
+  {
+    id: 'clean-brief',
+    label: 'Clean Brief',
+    description: 'Quiet, balanced styling for readable status updates.',
+    themeId: 'signal',
+    cardDensityId: 'balanced',
+    cardTypographyScaleId: 'default',
+    cardAccentId: 'emerald',
+    cardBackgroundIntensityId: 'soft',
+    cardCornerRadiusId: 'sharp',
+    cardTextureId: 'clean',
+    showCardLabels: true,
+  },
+];
+
 export function getMarkdownTemplate(templateId: TemplateId): MarkdownTemplate {
   return markdownTemplates.find((template) => template.id === templateId) ?? markdownTemplates[0];
 }
@@ -725,6 +804,29 @@ export function getStarterMarkdown(templateId: TemplateId): string {
 
 export function getRecipePreset(recipePresetId: RecipePresetId): RecipePreset {
   return recipePresets.find((recipePreset) => recipePreset.id === recipePresetId) ?? recipePresets[0];
+}
+
+export function getStylePack(stylePackId: StylePackId): StylePack {
+  return stylePacks.find((stylePack) => stylePack.id === stylePackId) ?? stylePacks[0];
+}
+
+export function applyStylePackAppearance<T extends object>(
+  config: T,
+  stylePackId: StylePackId,
+): T & CardAppearanceSettings {
+  const stylePack = getStylePack(stylePackId);
+
+  return {
+    ...config,
+    themeId: stylePack.themeId,
+    cardDensityId: stylePack.cardDensityId,
+    cardTypographyScaleId: stylePack.cardTypographyScaleId,
+    cardAccentId: stylePack.cardAccentId,
+    cardBackgroundIntensityId: stylePack.cardBackgroundIntensityId,
+    cardCornerRadiusId: stylePack.cardCornerRadiusId,
+    cardTextureId: stylePack.cardTextureId,
+    showCardLabels: stylePack.showCardLabels,
+  };
 }
 
 export function getMarkdownStats(markdown: string): MarkdownStats {

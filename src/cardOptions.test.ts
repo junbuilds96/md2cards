@@ -12,6 +12,7 @@ import {
   defaultCardTypographyScaleId,
   defaultExportScaleId,
   exportScaleOptions,
+  applyStylePackAppearance,
   fitMarkdownToPreset,
   getCardBackgroundIntensityOption,
   getCardCornerRadiusOption,
@@ -27,13 +28,16 @@ import {
   getRecipePreset,
   getSafeAreaGuide,
   getStarterMarkdown,
+  getStylePack,
   markdownTemplates,
   onboardingWorkflowSteps,
   platformFitHelpers,
   platformPresets,
   recipePresets,
   sampleMarkdown,
+  stylePacks,
   type RecipePresetId,
+  type StylePackId,
   type TemplateId,
 } from './cardOptions';
 
@@ -191,6 +195,63 @@ describe('recipePresets', () => {
 
   it('falls back to the default recipe for an unknown recipe id', () => {
     expect(getRecipePreset('missing-recipe' as RecipePresetId)).toBe(recipePresets[0]);
+  });
+});
+
+describe('stylePacks', () => {
+  it('exposes unique appearance-only packs with valid option ids', () => {
+    const stylePackIds = new Set(stylePacks.map((stylePack) => stylePack.id));
+    const themeIds = new Set(cardThemes.map((theme) => theme.id));
+    const densityIds = new Set(cardDensityOptions.map((option) => option.id));
+    const typographyIds = new Set(cardTypographyScaleOptions.map((option) => option.id));
+    const accentIds = new Set(cardAccentOptions.map((option) => option.id));
+    const backgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
+    const cornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
+    const textureIds = new Set(cardTextureOptions.map((option) => option.id));
+
+    expect(stylePacks).toHaveLength(5);
+    expect(stylePackIds.size).toBe(stylePacks.length);
+    expect(stylePacks.map((stylePack) => stylePack.id)).toEqual([
+      'launch-glow',
+      'editorial-note',
+      'terminal-proof',
+      'warm-quote',
+      'clean-brief',
+    ]);
+    expect(stylePacks.every((stylePack) => themeIds.has(stylePack.themeId))).toBe(true);
+    expect(stylePacks.every((stylePack) => densityIds.has(stylePack.cardDensityId))).toBe(true);
+    expect(stylePacks.every((stylePack) => typographyIds.has(stylePack.cardTypographyScaleId))).toBe(true);
+    expect(stylePacks.every((stylePack) => accentIds.has(stylePack.cardAccentId))).toBe(true);
+    expect(stylePacks.every((stylePack) => backgroundIntensityIds.has(stylePack.cardBackgroundIntensityId))).toBe(true);
+    expect(stylePacks.every((stylePack) => cornerRadiusIds.has(stylePack.cardCornerRadiusId))).toBe(true);
+    expect(stylePacks.every((stylePack) => textureIds.has(stylePack.cardTextureId))).toBe(true);
+    expect(new Set(stylePacks.map((stylePack) => stylePack.showCardLabels)).size).toBe(2);
+  });
+
+  it('applies only appearance settings to an existing card config', () => {
+    const config = {
+      markdown: '# Keep my Markdown',
+      presetId: 'xiaohongshu',
+      exportScaleId: 'fast',
+    };
+
+    expect(applyStylePackAppearance(config, 'terminal-proof')).toEqual({
+      markdown: '# Keep my Markdown',
+      presetId: 'xiaohongshu',
+      exportScaleId: 'fast',
+      themeId: 'midnight',
+      cardDensityId: 'compact',
+      cardTypographyScaleId: 'small',
+      cardAccentId: 'emerald',
+      cardBackgroundIntensityId: 'vivid',
+      cardCornerRadiusId: 'sharp',
+      cardTextureId: 'rich',
+      showCardLabels: true,
+    });
+  });
+
+  it('falls back to the default style pack for an unknown style pack id', () => {
+    expect(getStylePack('missing-pack' as StylePackId)).toBe(stylePacks[0]);
   });
 });
 

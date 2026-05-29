@@ -70,6 +70,7 @@ describe('saved preset storage', () => {
         cardBackgroundIntensityId: 'vivid',
         cardCornerRadiusId: 'rounded',
         cardTextureId: 'rich',
+        showCardLabels: false,
         updatedAt: 200,
       },
     ]);
@@ -88,6 +89,7 @@ describe('saved preset storage', () => {
         cardBackgroundIntensityId: 'vivid',
         cardCornerRadiusId: 'rounded',
         cardTextureId: 'rich',
+        showCardLabels: false,
         updatedAt: 200,
       },
       {
@@ -103,6 +105,7 @@ describe('saved preset storage', () => {
         cardBackgroundIntensityId: 'balanced',
         cardCornerRadiusId: 'sharp',
         cardTextureId: 'subtle',
+        showCardLabels: true,
         updatedAt: 100,
       },
     ]);
@@ -124,6 +127,7 @@ describe('saved preset storage', () => {
         cardBackgroundIntensityId: 'soft',
         cardCornerRadiusId: 'subtle',
         cardTextureId: 'clean',
+        showCardLabels: false,
       },
       storage,
       1234,
@@ -143,6 +147,7 @@ describe('saved preset storage', () => {
       cardBackgroundIntensityId: 'soft',
       cardCornerRadiusId: 'subtle',
       cardTextureId: 'clean',
+      showCardLabels: false,
       updatedAt: 1234,
     });
     expect(readSavedPresets(storage)).toEqual([result.preset]);
@@ -181,6 +186,7 @@ describe('saved preset storage', () => {
         cardBackgroundIntensityId: 'vivid',
         cardCornerRadiusId: 'rounded',
         cardTextureId: 'rich',
+        showCardLabels: false,
       },
       storage,
       200,
@@ -202,6 +208,7 @@ describe('saved preset storage', () => {
         cardBackgroundIntensityId: 'vivid',
         cardCornerRadiusId: 'rounded',
         cardTextureId: 'rich',
+        showCardLabels: false,
         updatedAt: 200,
       },
     ]);

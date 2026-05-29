@@ -686,6 +686,21 @@ textarea:focus {
   gap: 8px;
 }
 
+.style-pack-selector {
+  display: grid;
+  gap: 8px;
+}
+
+.style-pack-selector .field-hint {
+  margin: 0;
+}
+
+.style-pack-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .segmented-control button,
 .quality-control button,
 .density-control button,
@@ -694,6 +709,7 @@ textarea:focus {
 .background-intensity-control button,
 .corner-radius-control button,
 .texture-control button,
+.style-pack-grid button,
 .recipe-preset-grid button,
 .template-gallery button,
 .theme-option {
@@ -751,6 +767,15 @@ textarea:focus {
   padding: 9px;
 }
 
+.style-pack-grid button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 7px;
+  align-items: start;
+  min-height: 96px;
+  padding: 9px;
+}
+
 .segmented-control button span,
 .quality-control button span,
 .density-control button span,
@@ -759,6 +784,7 @@ textarea:focus {
 .background-intensity-control button span,
 .corner-radius-control button span,
 .texture-control button span,
+.style-pack-grid button span,
 .recipe-preset-grid button span,
 .template-gallery button span,
 .theme-option span:last-child {
@@ -770,6 +796,7 @@ textarea:focus {
 }
 
 .template-gallery svg,
+.style-pack-grid svg,
 .recipe-preset-grid svg {
   margin-top: 1px;
   color: #2059e8;
@@ -878,6 +905,35 @@ textarea:focus {
   -webkit-line-clamp: 2;
 }
 
+.style-pack-grid small {
+  grid-column: 2;
+  display: -webkit-box;
+  overflow: hidden;
+  color: #667085;
+  font-size: 0.7rem;
+  line-height: 1.22;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.style-pack-grid .style-pack-setup {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  padding-top: 6px;
+  overflow: hidden;
+  color: #475467;
+  border-top: 1px solid #eef2f7;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .recipe-preset-grid .recipe-setup {
   grid-column: 1 / -1;
   display: inline-flex;
@@ -896,6 +952,7 @@ textarea:focus {
   white-space: nowrap;
 }
 
+.style-pack-grid .recipe-accent-dot,
 .recipe-preset-grid .recipe-accent-dot {
   flex: 0 0 auto;
   width: 9px;
@@ -912,6 +969,7 @@ textarea:focus {
 .background-intensity-control button.active,
 .corner-radius-control button.active,
 .texture-control button.active,
+.style-pack-grid button.active,
 .recipe-preset-grid button.active,
 .template-gallery button.active,
 .theme-option.active {
@@ -2185,6 +2243,7 @@ textarea:focus {
   .background-intensity-control,
   .corner-radius-control,
   .texture-control,
+  .style-pack-grid,
   .recipe-preset-grid,
   .theme-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -2267,6 +2326,7 @@ textarea:focus {
   }
 
   .template-gallery button,
+  .style-pack-grid button,
   .recipe-preset-grid button,
   .segmented-control button,
   .quality-control button,

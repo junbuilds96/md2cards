@@ -42,6 +42,7 @@ export type SavedCardPreset = {
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
   cardTextureId: CardTextureId;
+  showCardLabels: boolean;
   updatedAt: number;
 };
 
@@ -57,6 +58,7 @@ export type SavedCardPresetDraft = {
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
   cardTextureId: CardTextureId;
+  showCardLabels?: boolean;
 };
 
 export type SaveSavedPresetResult = {
@@ -120,6 +122,7 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
   const cardCornerRadiusId =
     value.cardCornerRadiusId === undefined ? defaultCardCornerRadiusId : value.cardCornerRadiusId;
   const cardTextureId = value.cardTextureId === undefined ? defaultCardTextureId : value.cardTextureId;
+  const showCardLabels = value.showCardLabels === undefined ? true : value.showCardLabels;
   const updatedAt = typeof value.updatedAt === 'number' && Number.isFinite(value.updatedAt) ? value.updatedAt : 0;
 
   if (
@@ -134,7 +137,8 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     !validCardAccentIds.has(cardAccentId as CardAccentId) ||
     !validCardBackgroundIntensityIds.has(cardBackgroundIntensityId as CardBackgroundIntensityId) ||
     !validCardCornerRadiusIds.has(cardCornerRadiusId as CardCornerRadiusId) ||
-    !validCardTextureIds.has(cardTextureId as CardTextureId)
+    !validCardTextureIds.has(cardTextureId as CardTextureId) ||
+    typeof showCardLabels !== 'boolean'
   ) {
     return null;
   }
@@ -152,6 +156,7 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     cardBackgroundIntensityId: cardBackgroundIntensityId as CardBackgroundIntensityId,
     cardCornerRadiusId: cardCornerRadiusId as CardCornerRadiusId,
     cardTextureId: cardTextureId as CardTextureId,
+    showCardLabels,
     updatedAt,
   };
 }
@@ -246,6 +251,7 @@ export function saveSavedPreset(
       ? draft.cardCornerRadiusId
       : defaultCardCornerRadiusId,
     cardTextureId: validCardTextureIds.has(draft.cardTextureId) ? draft.cardTextureId : defaultCardTextureId,
+    showCardLabels: typeof draft.showCardLabels === 'boolean' ? draft.showCardLabels : true,
     updatedAt,
   };
 
