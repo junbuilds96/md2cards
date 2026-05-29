@@ -2,6 +2,7 @@ import {
   cardThemes,
   cardAccentOptions,
   cardBackgroundIntensityOptions,
+  cardCompositionOptions,
   cardCornerRadiusOptions,
   cardDensityOptions,
   cardMoodOptions,
@@ -10,6 +11,7 @@ import {
   cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardBackgroundIntensityId,
+  defaultCardCompositionId,
   defaultCardCornerRadiusId,
   defaultCardDensityId,
   defaultCardMoodId,
@@ -21,6 +23,7 @@ import {
   platformPresets,
   type CardAccentId,
   type CardBackgroundIntensityId,
+  type CardCompositionId,
   type CardCornerRadiusId,
   type CardDensityId,
   type CardMoodId,
@@ -49,6 +52,7 @@ export type CardConfig = {
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
+  cardCompositionId: CardCompositionId;
   cardTextureId: CardTextureId;
   cardMoodId: CardMoodId;
   showCardLabels: boolean;
@@ -65,6 +69,7 @@ export type CardConfigDraft = {
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
+  cardCompositionId: CardCompositionId;
   cardTextureId: CardTextureId;
   cardMoodId: CardMoodId;
   showCardLabels: boolean;
@@ -98,6 +103,7 @@ const validCardTypographyVoiceIds = new Set(cardTypographyVoiceOptions.map((opti
 const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
 const validCardBackgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
 const validCardCornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
+const validCardCompositionIds = new Set(cardCompositionOptions.map((option) => option.id));
 const validCardTextureIds = new Set(cardTextureOptions.map((option) => option.id));
 const validCardMoodIds = new Set(cardMoodOptions.map((option) => option.id));
 
@@ -153,6 +159,9 @@ export function createCardConfig(draft: CardConfigDraft): CardConfig {
     cardCornerRadiusId: validCardCornerRadiusIds.has(draft.cardCornerRadiusId)
       ? draft.cardCornerRadiusId
       : defaultCardCornerRadiusId,
+    cardCompositionId: validCardCompositionIds.has(draft.cardCompositionId)
+      ? draft.cardCompositionId
+      : defaultCardCompositionId,
     cardTextureId: validCardTextureIds.has(draft.cardTextureId) ? draft.cardTextureId : defaultCardTextureId,
     cardMoodId: validCardMoodIds.has(draft.cardMoodId) ? draft.cardMoodId : defaultCardMoodId,
     showCardLabels: draft.showCardLabels,
@@ -295,6 +304,17 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
     };
   }
 
+  const cardCompositionId =
+    parsed.cardCompositionId === undefined
+      ? defaultCardCompositionId
+      : (parsed.cardCompositionId as CardCompositionId);
+  if (!validCardCompositionIds.has(cardCompositionId)) {
+    return {
+      valid: false,
+      message: 'This recipe uses an unknown card composition.',
+    };
+  }
+
   const cardTextureId =
     parsed.cardTextureId === undefined ? defaultCardTextureId : (parsed.cardTextureId as CardTextureId);
   if (!validCardTextureIds.has(cardTextureId)) {
@@ -335,6 +355,7 @@ export function parseCardConfigJson(rawJson: string): CardConfigParseResult {
       cardAccentId,
       cardBackgroundIntensityId,
       cardCornerRadiusId,
+      cardCompositionId,
       cardTextureId,
       cardMoodId,
       showCardLabels: parsed.showCardLabels,

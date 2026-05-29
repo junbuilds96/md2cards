@@ -1,6 +1,7 @@
 import {
   getCardAccentOption,
   getCardBackgroundIntensityOption,
+  getCardCompositionOption,
   getCardCornerRadiusOption,
   getCardDensityOption,
   getCardMoodOption,
@@ -10,6 +11,7 @@ import {
   type PresetId,
   type CardAccentId,
   type CardBackgroundIntensityId,
+  type CardCompositionId,
   type CardCornerRadiusId,
   type CardDensityId,
   type CardMoodId,
@@ -33,6 +35,7 @@ export function getCardClassName(
   cardTypographyVoiceId: CardTypographyVoiceId,
   cardBackgroundIntensityId: CardBackgroundIntensityId,
   cardCornerRadiusId: CardCornerRadiusId,
+  cardCompositionId: CardCompositionId,
   cardTextureId: CardTextureId,
   cardMoodId: CardMoodId,
 ): string {
@@ -45,6 +48,7 @@ export function getCardClassName(
     getCardTypographyVoiceOption(cardTypographyVoiceId).className,
     getCardBackgroundIntensityOption(cardBackgroundIntensityId).className,
     getCardCornerRadiusOption(cardCornerRadiusId).className,
+    getCardCompositionOption(cardCompositionId).className,
     getCardTextureOption(cardTextureId).className,
     getCardMoodOption(cardMoodId).className,
     showCardLabels ? '' : 'card-labels-hidden',

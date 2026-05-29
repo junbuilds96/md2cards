@@ -2,6 +2,7 @@ import {
   cardThemes,
   cardAccentOptions,
   cardBackgroundIntensityOptions,
+  cardCompositionOptions,
   cardCornerRadiusOptions,
   cardDensityOptions,
   cardMoodOptions,
@@ -10,6 +11,7 @@ import {
   cardTypographyScaleOptions,
   defaultCardAccentId,
   defaultCardBackgroundIntensityId,
+  defaultCardCompositionId,
   defaultCardCornerRadiusId,
   defaultCardDensityId,
   defaultCardMoodId,
@@ -21,6 +23,7 @@ import {
   platformPresets,
   type CardAccentId,
   type CardBackgroundIntensityId,
+  type CardCompositionId,
   type CardCornerRadiusId,
   type CardDensityId,
   type CardMoodId,
@@ -48,6 +51,7 @@ export type SavedCardPreset = {
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
+  cardCompositionId: CardCompositionId;
   cardTextureId: CardTextureId;
   cardMoodId: CardMoodId;
   showCardLabels: boolean;
@@ -66,6 +70,7 @@ export type SavedCardPresetDraft = {
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
+  cardCompositionId?: CardCompositionId;
   cardTextureId: CardTextureId;
   cardMoodId?: CardMoodId;
   showCardLabels?: boolean;
@@ -88,6 +93,7 @@ const validCardTypographyVoiceIds = new Set(cardTypographyVoiceOptions.map((opti
 const validCardAccentIds = new Set(cardAccentOptions.map((option) => option.id));
 const validCardBackgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
 const validCardCornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
+const validCardCompositionIds = new Set(cardCompositionOptions.map((option) => option.id));
 const validCardTextureIds = new Set(cardTextureOptions.map((option) => option.id));
 const validCardMoodIds = new Set(cardMoodOptions.map((option) => option.id));
 
@@ -135,6 +141,8 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
       : value.cardBackgroundIntensityId;
   const cardCornerRadiusId =
     value.cardCornerRadiusId === undefined ? defaultCardCornerRadiusId : value.cardCornerRadiusId;
+  const cardCompositionId =
+    value.cardCompositionId === undefined ? defaultCardCompositionId : value.cardCompositionId;
   const cardTextureId = value.cardTextureId === undefined ? defaultCardTextureId : value.cardTextureId;
   const cardMoodId = value.cardMoodId === undefined ? defaultCardMoodId : value.cardMoodId;
   const showCardLabels = value.showCardLabels === undefined ? true : value.showCardLabels;
@@ -153,6 +161,7 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     !validCardAccentIds.has(cardAccentId as CardAccentId) ||
     !validCardBackgroundIntensityIds.has(cardBackgroundIntensityId as CardBackgroundIntensityId) ||
     !validCardCornerRadiusIds.has(cardCornerRadiusId as CardCornerRadiusId) ||
+    !validCardCompositionIds.has(cardCompositionId as CardCompositionId) ||
     !validCardTextureIds.has(cardTextureId as CardTextureId) ||
     !validCardMoodIds.has(cardMoodId as CardMoodId) ||
     typeof showCardLabels !== 'boolean'
@@ -173,6 +182,7 @@ function parseSavedPreset(value: unknown): SavedCardPreset | null {
     cardAccentId: cardAccentId as CardAccentId,
     cardBackgroundIntensityId: cardBackgroundIntensityId as CardBackgroundIntensityId,
     cardCornerRadiusId: cardCornerRadiusId as CardCornerRadiusId,
+    cardCompositionId: cardCompositionId as CardCompositionId,
     cardTextureId: cardTextureId as CardTextureId,
     cardMoodId: cardMoodId as CardMoodId,
     showCardLabels,
@@ -272,6 +282,10 @@ export function saveSavedPreset(
     cardCornerRadiusId: validCardCornerRadiusIds.has(draft.cardCornerRadiusId)
       ? draft.cardCornerRadiusId
       : defaultCardCornerRadiusId,
+    cardCompositionId:
+      draft.cardCompositionId && validCardCompositionIds.has(draft.cardCompositionId)
+        ? draft.cardCompositionId
+        : defaultCardCompositionId,
     cardTextureId: validCardTextureIds.has(draft.cardTextureId) ? draft.cardTextureId : defaultCardTextureId,
     cardMoodId:
       draft.cardMoodId && validCardMoodIds.has(draft.cardMoodId) ? draft.cardMoodId : defaultCardMoodId,

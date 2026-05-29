@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   cardAccentOptions,
   cardBackgroundIntensityOptions,
+  cardCompositionOptions,
   cardCornerRadiusOptions,
   cardDensityOptions,
   cardMoodOptions,
@@ -9,6 +10,7 @@ import {
   cardTypographyVoiceOptions,
   cardTypographyScaleOptions,
   cardThemes,
+  defaultCardCompositionId,
   defaultCardCornerRadiusId,
   defaultCardMoodId,
   defaultCardTextureId,
@@ -19,6 +21,7 @@ import {
   applyStylePackAppearance,
   fitMarkdownToPreset,
   getCardBackgroundIntensityOption,
+  getCardCompositionOption,
   getCardCornerRadiusOption,
   getCardMoodOption,
   getCardTextureOption,
@@ -117,6 +120,7 @@ describe('recipePresets', () => {
     const accentIds = new Set(cardAccentOptions.map((option) => option.id));
     const backgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
     const cornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
+    const compositionIds = new Set(cardCompositionOptions.map((option) => option.id));
     const textureIds = new Set(cardTextureOptions.map((option) => option.id));
     const moodIds = new Set(cardMoodOptions.map((option) => option.id));
 
@@ -142,6 +146,7 @@ describe('recipePresets', () => {
       recipePresets.every((recipePreset) => backgroundIntensityIds.has(recipePreset.cardBackgroundIntensityId)),
     ).toBe(true);
     expect(recipePresets.every((recipePreset) => cornerRadiusIds.has(recipePreset.cardCornerRadiusId))).toBe(true);
+    expect(recipePresets.every((recipePreset) => compositionIds.has(recipePreset.cardCompositionId))).toBe(true);
     expect(recipePresets.every((recipePreset) => textureIds.has(recipePreset.cardTextureId))).toBe(true);
     expect(recipePresets.every((recipePreset) => moodIds.has(recipePreset.cardMoodId))).toBe(true);
     expect(recipePresets.every((recipePreset) => recipePreset.markdown.trim().startsWith('#'))).toBe(true);
@@ -159,6 +164,7 @@ describe('recipePresets', () => {
           recipePreset.cardAccentId,
           recipePreset.cardBackgroundIntensityId,
           recipePreset.cardCornerRadiusId,
+          recipePreset.cardCompositionId,
           recipePreset.cardTextureId,
           recipePreset.cardMoodId,
           recipePreset.showCardLabels,
@@ -174,6 +180,7 @@ describe('recipePresets', () => {
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTypographyVoiceId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardBackgroundIntensityId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardCornerRadiusId)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardCompositionId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardTextureId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.cardMoodId)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(recipePresets.map((recipePreset) => recipePreset.showCardLabels)).size).toBe(2);
@@ -182,6 +189,7 @@ describe('recipePresets', () => {
       themeId: 'editorial',
       cardAccentId: 'emerald',
       cardBackgroundIntensityId: 'vivid',
+      cardCompositionId: 'framed',
       cardTextureId: 'rich',
       cardMoodId: 'punchy',
       showCardLabels: false,
@@ -190,6 +198,7 @@ describe('recipePresets', () => {
       presetId: 'xiaohongshu',
       themeId: 'paper',
       cardCornerRadiusId: 'rounded',
+      cardCompositionId: 'poster',
       cardTextureId: 'clean',
       cardMoodId: 'calm',
       showCardLabels: false,
@@ -228,6 +237,7 @@ describe('stylePacks', () => {
     const accentIds = new Set(cardAccentOptions.map((option) => option.id));
     const backgroundIntensityIds = new Set(cardBackgroundIntensityOptions.map((option) => option.id));
     const cornerRadiusIds = new Set(cardCornerRadiusOptions.map((option) => option.id));
+    const compositionIds = new Set(cardCompositionOptions.map((option) => option.id));
     const textureIds = new Set(cardTextureOptions.map((option) => option.id));
     const moodIds = new Set(cardMoodOptions.map((option) => option.id));
 
@@ -247,6 +257,7 @@ describe('stylePacks', () => {
     expect(stylePacks.every((stylePack) => accentIds.has(stylePack.cardAccentId))).toBe(true);
     expect(stylePacks.every((stylePack) => backgroundIntensityIds.has(stylePack.cardBackgroundIntensityId))).toBe(true);
     expect(stylePacks.every((stylePack) => cornerRadiusIds.has(stylePack.cardCornerRadiusId))).toBe(true);
+    expect(stylePacks.every((stylePack) => compositionIds.has(stylePack.cardCompositionId))).toBe(true);
     expect(stylePacks.every((stylePack) => textureIds.has(stylePack.cardTextureId))).toBe(true);
     expect(stylePacks.every((stylePack) => moodIds.has(stylePack.cardMoodId))).toBe(true);
     expect(new Set(stylePacks.map((stylePack) => stylePack.cardMoodId)).size).toBeGreaterThanOrEqual(3);
@@ -271,6 +282,7 @@ describe('stylePacks', () => {
       cardAccentId: 'emerald',
       cardBackgroundIntensityId: 'vivid',
       cardCornerRadiusId: 'sharp',
+      cardCompositionId: 'framed',
       cardTextureId: 'rich',
       cardMoodId: 'punchy',
       showCardLabels: true,
@@ -317,6 +329,29 @@ describe('corner radius options', () => {
       id: 'sharp',
       label: 'Sharp',
       className: 'radius-sharp',
+    });
+  });
+});
+
+describe('composition options', () => {
+  it('defaults to the standard frame and exposes exported card classes', () => {
+    expect(getCardCompositionOption(defaultCardCompositionId)).toMatchObject({
+      id: 'standard',
+      className: 'composition-standard',
+    });
+    expect(cardCompositionOptions.map((option) => option.id)).toEqual(['standard', 'framed', 'poster']);
+    expect(cardCompositionOptions.map((option) => option.className)).toEqual([
+      'composition-standard',
+      'composition-framed',
+      'composition-poster',
+    ]);
+  });
+
+  it('falls back to standard composition for unknown ids', () => {
+    expect(getCardCompositionOption('missing' as never)).toMatchObject({
+      id: 'standard',
+      label: 'Standard',
+      className: 'composition-standard',
     });
   });
 });

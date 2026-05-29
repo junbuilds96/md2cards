@@ -16,6 +16,8 @@ export type CardBackgroundIntensityId = 'soft' | 'balanced' | 'vivid';
 
 export type CardCornerRadiusId = 'sharp' | 'subtle' | 'rounded';
 
+export type CardCompositionId = 'standard' | 'framed' | 'poster';
+
 export type CardTextureId = 'clean' | 'subtle' | 'rich';
 
 export type CardMoodId = 'calm' | 'punchy' | 'premium';
@@ -104,6 +106,13 @@ export type CardCornerRadiusOption = {
   className: string;
 };
 
+export type CardCompositionOption = {
+  id: CardCompositionId;
+  label: string;
+  description: string;
+  className: string;
+};
+
 export type CardTextureOption = {
   id: CardTextureId;
   label: string;
@@ -150,6 +159,7 @@ export type CardAppearanceSettings = {
   cardAccentId: CardAccentId;
   cardBackgroundIntensityId: CardBackgroundIntensityId;
   cardCornerRadiusId: CardCornerRadiusId;
+  cardCompositionId: CardCompositionId;
   cardTextureId: CardTextureId;
   cardMoodId: CardMoodId;
   showCardLabels: boolean;
@@ -319,6 +329,8 @@ export const defaultCardBackgroundIntensityId: CardBackgroundIntensityId = 'bala
 
 export const defaultCardCornerRadiusId: CardCornerRadiusId = 'sharp';
 
+export const defaultCardCompositionId: CardCompositionId = 'standard';
+
 export const defaultCardTextureId: CardTextureId = 'subtle';
 
 export const defaultCardMoodId: CardMoodId = 'calm';
@@ -480,6 +492,27 @@ export const cardCornerRadiusOptions: CardCornerRadiusOption[] = [
   },
 ];
 
+export const cardCompositionOptions: CardCompositionOption[] = [
+  {
+    id: 'standard',
+    label: 'Standard',
+    description: 'Clean full-card canvas with the current body rhythm.',
+    className: 'composition-standard',
+  },
+  {
+    id: 'framed',
+    label: 'Framed',
+    description: 'Adds an inner rule and panel treatment around the Markdown body.',
+    className: 'composition-framed',
+  },
+  {
+    id: 'poster',
+    label: 'Poster',
+    description: 'Creates an inset poster panel with stronger edge chrome.',
+    className: 'composition-poster',
+  },
+];
+
 export const cardTextureOptions: CardTextureOption[] = [
   {
     id: 'clean',
@@ -597,6 +630,7 @@ export const recipePresets: RecipePreset[] = [
     cardAccentId: 'blue',
     cardBackgroundIntensityId: 'balanced',
     cardCornerRadiusId: 'subtle',
+    cardCompositionId: 'standard',
     cardTextureId: 'subtle',
     cardMoodId: 'calm',
     showCardLabels: true,
@@ -620,6 +654,7 @@ Turn a product update into a share-ready visual in one pass.
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'subtle',
+    cardCompositionId: 'framed',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
     showCardLabels: false,
@@ -645,6 +680,7 @@ Ship the contrast, not the changelog.`,
     cardAccentId: 'amber',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
+    cardCompositionId: 'poster',
     cardTextureId: 'clean',
     cardMoodId: 'calm',
     showCardLabels: false,
@@ -669,6 +705,7 @@ Ship the contrast, not the changelog.`,
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
+    cardCompositionId: 'framed',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
     showCardLabels: true,
@@ -697,6 +734,7 @@ Ship the contrast, not the changelog.`,
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
+    cardCompositionId: 'framed',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
     showCardLabels: true,
@@ -726,6 +764,7 @@ Ship the contrast, not the changelog.`,
     cardAccentId: 'amber',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'subtle',
+    cardCompositionId: 'standard',
     cardTextureId: 'subtle',
     cardMoodId: 'calm',
     showCardLabels: false,
@@ -751,6 +790,7 @@ Ship the contrast, not the changelog.`,
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'rounded',
+    cardCompositionId: 'poster',
     cardTextureId: 'rich',
     cardMoodId: 'premium',
     showCardLabels: false,
@@ -774,6 +814,7 @@ People decide whether to read the caption from the first two seconds.
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
+    cardCompositionId: 'poster',
     cardTextureId: 'clean',
     cardMoodId: 'premium',
     showCardLabels: false,
@@ -795,6 +836,7 @@ Use Markdown for structure. Use recipes for the visual rhythm.
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'balanced',
     cardCornerRadiusId: 'sharp',
+    cardCompositionId: 'framed',
     cardTextureId: 'subtle',
     cardMoodId: 'punchy',
     showCardLabels: true,
@@ -824,6 +866,7 @@ export const stylePacks: StylePack[] = [
     cardAccentId: 'blue',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'subtle',
+    cardCompositionId: 'standard',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
     showCardLabels: true,
@@ -839,6 +882,7 @@ export const stylePacks: StylePack[] = [
     cardAccentId: 'rose',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
+    cardCompositionId: 'poster',
     cardTextureId: 'subtle',
     cardMoodId: 'premium',
     showCardLabels: false,
@@ -854,6 +898,7 @@ export const stylePacks: StylePack[] = [
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'vivid',
     cardCornerRadiusId: 'sharp',
+    cardCompositionId: 'framed',
     cardTextureId: 'rich',
     cardMoodId: 'punchy',
     showCardLabels: true,
@@ -869,6 +914,7 @@ export const stylePacks: StylePack[] = [
     cardAccentId: 'amber',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'rounded',
+    cardCompositionId: 'poster',
     cardTextureId: 'clean',
     cardMoodId: 'premium',
     showCardLabels: false,
@@ -884,6 +930,7 @@ export const stylePacks: StylePack[] = [
     cardAccentId: 'emerald',
     cardBackgroundIntensityId: 'soft',
     cardCornerRadiusId: 'sharp',
+    cardCompositionId: 'standard',
     cardTextureId: 'clean',
     cardMoodId: 'calm',
     showCardLabels: true,
@@ -921,6 +968,7 @@ export function applyStylePackAppearance<T extends object>(
     cardAccentId: stylePack.cardAccentId,
     cardBackgroundIntensityId: stylePack.cardBackgroundIntensityId,
     cardCornerRadiusId: stylePack.cardCornerRadiusId,
+    cardCompositionId: stylePack.cardCompositionId,
     cardTextureId: stylePack.cardTextureId,
     cardMoodId: stylePack.cardMoodId,
     showCardLabels: stylePack.showCardLabels,
@@ -1375,6 +1423,10 @@ export function getCardBackgroundIntensityOption(
 
 export function getCardCornerRadiusOption(cardCornerRadiusId: CardCornerRadiusId): CardCornerRadiusOption {
   return cardCornerRadiusOptions.find((option) => option.id === cardCornerRadiusId) ?? cardCornerRadiusOptions[0];
+}
+
+export function getCardCompositionOption(cardCompositionId: CardCompositionId): CardCompositionOption {
+  return cardCompositionOptions.find((option) => option.id === cardCompositionId) ?? cardCompositionOptions[0];
 }
 
 export function getCardTextureOption(cardTextureId: CardTextureId): CardTextureOption {

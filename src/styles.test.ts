@@ -180,7 +180,7 @@ describe('social card CSS', () => {
     const richRule = getRule('.social-card.texture-rich');
 
     expect(beforeRule).toContain('opacity: var(--card-texture-layer-opacity)');
-    expect(afterRule).toContain('opacity: var(--card-texture-accent-opacity)');
+    expect(afterRule).toContain('opacity: var(--card-accent-layer-opacity)');
     expect(cleanRule).toContain('--card-texture-layer-opacity: 0.06');
     expect(cleanRule).toContain('--card-texture-accent-opacity: 0.08');
     expect(subtleRule).toContain('--card-texture-layer-opacity: var(--card-personality-layer-opacity)');
@@ -189,6 +189,47 @@ describe('social card CSS', () => {
     expect(richRule).toContain('--card-texture-accent-opacity: 0.78');
     expect(cleanRule).not.toContain('--card-body');
     expect(richRule).not.toContain('--card-body');
+  });
+
+  it('defines composition classes that alter frame treatment without changing export dimensions', () => {
+    const cardRule = getRule('.social-card');
+    const bodyRule = getRule('.markdown-card-body');
+    const framedRule = getRule('.social-card.composition-framed');
+    const posterRule = getRule('.social-card.composition-poster');
+    const twitterStandardRule = getRule('.social-card.preset-twitter.composition-standard');
+    const twitterFramedRule = getRule('.social-card.preset-twitter.composition-framed');
+    const twitterPosterRule = getRule('.social-card.preset-twitter.composition-poster');
+    const afterRule = getRuleContaining('.social-card::after', 'background-image');
+
+    expect(cardRule).toContain('--card-body-frame-margin: 0');
+    expect(cardRule).toContain('--card-frame-accent-image: linear-gradient(transparent, transparent)');
+    expect(cardRule).toContain('--card-accent-layer-opacity: var(--card-texture-accent-opacity)');
+    expect(bodyRule).toContain('margin: var(--card-body-frame-margin)');
+    expect(bodyRule).toContain('background: var(--card-body-frame-bg)');
+    expect(bodyRule).toContain('border: var(--card-body-frame-border)');
+    expect(bodyRule).toContain('box-shadow: var(--card-body-frame-shadow), var(--card-body-frame-outline)');
+    expect(afterRule).toContain('var(--card-frame-accent-image)');
+    expect(framedRule).toContain('--card-body-frame-margin: 0 clamp(34px, 4.2cqw, 72px)');
+    expect(framedRule).toContain('--card-body-frame-border: 1px solid');
+    expect(framedRule).toContain('--card-frame-accent-opacity: 0.28');
+    expect(framedRule).toContain('--card-accent-layer-opacity: 0.52');
+    expect(posterRule).toContain('--card-body-frame-margin: clamp(8px, 1.8cqh, 24px)');
+    expect(posterRule).toContain('--card-body-frame-border: 2px solid');
+    expect(posterRule).toContain('--card-frame-accent-opacity: 0.34');
+    expect(posterRule).toContain('--card-accent-layer-opacity: 0.58');
+    expect(twitterStandardRule).toContain('--card-body-block-padding: clamp(28px, 7.8cqh, 32px)');
+    expect(twitterFramedRule).toContain('--card-body-frame-margin: 0 clamp(12px, 2cqw, 28px)');
+    expect(twitterFramedRule).toContain('--card-body-block-padding: clamp(24px, 7cqh, 30px)');
+    expect(twitterFramedRule).toContain('--card-body-inline-padding: clamp(38px, 6.4cqw, 58px)');
+    expect(twitterPosterRule).toContain('--card-body-frame-margin: 0 clamp(12px, 2cqw, 28px)');
+    expect(twitterPosterRule).toContain('--card-body-block-padding: clamp(24px, 6cqh, 30px)');
+    expect(twitterPosterRule).toContain('--card-body-inline-padding: clamp(34px, 5.8cqw, 52px)');
+    expect(framedRule).not.toMatch(/(^|\n)\s*width:/);
+    expect(framedRule).not.toMatch(/(^|\n)\s*height:/);
+    expect(posterRule).not.toMatch(/(^|\n)\s*aspect-ratio:/);
+    expect(twitterStandardRule).not.toMatch(/(^|\n)\s*width:/);
+    expect(twitterFramedRule).not.toMatch(/(^|\n)\s*width:/);
+    expect(twitterPosterRule).not.toMatch(/(^|\n)\s*height:/);
   });
 
   it('defines mood classes that tune exported card tone through distinct variables', () => {

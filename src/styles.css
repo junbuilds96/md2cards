@@ -675,6 +675,12 @@ textarea:focus {
   gap: 8px;
 }
 
+.composition-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .texture-control {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -721,6 +727,7 @@ textarea:focus {
 .accent-control button,
 .background-intensity-control button,
 .corner-radius-control button,
+.composition-control button,
 .texture-control button,
 .mood-control button,
 .style-pack-grid button,
@@ -757,6 +764,7 @@ textarea:focus {
 .accent-control button,
 .background-intensity-control button,
 .corner-radius-control button,
+.composition-control button,
 .texture-control button,
 .mood-control button {
   display: inline-flex;
@@ -800,6 +808,7 @@ textarea:focus {
 .accent-control button span:last-child,
 .background-intensity-control button span,
 .corner-radius-control button span,
+.composition-control button span,
 .texture-control button span,
 .mood-control button span,
 .style-pack-grid button span,
@@ -987,6 +996,7 @@ textarea:focus {
 .accent-control button.active,
 .background-intensity-control button.active,
 .corner-radius-control button.active,
+.composition-control button.active,
 .texture-control button.active,
 .mood-control button.active,
 .style-pack-grid button.active,
@@ -1337,6 +1347,15 @@ textarea:focus {
   --card-surface-strong-bg: color-mix(in srgb, var(--card-surface-bg) var(--card-mood-surface-mix), var(--card-bg));
   --card-table-header-bg: linear-gradient(180deg, var(--card-surface-shine), var(--code-bg));
   --card-table-row-bg: var(--card-surface-bg);
+  --card-body-frame-margin: 0;
+  --card-body-frame-bg: transparent;
+  --card-body-frame-border: 0 solid transparent;
+  --card-body-frame-radius: var(--card-surface-radius);
+  --card-body-frame-shadow: none;
+  --card-body-frame-outline: inset 0 0 0 0 transparent;
+  --card-frame-accent-image: linear-gradient(transparent, transparent);
+  --card-frame-accent-opacity: 0;
+  --card-accent-layer-opacity: var(--card-texture-accent-opacity);
   --card-heading-font-family: inherit;
   --card-body-font-family: inherit;
   --card-inline-code-font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -1382,8 +1401,8 @@ textarea:focus {
 }
 
 .social-card::after {
-  background-image: var(--card-personality-accent-image);
-  opacity: var(--card-texture-accent-opacity);
+  background-image: var(--card-personality-accent-image), var(--card-frame-accent-image);
+  opacity: var(--card-accent-layer-opacity);
 }
 
 .social-card.background-soft {
@@ -1418,6 +1437,45 @@ textarea:focus {
   --card-radius: clamp(34px, 5cqw, 72px);
   --card-surface-radius: clamp(16px, 2cqw, 28px);
   --card-inline-radius: clamp(10px, 1.2cqw, 16px);
+}
+
+.social-card.composition-framed {
+  --card-body-frame-margin: 0 clamp(34px, 4.2cqw, 72px);
+  --card-body-frame-bg:
+    linear-gradient(180deg, var(--card-surface-shine), transparent 40%),
+    color-mix(in srgb, var(--card-surface-bg) 78%, transparent);
+  --card-body-frame-border: 1px solid color-mix(in srgb, var(--card-accent) 30%, var(--card-surface-border));
+  --card-body-frame-radius: calc(var(--card-surface-radius) * 1.3);
+  --card-body-frame-shadow:
+    var(--card-surface-shadow),
+    inset 0 0 0 1px color-mix(in srgb, #ffffff 18%, transparent);
+  --card-body-block-padding: max(var(--card-body-block-padding), 3cqh);
+  --card-body-inline-padding: max(var(--card-body-inline-padding), 6cqw);
+  --card-frame-accent-image:
+    linear-gradient(90deg, var(--card-accent), transparent 26%, transparent 74%, var(--card-accent)),
+    linear-gradient(180deg, transparent 0 10%, color-mix(in srgb, var(--card-accent) 18%, transparent) 10% 10.5%, transparent 10.5% 89.5%, color-mix(in srgb, var(--card-accent) 18%, transparent) 89.5% 90%, transparent 90%);
+  --card-frame-accent-opacity: 0.28;
+  --card-accent-layer-opacity: 0.52;
+}
+
+.social-card.composition-poster {
+  --card-body-frame-margin: clamp(8px, 1.8cqh, 24px) clamp(42px, 6cqw, 92px);
+  --card-body-frame-bg:
+    linear-gradient(180deg, color-mix(in srgb, #ffffff 28%, transparent), transparent 46%),
+    color-mix(in srgb, var(--card-bg) 56%, var(--card-surface-bg));
+  --card-body-frame-border: 2px solid color-mix(in srgb, var(--card-accent) 42%, var(--card-border));
+  --card-body-frame-radius: calc(var(--card-surface-radius) * 1.65);
+  --card-body-frame-shadow:
+    0 22px 54px color-mix(in srgb, var(--card-accent) 16%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #ffffff 42%, transparent),
+    inset 0 0 0 clamp(6px, 0.8cqw, 12px) color-mix(in srgb, var(--card-accent) 9%, transparent);
+  --card-body-block-padding: max(var(--card-body-block-padding), 4cqh);
+  --card-body-inline-padding: max(var(--card-body-inline-padding), 6.8cqw);
+  --card-frame-accent-image:
+    linear-gradient(90deg, color-mix(in srgb, var(--card-accent) 70%, transparent) 0 1.1%, transparent 1.1% 98.9%, color-mix(in srgb, var(--card-accent) 70%, transparent) 98.9%),
+    linear-gradient(180deg, color-mix(in srgb, var(--card-accent) 24%, transparent), transparent 22%, transparent 78%, color-mix(in srgb, var(--card-accent) 24%, transparent));
+  --card-frame-accent-opacity: 0.34;
+  --card-accent-layer-opacity: 0.58;
 }
 
 .social-card.texture-clean {
@@ -1557,6 +1615,22 @@ textarea:focus {
   --card-list-item-padding-block: 0.3em;
 }
 
+.social-card.preset-twitter.composition-standard {
+  --card-body-block-padding: clamp(28px, 7.8cqh, 32px);
+}
+
+.social-card.preset-twitter.composition-framed {
+  --card-body-frame-margin: 0 clamp(12px, 2cqw, 28px);
+  --card-body-block-padding: clamp(24px, 7cqh, 30px);
+  --card-body-inline-padding: clamp(38px, 6.4cqw, 58px);
+}
+
+.social-card.preset-twitter.composition-poster {
+  --card-body-frame-margin: 0 clamp(12px, 2cqw, 28px);
+  --card-body-block-padding: clamp(24px, 6cqh, 30px);
+  --card-body-inline-padding: clamp(34px, 5.8cqw, 52px);
+}
+
 .social-card.type-small {
   --card-h1-font-size: clamp(24px, 5.9cqw, 94px);
   --card-h2-font-size: clamp(18px, 2.9cqw, 45px);
@@ -1647,8 +1721,13 @@ textarea:focus {
   flex-direction: column;
   justify-content: center;
   justify-content: safe center;
+  margin: var(--card-body-frame-margin);
   padding: var(--card-body-block-padding) var(--card-body-inline-padding);
   overflow: hidden;
+  background: var(--card-body-frame-bg);
+  border: var(--card-body-frame-border);
+  border-radius: var(--card-body-frame-radius);
+  box-shadow: var(--card-body-frame-shadow), var(--card-body-frame-outline);
   font-family: var(--card-body-font-family);
   font-weight: var(--card-body-font-weight);
 }

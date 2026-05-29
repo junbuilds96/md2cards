@@ -5,9 +5,21 @@ describe('card label layout', () => {
   it('keeps label chrome visible by default behavior', () => {
     expect(shouldShowCardLabels(true)).toBe(true);
     expect(
-      getCardClassName('theme-signal', 'twitter', true, 'balanced', 'default', 'modern', 'balanced', 'sharp', 'subtle', 'calm'),
+      getCardClassName(
+        'theme-signal',
+        'twitter',
+        true,
+        'balanced',
+        'default',
+        'modern',
+        'balanced',
+        'sharp',
+        'standard',
+        'subtle',
+        'calm',
+      ),
     ).toBe(
-      'social-card preset-twitter theme-signal density-balanced type-default voice-modern background-balanced radius-sharp texture-subtle mood-calm',
+      'social-card preset-twitter theme-signal density-balanced type-default voice-modern background-balanced radius-sharp composition-standard texture-subtle mood-calm',
     );
   });
 
@@ -23,17 +35,32 @@ describe('card label layout', () => {
         'editorial',
         'vivid',
         'rounded',
+        'poster',
         'clean',
         'punchy',
       ),
     ).toBe(
-      'social-card preset-xiaohongshu theme-signal density-compact type-large voice-editorial background-vivid radius-rounded texture-clean mood-punchy card-labels-hidden',
+      'social-card preset-xiaohongshu theme-signal density-compact type-large voice-editorial background-vivid radius-rounded composition-poster texture-clean mood-punchy card-labels-hidden',
     );
   });
 
-  it('adds the selected texture depth and mood classes to exported card markup', () => {
-    expect(getCardClassName('theme-paper', 'launch', true, 'spacious', 'small', 'mono', 'soft', 'subtle', 'rich', 'premium')).toBe(
-      'social-card preset-launch theme-paper density-spacious type-small voice-mono background-soft radius-subtle texture-rich mood-premium',
+  it('adds the selected composition, texture depth, and mood classes to exported card markup', () => {
+    expect(
+      getCardClassName(
+        'theme-paper',
+        'launch',
+        true,
+        'spacious',
+        'small',
+        'mono',
+        'soft',
+        'subtle',
+        'framed',
+        'rich',
+        'premium',
+      ),
+    ).toBe(
+      'social-card preset-launch theme-paper density-spacious type-small voice-mono background-soft radius-subtle composition-framed texture-rich mood-premium',
     );
   });
 

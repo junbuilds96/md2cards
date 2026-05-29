@@ -25,6 +25,7 @@ describe('card config recipes', () => {
       cardAccentId: 'rose',
       cardBackgroundIntensityId: 'vivid',
       cardCornerRadiusId: 'rounded',
+      cardCompositionId: 'poster',
       cardTextureId: 'rich',
       cardMoodId: 'premium',
       showCardLabels: false,
@@ -43,6 +44,7 @@ describe('card config recipes', () => {
       cardAccentId: 'rose',
       cardBackgroundIntensityId: 'vivid',
       cardCornerRadiusId: 'rounded',
+      cardCompositionId: 'poster',
       cardTextureId: 'rich',
       cardMoodId: 'premium',
       showCardLabels: false,
@@ -65,6 +67,7 @@ describe('card config recipes', () => {
         cardAccentId: 'emerald',
         cardBackgroundIntensityId: 'soft',
         cardCornerRadiusId: 'subtle',
+        cardCompositionId: 'framed',
         cardTextureId: 'clean',
         cardMoodId: 'punchy',
         showCardLabels: true,
@@ -86,6 +89,7 @@ describe('card config recipes', () => {
         cardAccentId: 'emerald',
         cardBackgroundIntensityId: 'soft',
         cardCornerRadiusId: 'subtle',
+        cardCompositionId: 'framed',
         cardTextureId: 'clean',
         cardMoodId: 'punchy',
         showCardLabels: true,
@@ -115,6 +119,7 @@ describe('card config recipes', () => {
         cardAccentId: 'blue',
         cardBackgroundIntensityId: 'balanced',
         cardCornerRadiusId: 'sharp',
+        cardCompositionId: 'standard',
         cardTextureId: 'subtle',
         cardMoodId: 'calm',
       },
@@ -154,6 +159,7 @@ describe('card config recipes', () => {
       cardAccentId: 'blue',
       cardBackgroundIntensityId: 'balanced',
       cardCornerRadiusId: 'sharp',
+      cardCompositionId: 'standard',
       cardTextureId: 'subtle',
       cardMoodId: 'calm',
       showCardLabels: true,
@@ -194,6 +200,10 @@ describe('card config recipes', () => {
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardCornerRadiusId: 'missing' }))).toEqual({
       valid: false,
       message: 'This recipe uses an unknown corner radius.',
+    });
+    expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardCompositionId: 'missing' }))).toEqual({
+      valid: false,
+      message: 'This recipe uses an unknown card composition.',
     });
     expect(parseCardConfigJson(JSON.stringify({ ...baseRecipe, cardTextureId: 'missing' }))).toEqual({
       valid: false,
