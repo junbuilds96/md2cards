@@ -239,6 +239,27 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('keeps Chinese closing quote marks attached when splitting long mixed-language paragraphs', () => {
+    const quotedSentence =
+      '这段中文说明先铺垫上下文，确保段落会被拆成多张卡。“导出没有坏。”她说，“只是链接和中文标点要一起留下。”';
+    const markdown = [
+      '# 引号回归',
+      '',
+      '## 客户原话',
+      '',
+      Array.from({ length: 18 }, () => quotedSentence).join(' '),
+    ].join('\n');
+
+    const result = splitMarkdownIntoCardDeck(markdown, platformPresets[0]);
+    const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+    expect(result.deck?.cards.length).toBeGreaterThan(1);
+    expect(joinedCards).toContain('“导出没有坏。”');
+    expect(joinedCards).toContain('“只是链接和中文标点要一起留下。”');
+    expect(result.deck?.cards.every((card) => !/\n\n[”」』）】》]/.test(card.markdown))).toBe(true);
+    expect(joinedCards).not.toMatch(/“导出没有坏。(?!”)/u);
+  });
+
   it('preserves H2/H3 order as card titles', () => {
     const markdown = [
       '# Source title',

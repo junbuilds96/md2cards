@@ -447,20 +447,25 @@ function createSections(deckTitle: string, blocks: SourceBlock[]): Section[] {
 
 function getSentenceBoundaryEnd(text: string, index: number): number | null {
   const character = text[index];
+  const consumeClosingMarks = (boundaryIndex: number) => {
+    let boundaryEnd = boundaryIndex;
+
+    while (/["')\]”’」』）】》]/.test(text[boundaryEnd + 1] ?? '')) {
+      boundaryEnd += 1;
+    }
+
+    return boundaryEnd;
+  };
 
   if ('。！？'.includes(character)) {
-    return index;
+    return consumeClosingMarks(index);
   }
 
   if (!'.!?'.includes(character)) {
     return null;
   }
 
-  let boundaryEnd = index;
-  while (/["')\]”’]/.test(text[boundaryEnd + 1] ?? '')) {
-    boundaryEnd += 1;
-  }
-
+  const boundaryEnd = consumeClosingMarks(index);
   const nextCharacter = text[boundaryEnd + 1];
   return nextCharacter === undefined || /\s/.test(nextCharacter) ? boundaryEnd : null;
 }
