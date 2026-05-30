@@ -202,6 +202,43 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('does not split Markdown links across cards when long paragraphs contain URL punctuation', () => {
+    const setupSentence =
+      'This release note keeps enough setup context to move the next source sentence near a platform split point today.';
+    const markdown = [
+      '# Link capacity',
+      '',
+      [
+        setupSentence,
+        setupSentence,
+        setupSentence,
+        setupSentence,
+        setupSentence,
+        setupSentence,
+        'Source: [capacity audit](https://example.com/docs/card.capacity?view=deck.splitter&owner=md2cards) confirms **deck splitting** remains stable.',
+        'Follow-up: keep the caption short and leave the raw audit trail in the source Markdown.',
+      ].join(' '),
+    ].join('\n');
+
+    const preset = platformPresets[0];
+    const limits = getMarkdownFitLimits(preset);
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const linkCards = result.deck?.cards.filter((card) => card.markdown.includes('[capacity audit]')) ?? [];
+
+    expect(result.deck?.cards.length).toBeGreaterThan(1);
+    expect(linkCards).toHaveLength(1);
+    expect(linkCards[0].markdown).toContain(
+      '[capacity audit](https://example.com/docs/card.capacity?view=deck.splitter&owner=md2cards)',
+    );
+    expect(linkCards[0].markdown).toContain('**deck splitting**');
+    for (const card of result.deck?.cards ?? []) {
+      expect(card.markdown).not.toMatch(/\[[^\]]+\]\([^)]*$/);
+      const stats = getMarkdownStats(card.markdown);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    }
+  });
+
   it('preserves H2/H3 order as card titles', () => {
     const markdown = [
       '# Source title',

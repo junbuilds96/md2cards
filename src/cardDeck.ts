@@ -425,6 +425,55 @@ function createSections(deckTitle: string, blocks: SourceBlock[]): Section[] {
   return sections;
 }
 
+function getSentenceBoundaryEnd(text: string, index: number): number | null {
+  const character = text[index];
+
+  if ('。！？'.includes(character)) {
+    return index;
+  }
+
+  if (!'.!?'.includes(character)) {
+    return null;
+  }
+
+  let boundaryEnd = index;
+  while (/["')\]”’]/.test(text[boundaryEnd + 1] ?? '')) {
+    boundaryEnd += 1;
+  }
+
+  const nextCharacter = text[boundaryEnd + 1];
+  return nextCharacter === undefined || /\s/.test(nextCharacter) ? boundaryEnd : null;
+}
+
+function splitTextIntoSentences(text: string): string[] {
+  const sentences: string[] = [];
+  let start = 0;
+  let index = 0;
+
+  while (index < text.length) {
+    const boundaryEnd = getSentenceBoundaryEnd(text, index);
+
+    if (boundaryEnd !== null) {
+      const sentence = text.slice(start, boundaryEnd + 1).trim();
+      if (sentence) {
+        sentences.push(sentence);
+      }
+      start = boundaryEnd + 1;
+      index = start;
+      continue;
+    }
+
+    index += 1;
+  }
+
+  const tail = text.slice(start).trim();
+  if (tail) {
+    sentences.push(tail);
+  }
+
+  return sentences;
+}
+
 function splitParagraphIntoSegments(markdown: string, characterLimit: number): string[] {
   const text = markdown.replace(/\s+/g, ' ').trim();
 
@@ -432,7 +481,7 @@ function splitParagraphIntoSegments(markdown: string, characterLimit: number): s
     return [text];
   }
 
-  const sentences = text.match(/[^。！？.!?]+[。！？.!?]?/g)?.map((item) => item.trim()).filter(Boolean) ?? [text];
+  const sentences = splitTextIntoSentences(text);
   const chunks: string[] = [];
   let current = '';
 
