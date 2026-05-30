@@ -225,6 +225,32 @@ describe('splitMarkdownIntoCardDeck', () => {
     ]);
   });
 
+  it('uses Setext headings as deck title and section boundaries', () => {
+    const markdown = [
+      'Launch readiness memo',
+      '=====================',
+      '',
+      'Risk review',
+      '-----------',
+      'Mixed Markdown imported from older docs should still split by the section heading.',
+      '',
+      'Caption checks',
+      '--------------',
+      'The generated caption should use the source title, not the first body paragraph.',
+    ].join('\n');
+
+    const result = splitMarkdownIntoCardDeck(markdown, platformPresets[2]);
+    const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+    expect(result.deck?.title).toBe('Launch readiness memo');
+    expect(result.deck?.cards.map((card) => card.title)).toEqual(['Risk review', 'Caption checks']);
+    expect(result.deck?.captionText).toContain('Launch readiness memo');
+    expect(joinedCards).toContain('Mixed Markdown imported from older docs');
+    expect(joinedCards).toContain('The generated caption should use the source title');
+    expect(joinedCards).not.toContain('=====================');
+    expect(joinedCards).not.toContain('--------------');
+  });
+
   it('groups continuous bullet lists by the preset bulletLimit', () => {
     const preset = platformPresets[0];
     const limits = getMarkdownFitLimits(preset);

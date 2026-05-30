@@ -121,6 +121,38 @@ function getHeadingText(line: string): { depth: number; title: string } | null {
   };
 }
 
+function getSetextHeadingText(line: string, nextLine: string | undefined): { depth: number; title: string } | null {
+  const titleText = line.trim();
+  const underline = nextLine?.trim() ?? '';
+  const isParagraphLike =
+    titleText.length > 0 &&
+    !getHeadingText(line) &&
+    !isListLine(line) &&
+    !isMarkdownQuoteLine(line) &&
+    !isMarkdownCodeFenceLine(line) &&
+    !isMarkdownTableRowLine(line);
+
+  if (!isParagraphLike) {
+    return null;
+  }
+
+  if (/^=+\s*$/.test(underline)) {
+    return {
+      depth: 1,
+      title: stripMarkdownText(titleText) || 'Untitled',
+    };
+  }
+
+  if (/^-{3,}\s*$/.test(underline)) {
+    return {
+      depth: 2,
+      title: stripMarkdownText(titleText) || 'Untitled',
+    };
+  }
+
+  return null;
+}
+
 function getListMarkerIndent(line: string): number | null {
   const match = line.match(/^(\s*)(?:[-*+]|\d+[.)])\s+\S/);
 
@@ -213,6 +245,22 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       }
 
       blocks.push({ type: 'code', markdown: codeLines.join('\n') });
+      continue;
+    }
+
+    const setextHeading = getSetextHeadingText(line, lines[index + 1]);
+    if (setextHeading) {
+      if (setextHeading.depth === 1 && !title) {
+        title = setextHeading.title;
+      } else {
+        blocks.push({
+          type: 'heading',
+          depth: setextHeading.depth,
+          title: setextHeading.title,
+          markdown: `${'#'.repeat(setextHeading.depth)} ${setextHeading.title}`,
+        });
+      }
+      index += 2;
       continue;
     }
 
