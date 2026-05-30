@@ -199,6 +199,7 @@ export function getInlineSafeCutIndex(text: string, cutIndex: number, maxCutInde
     ...getAutolinkRanges(text),
     ...getRegexRanges(text, [
       /(`+)([\s\S]*?)\1/g,
+      /(~~)(?=\S)([\s\S]*?\S)\1/g,
       /(\*\*|__)(?=\S)([\s\S]*?\S)\1/g,
       /([*_])(?=\S)([\s\S]*?\S)\1/g,
     ]),

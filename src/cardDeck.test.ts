@@ -431,6 +431,32 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('does not split inline strikethrough spans in oversized mixed-language sentences without spaces', () => {
+    const setupText = '中文发布说明需要连续上下文'.repeat(7);
+    const strikeSpan = '~~旧方案：手动截图再裁切，容易丢字和错过 safe area~~';
+    const markdown = [
+      '# 删除线回归',
+      '',
+      `${setupText}${strikeSpan}${'继续补充平台容量、导出校验和 English context'.repeat(80)}。`,
+    ].join('\n');
+
+    const preset = platformPresets[0];
+    const limits = getMarkdownFitLimits(preset);
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const strikeCards =
+      result.deck?.cards.filter((card) => card.markdown.includes('旧方案') || card.markdown.includes('~~')) ?? [];
+
+    expect(result.deck?.cards.length).toBeGreaterThan(1);
+    expect(strikeCards).toHaveLength(1);
+    expect(strikeCards[0].markdown).toContain(strikeSpan);
+    for (const card of result.deck?.cards ?? []) {
+      expect(card.markdown.includes('~~旧方案')).toBe(card.markdown.includes(strikeSpan));
+      const stats = getMarkdownStats(card.markdown);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    }
+  });
+
   it('keeps Chinese closing quote marks attached when splitting long mixed-language paragraphs', () => {
     const quotedSentence =
       '这段中文说明先铺垫上下文，确保段落会被拆成多张卡。“导出没有坏。”她说，“只是链接和中文标点要一起留下。”';
