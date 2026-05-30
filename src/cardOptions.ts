@@ -4,6 +4,7 @@ import {
   isMarkdownCodeFenceLine,
   normalizeMarkdownCodeFenceBlock,
 } from './markdownCodeFences';
+import { getInlineSafeCutIndex } from './markdownInline';
 import {
   isMarkdownTableDelimiterLine,
   isMarkdownTableRowLine,
@@ -1196,40 +1197,12 @@ function shortenText(text: string, characterLimit: number): { text: string; chan
   const clipped = normalizedText.slice(0, Math.max(0, characterLimit - 3));
   const wordBoundary = clipped.lastIndexOf(' ');
   const preferredCutIndex = wordBoundary > characterLimit * 0.55 ? wordBoundary : clipped.length;
-  const cutIndex = getInlineSafeShortenCutIndex(normalizedText, preferredCutIndex, characterLimit - 3);
+  const cutIndex = getInlineSafeCutIndex(normalizedText, preferredCutIndex, characterLimit - 3);
 
   return {
     text: `${normalizedText.slice(0, cutIndex).trimEnd()}...`,
     changed: true,
   };
-}
-
-function getInlineSafeShortenCutIndex(text: string, cutIndex: number, maxCutIndex: number): number {
-  const protectedPatterns = [
-    /!?\[[^\]]+\]\((?:\\.|[^)])*\)/g,
-    /(`+)([\s\S]*?)\1/g,
-    /(\*\*|__)(?=\S)([\s\S]*?\S)\1/g,
-    /([*_])(?=\S)([\s\S]*?\S)\1/g,
-  ];
-
-  for (const pattern of protectedPatterns) {
-    let match: RegExpExecArray | null;
-
-    while ((match = pattern.exec(text)) !== null) {
-      const start = match.index;
-      const end = start + match[0].length;
-
-      if (start < cutIndex && cutIndex < end) {
-        if (start > 0) {
-          return start;
-        }
-
-        return Math.min(end, maxCutIndex);
-      }
-    }
-  }
-
-  return cutIndex;
 }
 
 function getMarkdownListMarkerIndent(line: string): number | null {

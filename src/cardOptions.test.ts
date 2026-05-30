@@ -748,6 +748,26 @@ More detail belongs in the caption.`;
     expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
   });
 
+  it('does not leave partial parenthesized Markdown links when shortening mixed-language paragraphs', () => {
+    const completeLink =
+      '[完整复盘](https://example.com/wiki/Card_(deck)_splitter?owner=fit&surface=xiaohongshu)';
+    const markdown = [
+      '# 括号链接压缩',
+      '',
+      `${'中文背景需要连续铺垫'.repeat(16)}${completeLink}${'后续继续补充 English context 和平台容量说明'.repeat(30)}。`,
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+    const stats = getMarkdownStats(result.markdown);
+    const limits = getMarkdownFitLimits(platformPresets[0]);
+
+    expect(result.changed).toBe(true);
+    expect(result.markdown).not.toContain('[完整复盘]');
+    expect(result.markdown).not.toContain('example.com/wiki/Card_');
+    expect(result.markdown).not.toMatch(/\[[^\]]+\]\([^)]*$/);
+    expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+  });
+
   it('preserves the first heading while dropping later sections when over platform limits', () => {
     const markdown = [
       '# Primary headline',

@@ -11,6 +11,7 @@ import {
   isMarkdownCodeFenceLine,
   normalizeMarkdownCodeFenceBlock,
 } from './markdownCodeFences';
+import { getInlineSafeCutIndex } from './markdownInline';
 import { isMarkdownTableRowLine, isMarkdownTableStart } from './markdownTables';
 
 export type CardDeckCard = {
@@ -550,34 +551,6 @@ function splitParagraphIntoSegments(markdown: string, characterLimit: number): s
 
     return pieces;
   });
-}
-
-function getInlineSafeCutIndex(text: string, cutIndex: number): number {
-  const protectedPatterns = [
-    /!?\[[^\]]+\]\((?:\\.|[^)])*\)/g,
-    /(`+)([\s\S]*?)\1/g,
-    /(\*\*|__)(?=\S)([\s\S]*?\S)\1/g,
-    /([*_])(?=\S)([\s\S]*?\S)\1/g,
-  ];
-
-  for (const pattern of protectedPatterns) {
-    let match: RegExpExecArray | null;
-
-    while ((match = pattern.exec(text)) !== null) {
-      const start = match.index;
-      const end = start + match[0].length;
-
-      if (start < cutIndex && cutIndex < end) {
-        if (start > 0) {
-          return start;
-        }
-
-        return end;
-      }
-    }
-  }
-
-  return cutIndex;
 }
 
 function splitOversizedListItem(item: string, lineLimit: number): string[] {

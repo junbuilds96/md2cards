@@ -268,6 +268,36 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('does not split inline Markdown links with parenthesized URLs in mixed-language text', () => {
+    const setupText = '中文发布说明需要连续铺垫上下文'.repeat(8);
+    const completeLink =
+      '[完整复盘](https://example.com/wiki/Card_(deck)_splitter?owner=md2cards&surface=xiaohongshu)';
+    const markdown = [
+      '# 括号链接回归',
+      '',
+      `${setupText}${completeLink}${'继续补充导出稳定性和 English context'.repeat(80)}。`,
+    ].join('\n');
+
+    const preset = platformPresets[0];
+    const limits = getMarkdownFitLimits(preset);
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const linkCards =
+      result.deck?.cards.filter((card) => card.markdown.includes('完整复盘') || card.markdown.includes('example.com')) ??
+      [];
+
+    expect(result.deck?.cards.length).toBeGreaterThan(1);
+    expect(linkCards).toHaveLength(1);
+    expect(linkCards[0].markdown).toContain(completeLink);
+    for (const card of result.deck?.cards ?? []) {
+      expect(card.markdown.includes('[完整复盘]')).toBe(card.markdown.includes(completeLink));
+      expect(card.markdown.includes('example.com')).toBe(card.markdown.includes(completeLink));
+      expect(card.markdown).not.toMatch(/\[[^\]]+\]\([^)]*$/);
+      const stats = getMarkdownStats(card.markdown);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    }
+  });
+
   it('does not split inline code spans in oversized mixed-language sentences without spaces', () => {
     const setupText = '中文排查说明需要连续上下文'.repeat(7);
     const codeSpan = '`npm run build -- --mode=production && npm test -- --runInBand`';
