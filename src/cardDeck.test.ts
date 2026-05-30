@@ -1189,4 +1189,62 @@ describe('splitMarkdownIntoCardDeck', () => {
       }
     }
   });
+
+  it('keeps oversized code segments in Chinese story decks inside platform capacity', () => {
+    const longPayload = `TRACE_${'0123456789abcdef'.repeat(72)}`;
+    const markdown = [
+      '# 雨夜排障',
+      '',
+      '雨从凌晨一点落到三点，发布群里只剩下键盘声。',
+      '',
+      '林夏把最后一条错误贴进 Markdown，像把一盏灯推到桌面中央。',
+      '',
+      '“先别急着重发。”陈屿说。',
+      '',
+      '> 第一行：用户看不见我们的慌张。',
+      '> 第二行：但每一张导出的卡片都应该稳定。',
+      '',
+      '她把复现命令放在故事中间，提醒自己不要凭感觉修。',
+      '',
+      '```bash',
+      'npm test && npm run build',
+      `node scripts/export.js --preset=xiaohongshu --payload=${longPayload}`,
+      'curl https://example.com/reports/nightly-capacity-regression-check',
+      'open dist/index.html',
+      'echo "done 中文"',
+      '```',
+      '',
+      '命令跑完时，雨停了一会儿。',
+      '',
+      '“现在像一次修复了吗？”他问。',
+      '',
+      '“像一次没有丢字的修复。”',
+      '',
+      '---',
+      '',
+      '天亮前，他们把结论写进最后一张卡。',
+    ].join('\n');
+
+    expect(detectNarrativeMarkdown(markdown)).toBe(true);
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+      const maxLineLimit = preset.id === 'twitter' ? 7 : 8;
+
+      expect(result.deck?.note).toContain('Story deck');
+      expect(joinedCards).toContain('```bash');
+      expect(joinedCards).toContain('npm test && npm run build');
+      expect(joinedCards).toContain('node scripts/export.js --preset=xiaohongshu --payload=');
+      expect(joinedCards).toContain('...');
+      expect(joinedCards).not.toContain(longPayload);
+      expect(result.deck?.notes.some((note) => note.includes('tightened oversized story code block'))).toBe(true);
+      expect(result.deck?.notes.some((note) => note.includes('shortened long code lines'))).toBe(true);
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(420);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(maxLineLimit);
+      }
+    }
+  });
 });

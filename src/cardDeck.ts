@@ -81,6 +81,7 @@ type CardSegment = {
 
 type StorySegment = {
   markdown: string;
+  note?: string;
 };
 
 function addUnique(items: string[], item: string) {
@@ -1004,6 +1005,42 @@ function getStoryCardLimits(preset: PlatformPreset): { characterLimit: number; t
   };
 }
 
+function fitStorySegmentToLimits(
+  segment: StorySegment,
+  limits: ReturnType<typeof getStoryCardLimits>,
+): StorySegment[] {
+  const stats = getMarkdownStats(segment.markdown);
+
+  if (stats.characterCount <= limits.characterLimit && stats.nonEmptyLineCount <= limits.maxLineLimit) {
+    return [segment];
+  }
+
+  const lines = segment.markdown.split('\n');
+  const openingFence = getMarkdownCodeFenceMarker(lines[0] ?? '');
+
+  if (openingFence) {
+    const codeLineLimit = Math.max(1, limits.maxLineLimit - 3);
+    const codeLineCharacterLimit = Math.max(48, Math.floor(limits.characterLimit / Math.max(1, codeLineLimit + 2)));
+    const normalized = normalizeMarkdownCodeFenceBlock(lines, codeLineLimit, codeLineCharacterLimit);
+    const notes = [
+      segment.note,
+      'tightened oversized story code block',
+      normalized.truncated ? 'kept the first story-safe code lines' : '',
+      normalized.shortenedLines ? 'shortened long code lines' : '',
+      normalized.closedFence ? 'closed an unterminated code fence' : '',
+    ].filter(Boolean);
+
+    return [
+      {
+        markdown: normalized.markdown,
+        note: notes.join('; '),
+      },
+    ];
+  }
+
+  return [segment];
+}
+
 function buildStoryCardMarkdown(title: string, segments: StorySegment[], includeTitle: boolean): string {
   return [includeTitle ? `# ${shortenPlainText(title, 90)}` : '', ...segments.map((segment) => segment.markdown)]
     .filter(Boolean)
@@ -1052,6 +1089,7 @@ function createStoryDeck(markdown: string, preset: PlatformPreset, options: Card
   const parsed = parseStorySegments(markdown);
   const sourceTitle = parsed.title || titleFromBlocks(parseSourceBlocks(markdown).blocks);
   const limits = getStoryCardLimits(preset);
+  const deckNotes = ['Story deck split with short narrative pacing.'];
   const rawCards: Omit<CardDeckCard, 'id' | 'index'>[] = [];
   let currentSegments: StorySegment[] = [];
 
@@ -1064,39 +1102,50 @@ function createStoryDeck(markdown: string, preset: PlatformPreset, options: Card
     rawCards.push({
       title: sourceTitle,
       markdown: buildStoryCardMarkdown(sourceTitle, currentSegments, includeTitle),
-      note: `Story card for ${preset.label}.`,
+      note: [`Story card for ${preset.label}.`, ...currentSegments.map((segment) => segment.note).filter(Boolean)].join(' '),
+    });
+    currentSegments.forEach((segment) => {
+      if (segment.note) {
+        addUnique(deckNotes, segment.note);
+      }
     });
     currentSegments = [];
   };
 
-  for (const segment of parsed.segments) {
-    if (segment === 'break') {
+  for (const rawSegment of parsed.segments) {
+    if (rawSegment === 'break') {
       flushCard();
       continue;
     }
 
-    const candidateSegments = [...currentSegments, segment];
-    const includeTitle = rawCards.length === 0;
-    const targetFits = storyCandidateFits(
-      sourceTitle,
-      candidateSegments,
-      includeTitle,
-      limits.characterLimit,
-      limits.targetLineLimit,
-    );
-    const maxFits = storyCandidateFits(
-      sourceTitle,
-      candidateSegments,
-      includeTitle,
-      limits.characterLimit,
-      limits.maxLineLimit,
-    );
+    for (const segment of fitStorySegmentToLimits(rawSegment, limits)) {
+      const candidateSegments = [...currentSegments, segment];
+      const includeTitle = rawCards.length === 0;
+      const targetFits = storyCandidateFits(
+        sourceTitle,
+        candidateSegments,
+        includeTitle,
+        limits.characterLimit,
+        limits.targetLineLimit,
+      );
+      const maxFits = storyCandidateFits(
+        sourceTitle,
+        candidateSegments,
+        includeTitle,
+        limits.characterLimit,
+        limits.maxLineLimit,
+      );
 
-    if (currentSegments.length === 0 || targetFits || (maxFits && getMarkdownStats(segment.markdown).nonEmptyLineCount > 1)) {
-      currentSegments = candidateSegments;
-    } else {
-      flushCard();
-      currentSegments = [segment];
+      if (
+        currentSegments.length === 0 ||
+        targetFits ||
+        (maxFits && getMarkdownStats(segment.markdown).nonEmptyLineCount > 1)
+      ) {
+        currentSegments = candidateSegments;
+      } else {
+        flushCard();
+        currentSegments = [segment];
+      }
     }
   }
 
@@ -1108,8 +1157,6 @@ function createStoryDeck(markdown: string, preset: PlatformPreset, options: Card
     id: `${deckIdFromTitle(sourceTitle)}-${String(index + 1).padStart(2, '0')}`,
     index,
   }));
-  const deckNotes = ['Story deck split with short narrative pacing.'];
-
   if (options.maxCards && rawCards.length > options.maxCards) {
     addUnique(deckNotes, `deck capped at ${options.maxCards} cards`);
   }
