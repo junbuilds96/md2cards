@@ -197,6 +197,16 @@ function isHorizontalRuleLine(line: string): boolean {
   return /^(?:-{3,}|\*{3,}|_{3,})$/.test(compactLine);
 }
 
+function getNextNonEmptyLineIndex(lines: string[], index: number): number | null {
+  for (let nextIndex = index; nextIndex < lines.length; nextIndex += 1) {
+    if (lines[nextIndex].trim().length > 0) {
+      return nextIndex;
+    }
+  }
+
+  return null;
+}
+
 function isMarkdownReferenceDefinitionLine(line: string): boolean {
   return /^\s{0,3}\[[^\]\n]+\]:\s+\S/.test(line);
 }
@@ -318,6 +328,26 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       const baseIndent = getListMarkerIndent(line) ?? 0;
 
       while (index < lines.length) {
+        if (lines[index].trim().length === 0) {
+          const nextNonEmptyIndex = getNextNonEmptyLineIndex(lines, index + 1);
+          const nextLine = nextNonEmptyIndex === null ? null : lines[nextNonEmptyIndex];
+          const nextMarkerIndent = nextLine === null ? null : getListMarkerIndent(nextLine);
+          const continuesLooseItem =
+            currentItem.length > 0 &&
+            nextLine !== null &&
+            (isListContinuationLine(nextLine) || (nextMarkerIndent !== null && nextMarkerIndent >= baseIndent));
+
+          if (!continuesLooseItem) {
+            break;
+          }
+
+          if (nextMarkerIndent === null) {
+            currentItem = `${currentItem}\n${lines[index].trimEnd()}`;
+          }
+          index += 1;
+          continue;
+        }
+
         const markerIndent = getListMarkerIndent(lines[index]);
 
         if (markerIndent !== null) {

@@ -1232,6 +1232,16 @@ function isMarkdownQuoteLine(line: string): boolean {
   return line.trim().startsWith('>');
 }
 
+function getNextNonEmptyLineIndex(lines: string[], index: number): number | null {
+  for (let nextIndex = index; nextIndex < lines.length; nextIndex += 1) {
+    if (lines[nextIndex].trim().length > 0) {
+      return nextIndex;
+    }
+  }
+
+  return null;
+}
+
 function compactListBlock(items: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
   const changes: string[] = [];
   const keptItems = items.slice(0, limits.bulletLimit).map((item) => {
@@ -1458,6 +1468,26 @@ function compactMarkdownBlocks(lines: string[], limits: MarkdownFitLimits): { bl
       const baseIndent = getMarkdownListMarkerIndent(line) ?? 0;
 
       while (index < lines.length) {
+        if (lines[index].trim().length === 0) {
+          const nextNonEmptyIndex = getNextNonEmptyLineIndex(lines, index + 1);
+          const nextLine = nextNonEmptyIndex === null ? null : lines[nextNonEmptyIndex];
+          const nextMarkerIndent = nextLine === null ? null : getMarkdownListMarkerIndent(nextLine);
+          const continuesLooseItem =
+            currentItem.length > 0 &&
+            nextLine !== null &&
+            (isMarkdownListContinuationLine(nextLine) || (nextMarkerIndent !== null && nextMarkerIndent >= baseIndent));
+
+          if (!continuesLooseItem) {
+            break;
+          }
+
+          if (nextMarkerIndent === null) {
+            currentItem = `${currentItem}\n${lines[index]}`;
+          }
+          index += 1;
+          continue;
+        }
+
         const markerIndent = getMarkdownListMarkerIndent(lines[index]);
 
         if (markerIndent !== null) {

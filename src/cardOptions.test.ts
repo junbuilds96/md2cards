@@ -584,6 +584,35 @@ More detail belongs in the caption.`;
     expect(result.markdown).not.toContain('第四条');
   });
 
+  it('keeps loose indented list continuations attached while fitting pasted outlines', () => {
+    const markdown = [
+      '# 发布检查',
+      '',
+      '- 第一条保留中文摘要。',
+      '',
+      '  这行来自 pasted docs，should stay attached after a blank line.',
+      '  - Nested proof keeps [ticket 42](https://example.com/tickets/42) close.',
+      '- 第二条 keeps English context visible.',
+      '- 第三条 keeps final action visible.',
+      '- 第四条应该被 Twitter landscape 的列表上限移到 caption/source.',
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+
+    expect(result.changed).toBe(true);
+    expect(result.note).toContain('capped lists at 3 items');
+    expect(result.markdown).toContain(
+      [
+        '- 第一条保留中文摘要。',
+        '',
+        '  这行来自 pasted docs，should stay attached after a blank line.',
+        '  - Nested proof keeps [ticket 42](https://example.com/tickets/42) close.',
+      ].join('\n'),
+    );
+    expect(result.markdown).toContain('- 第二条 keeps English context visible.');
+    expect(result.markdown).toContain('- 第三条 keeps final action visible.');
+    expect(result.markdown).not.toContain('第四条');
+  });
+
   it('does not compact prose with pipe separators as table rows', () => {
     const markdown = [
       '# 双语复盘',

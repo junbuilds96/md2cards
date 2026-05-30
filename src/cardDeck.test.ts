@@ -682,6 +682,44 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('keeps loose indented list continuations attached in mixed-language outlines', () => {
+    const markdown = [
+      '# Loose checklist',
+      '',
+      '## 发布复盘',
+      '',
+      '- 用户反馈：中文长段先给背景，再给动作。',
+      '',
+      '  这行来自 pasted docs，should stay under the same bullet after a blank line.',
+      '  - Nested proof keeps the link [ticket 42](https://example.com/tickets/42) close.',
+      '- English follow-up stays as the next top-level item.',
+      '',
+      'Plain closing paragraph should not become part of the list.',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(joinedCards).toContain(
+        [
+          '- 用户反馈：中文长段先给背景，再给动作。',
+          '',
+          '  这行来自 pasted docs，should stay under the same bullet after a blank line.',
+          '  - Nested proof keeps the link [ticket 42](https://example.com/tickets/42) close.',
+        ].join('\n'),
+      );
+      expect(joinedCards).toContain('- English follow-up stays as the next top-level item.');
+      expect(joinedCards).toContain('Plain closing paragraph should not become part of the list.');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('splits oversized nested list items without overflowing platform card limits', () => {
     const nestedDetails = [
       '   - Paste from Notion keeps the incident summary visible.',
