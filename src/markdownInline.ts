@@ -107,9 +107,40 @@ function getRegexRanges(text: string, patterns: RegExp[]): ProtectedInlineRange[
   return ranges;
 }
 
+function getAutolinkRanges(text: string): ProtectedInlineRange[] {
+  const ranges: ProtectedInlineRange[] = [];
+  const autolinkPattern = /https?:\/\/[^\s<>"']+/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = autolinkPattern.exec(text)) !== null) {
+    const previousCloseBracket = text.lastIndexOf(']', match.index - 1);
+    const previousOpenBracket = text.lastIndexOf('[', match.index - 1);
+
+    if (text[match.index - 1] === '(' && previousCloseBracket > previousOpenBracket) {
+      continue;
+    }
+
+    let end = match.index + match[0].length;
+
+    while (end > match.index && /[),.;:!?，。！？、；：）】》」』]/u.test(text[end - 1])) {
+      end -= 1;
+    }
+
+    if (end > match.index) {
+      ranges.push({
+        start: match.index,
+        end,
+      });
+    }
+  }
+
+  return ranges;
+}
+
 export function getInlineSafeCutIndex(text: string, cutIndex: number, maxCutIndex?: number): number {
   const protectedRanges = [
     ...getMarkdownLinkRanges(text),
+    ...getAutolinkRanges(text),
     ...getRegexRanges(text, [
       /(`+)([\s\S]*?)\1/g,
       /(\*\*|__)(?=\S)([\s\S]*?\S)\1/g,

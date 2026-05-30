@@ -298,6 +298,33 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('does not split bare URLs when oversized mixed-language sentences have no spaces', () => {
+    const setupText = '中文发布说明需要连续铺垫上下文'.repeat(7);
+    const bareUrl =
+      'https://example.com/reports/2026/05/30/md2cards-capacity-regression-check?owner=deck&surface=xiaohongshu#export';
+    const markdown = [
+      '# 裸链接回归',
+      '',
+      `${setupText}${bareUrl}${'继续补充导出稳定性和 English context'.repeat(85)}。`,
+    ].join('\n');
+
+    const preset = platformPresets[0];
+    const limits = getMarkdownFitLimits(preset);
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const urlCards = result.deck?.cards.filter((card) => card.markdown.includes('example.com')) ?? [];
+
+    expect(result.deck?.cards.length).toBeGreaterThan(1);
+    expect(urlCards).toHaveLength(1);
+    expect(urlCards[0].markdown).toContain(bareUrl);
+    for (const card of result.deck?.cards ?? []) {
+      expect(card.markdown.includes('example.com')).toBe(card.markdown.includes(bareUrl));
+      expect(card.markdown.includes('https://')).toBe(card.markdown.includes(bareUrl));
+      const stats = getMarkdownStats(card.markdown);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    }
+  });
+
   it('does not split inline code spans in oversized mixed-language sentences without spaces', () => {
     const setupText = '中文排查说明需要连续上下文'.repeat(7);
     const codeSpan = '`npm run build -- --mode=production && npm test -- --runInBand`';
