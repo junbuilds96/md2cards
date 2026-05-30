@@ -1327,11 +1327,16 @@ function compactTableBlock(lines: string[], limits: MarkdownFitLimits): { block:
 }
 
 function compactCodeBlock(lines: string[], limits: MarkdownFitLimits): { block: string; changes: string[] } {
-  const normalized = normalizeMarkdownCodeFenceBlock(lines, limits.codeLineLimit);
+  const codeLineCharacterLimit = Math.max(48, Math.floor(limits.characterLimit / Math.max(1, limits.codeLineLimit + 2)));
+  const normalized = normalizeMarkdownCodeFenceBlock(lines, limits.codeLineLimit, codeLineCharacterLimit);
   const changes: string[] = [];
 
   if (normalized.truncated) {
     addChange(changes, `kept the first ${limits.codeLineLimit} code lines`);
+  }
+
+  if (normalized.shortenedLines) {
+    addChange(changes, 'shortened long code lines');
   }
 
   if (normalized.closedFence) {

@@ -669,6 +669,29 @@ More detail belongs in the caption.`;
     }
   });
 
+  it('shortens oversized single-line code blocks so fitted cards stay inside platform character limits', () => {
+    const oversizedToken = `TOKEN_${'abcdef0123456789'.repeat(120)}`;
+    const markdown = ['# CLI payload', '', '```bash', `curl https://example.com/deploy?payload=${oversizedToken}`, '```'].join(
+      '\n',
+    );
+
+    for (const preset of platformPresets) {
+      const result = fitMarkdownToPreset(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const stats = getMarkdownStats(result.markdown);
+
+      expect(result.changed).toBe(true);
+      expect(result.note).toContain('shortened long code lines');
+      expect(result.markdown).toContain('```bash');
+      expect(result.markdown).toContain('curl https://example.com/deploy?payload=TOKEN_');
+      expect(result.markdown).toContain('...');
+      expect(result.markdown.endsWith('```')).toBe(true);
+      expect(result.markdown).not.toContain(oversizedToken);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+    }
+  });
+
   it('keeps multi-line blockquotes as quote lines when fitting pasted Markdown', () => {
     const markdown = [
       '# Quote check',

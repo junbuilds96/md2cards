@@ -663,6 +663,43 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('keeps deck cards within platform capacity when code fences contain one oversized line', () => {
+    const oversizedPayload = `PAYLOAD_${'0123456789abcdef'.repeat(120)}`;
+    const markdown = [
+      '# Deploy repro',
+      '',
+      '## CLI payload',
+      '',
+      'Context before the command should remain separate from the code block.',
+      '',
+      '```bash',
+      `curl https://example.com/release --data '${oversizedPayload}'`,
+      '```',
+      '',
+      'Follow-up text should remain available after the code card.',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+      const codeCard = result.deck?.cards.find((card) => card.markdown.includes('curl https://example.com/release'));
+
+      expect(result.deck?.cards.length).toBeGreaterThan(1);
+      expect(codeCard?.markdown).toContain('```bash');
+      expect(codeCard?.markdown).toContain('PAYLOAD_');
+      expect(codeCard?.markdown).toContain('...');
+      expect(codeCard?.markdown.trim().endsWith('```')).toBe(true);
+      expect(joinedCards).not.toContain(oversizedPayload);
+      expect(result.deck?.notes).toContain('some cards were tightened to stay inside platform limits');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      }
+    }
+  });
+
   it('preserves multi-line blockquotes in mixed-language social posts', () => {
     const markdown = [
       '# 客户反馈复盘',
