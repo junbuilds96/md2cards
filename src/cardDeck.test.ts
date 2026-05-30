@@ -804,6 +804,41 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('splits long mixed-language tables across platform-sized deck cards without dropping rows', () => {
+    const rows = [
+      '| 发现 | 中文摘要 keeps the incident context visible. |',
+      '| Impact | English detail stays close to the status owner. |',
+      '| Owner | [平台组](https://example.com/owners/platform) keeps follow-up traceable. |',
+      '| Quote | > 用户说导出卡片要稳定 readable. |',
+      '| Code | `npm test && npm run build` stays in the rollout row. |',
+      '| Launch | Final caption should point back to the source Markdown. |',
+      '| Review | QA checks X / 小红书 / launch capacity before export. |',
+    ];
+    const markdown = ['# Table paging', '', '## 发布矩阵', '', '| Type | Detail |', '| --- | --- |', ...rows].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const tableCards = result.deck?.cards.filter((card) => card.markdown.includes('| Type | Detail |')) ?? [];
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(tableCards.length).toBe(Math.ceil(rows.length / limits.tableDataRowLimit));
+      expect(result.deck?.notes).toContain('source contained table; split table rows across cards');
+      for (const row of rows) {
+        expect(joinedCards).toContain(row);
+      }
+      for (const card of tableCards) {
+        expect(card.markdown).toContain('| Type | Detail |');
+        expect(card.markdown).toContain('| --- | --- |');
+        const tableRowCount = card.markdown.split('\n').filter((line) => line.trim().startsWith('|')).length;
+        expect(tableRowCount).toBeLessThanOrEqual(2 + limits.tableDataRowLimit);
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('preserves tilde-fenced code blocks as code cards', () => {
     const markdown = [
       '# Code note',

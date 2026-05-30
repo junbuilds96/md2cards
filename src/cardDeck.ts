@@ -696,15 +696,35 @@ function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] 
 
   if (block.type === 'table') {
     const lines = block.markdown.split('\n');
-    const keptRows = lines.slice(0, 2 + limits.tableDataRowLimit);
+    const headerRows = lines.slice(0, 2);
+    const dataRows = lines.slice(2);
+    const maxDataRows = Math.max(1, limits.tableDataRowLimit);
 
-    return [
-      {
-        markdown: keptRows.join('\n'),
-        note: 'source contained table; kept the first rows on-card',
+    if (dataRows.length === 0) {
+      return [
+        {
+          markdown: headerRows.join('\n'),
+          note: 'source contained table',
+          forceCard: true,
+        },
+      ];
+    }
+
+    const chunks: CardSegment[] = [];
+
+    for (let index = 0; index < dataRows.length; index += maxDataRows) {
+      const rowChunk = dataRows.slice(index, index + maxDataRows);
+      chunks.push({
+        markdown: [...headerRows, ...rowChunk].join('\n'),
+        note:
+          dataRows.length > maxDataRows
+            ? 'source contained table; split table rows across cards'
+            : 'source contained table',
         forceCard: true,
-      },
-    ];
+      });
+    }
+
+    return chunks;
   }
 
   return [{ markdown: block.markdown }];
