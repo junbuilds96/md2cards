@@ -624,6 +624,24 @@ More detail belongs in the caption.`;
     expect(result.note).toContain('kept the first 2 table rows');
   });
 
+  it('keeps pipe characters inside inline code spans when fitting real GFM tables', () => {
+    const markdown = [
+      '# Table code check',
+      '',
+      '| Check | Detail |',
+      '| --- | --- |',
+      '| Parser | `value | fallback` stays in one cell. |',
+      '| Export | Keep generated SVG text stable. |',
+      '| Caption | This row should move back to the source. |',
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+
+    expect(result.markdown).toContain('| Parser | `value | fallback` stays in one cell. |');
+    expect(result.markdown).not.toContain('| Parser | `value | fallback` | stays in one cell. |');
+    expect(result.markdown).not.toContain('| Caption |');
+    expect(result.note).toContain('kept the first 2 table rows');
+  });
+
   it('caps tilde-fenced code blocks without flattening them into prose', () => {
     const markdown = [
       '# Code check',

@@ -675,6 +675,33 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('keeps inline code pipes inside GFM table cells when creating deck cards', () => {
+    const markdown = [
+      '# Table code deck',
+      '',
+      '## Parser notes',
+      '',
+      '| Check | Detail |',
+      '| --- | --- |',
+      '| Parser | `value | fallback` stays in one cell with 中文 context. |',
+      '| Export | Keep deck SVG text stable after fitting. |',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(joinedCards).toContain('| Parser | `value | fallback` stays in one cell');
+      expect(joinedCards).not.toContain('| Parser | `value | fallback` | stays in one cell');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('preserves tilde-fenced code blocks as code cards', () => {
     const markdown = [
       '# Code note',
