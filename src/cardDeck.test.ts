@@ -980,4 +980,68 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(joinedCards).not.toContain('> 第一行：我以为告别只是把门关上。 > 第二行');
     expect(joinedCards).not.toContain('> 第一行：不是所有故事都需要答案。 > 第二行');
   });
+
+  it('preserves list and table shapes inside realistic mixed-language story decks across platforms', () => {
+    const markdown = [
+      '# 雨夜发布清单',
+      '',
+      '凌晨的办公室只剩一盏灯，林夏把最后一版发布说明贴进 Markdown。',
+      '',
+      '“这不像故事。”陈屿说。',
+      '',
+      '“可用户读到的每一次故障，都是一个有开头和结尾的夜晚。”她回答。',
+      '',
+      '> 她后来记得，那天最安静的不是走廊，而是所有人等测试结果的三分钟。',
+      '',
+      '他们先把风险写成清单，避免情绪盖过事实。',
+      '',
+      '- 中文摘要：导出队列已恢复，用户不会丢失草稿。',
+      '- English note: keep the source Markdown editable after deck export.',
+      '',
+      '接着，她补了一行命令，像给混乱的夜晚按下暂停。',
+      '',
+      '```bash',
+      'npm test && npm run build',
+      '```',
+      '',
+      '最后，陈屿把状态表放进结尾。',
+      '',
+      '| 阶段 | Status |',
+      '| --- | --- |',
+      '| 回滚 | Ready |',
+      '| 导出 | Stable |',
+      '',
+      '---',
+      '',
+      '天快亮时，窗外的雨停了。',
+      '',
+      '“现在像故事了吗？”他问。',
+      '',
+      '“像一次没有惊动用户的修复。”',
+    ].join('\n');
+
+    expect(detectNarrativeMarkdown(markdown)).toBe(true);
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+      const maxLineLimit = preset.id === 'twitter' ? 7 : 8;
+
+      expect(result.deck?.note).toContain('Story deck');
+      expect(joinedCards).toContain('- 中文摘要：导出队列已恢复，用户不会丢失草稿。');
+      expect(joinedCards).toContain('- English note: keep the source Markdown editable after deck export.');
+      expect(joinedCards).toContain('```bash');
+      expect(joinedCards).toContain('npm test && npm run build');
+      expect(joinedCards).toContain('| 阶段 | Status |');
+      expect(joinedCards).toContain('| 回滚 | Ready |');
+      expect(joinedCards).not.toContain('事实。 - 中文摘要');
+      expect(joinedCards).not.toContain('结尾。 | 阶段 | Status |');
+
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(420);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(maxLineLimit);
+      }
+    }
+  });
 });

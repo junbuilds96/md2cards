@@ -868,6 +868,40 @@ function parseStorySegments(markdown: string): { title: string | null; segments:
       continue;
     }
 
+    if (isMarkdownTableStart(lines, index)) {
+      const tableLines: string[] = [lines[index].trimEnd(), lines[index + 1].trimEnd()];
+      index += 2;
+
+      while (index < lines.length && lines[index].trim().length > 0 && isMarkdownTableRowLine(lines[index])) {
+        tableLines.push(lines[index].trimEnd());
+        index += 1;
+      }
+
+      segments.push({ markdown: tableLines.join('\n') });
+      continue;
+    }
+
+    if (isListLine(line)) {
+      while (index < lines.length) {
+        const markerIndent = getListMarkerIndent(lines[index]);
+
+        if (markerIndent === null) {
+          break;
+        }
+
+        const itemLines = [lines[index].trimEnd()];
+        index += 1;
+
+        while (index < lines.length && isListContinuationLine(lines[index])) {
+          itemLines.push(lines[index].trimEnd());
+          index += 1;
+        }
+
+        segments.push({ markdown: itemLines.join('\n') });
+      }
+      continue;
+    }
+
     const paragraphLines: string[] = [];
 
     while (
@@ -876,6 +910,8 @@ function parseStorySegments(markdown: string): { title: string | null; segments:
       !isHorizontalRuleLine(lines[index]) &&
       !isMarkdownCodeFenceLine(lines[index]) &&
       !lines[index].trim().startsWith('>') &&
+      !isMarkdownTableStart(lines, index) &&
+      !isListLine(lines[index]) &&
       getHeadingText(lines[index])?.depth !== 1
     ) {
       paragraphLines.push(lines[index].trim());
