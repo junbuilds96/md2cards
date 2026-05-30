@@ -366,6 +366,7 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       !isListLine(lines[index]) &&
       !isMarkdownQuoteLine(lines[index]) &&
       !isMarkdownCodeFenceLine(lines[index]) &&
+      !isHorizontalRuleLine(lines[index]) &&
       !isMarkdownTableStart(lines, index)
     ) {
       paragraphLines.push(lines[index].trim());

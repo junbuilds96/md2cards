@@ -343,6 +343,36 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('keeps tightly pasted thematic breaks as card boundaries without dropping adjacent prose', () => {
+    const markdown = [
+      '# 紧贴分隔线复盘',
+      '',
+      '第一张卡保留中文背景和 English setup before the separator.',
+      '***',
+      'Second card keeps the outcome text even when no blank lines surround the break.',
+      '___',
+      '第三张卡保留最后的 CTA 和 mixed-language caption hint.',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(result.deck?.cards).toHaveLength(3);
+      expect(joinedCards).toContain('第一张卡保留中文背景');
+      expect(joinedCards).toContain('Second card keeps the outcome text');
+      expect(joinedCards).toContain('第三张卡保留最后的 CTA');
+      expect(joinedCards).not.toContain('***');
+      expect(joinedCards).not.toContain('___');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('groups continuous bullet lists by the preset bulletLimit', () => {
     const preset = platformPresets[0];
     const limits = getMarkdownFitLimits(preset);
