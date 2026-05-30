@@ -553,7 +553,12 @@ function splitParagraphIntoSegments(markdown: string, characterLimit: number): s
 }
 
 function getInlineSafeCutIndex(text: string, cutIndex: number): number {
-  const protectedPatterns = [/!?\[[^\]]+\]\((?:\\.|[^)])*\)/g, /(`+)([\s\S]*?)\1/g];
+  const protectedPatterns = [
+    /!?\[[^\]]+\]\((?:\\.|[^)])*\)/g,
+    /(`+)([\s\S]*?)\1/g,
+    /(\*\*|__)(?=\S)([\s\S]*?\S)\1/g,
+    /([*_])(?=\S)([\s\S]*?\S)\1/g,
+  ];
 
   for (const pattern of protectedPatterns) {
     let match: RegExpExecArray | null;

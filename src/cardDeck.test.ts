@@ -293,6 +293,42 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('does not split inline emphasis spans in oversized mixed-language sentences without spaces', () => {
+    const setupText = '中文发布说明需要连续上下文'.repeat(7);
+    const boldSpan = '**重点修复：链接、表格、quotes 都不能被拆坏**';
+    const italicSpan = '_fallback renderer keeps mixed CN/EN text readable_';
+    const markdown = [
+      '# 强调标记回归',
+      '',
+      `${setupText}${boldSpan}${'继续补充平台差异和导出校验context'.repeat(55)}${italicSpan}${'最后补充长段落尾部说明'.repeat(40)}。`,
+    ].join('\n');
+
+    const preset = platformPresets[0];
+    const limits = getMarkdownFitLimits(preset);
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const emphasisCards =
+      result.deck?.cards.filter(
+        (card) =>
+          card.markdown.includes('重点修复') ||
+          card.markdown.includes('fallback renderer') ||
+          card.markdown.includes('**') ||
+          card.markdown.includes('_fallback'),
+      ) ?? [];
+
+    expect(result.deck?.cards.length).toBeGreaterThan(1);
+    expect(emphasisCards.filter((card) => card.markdown.includes('重点修复'))).toHaveLength(1);
+    expect(emphasisCards.filter((card) => card.markdown.includes('fallback renderer'))).toHaveLength(1);
+    expect(emphasisCards.some((card) => card.markdown.includes(boldSpan))).toBe(true);
+    expect(emphasisCards.some((card) => card.markdown.includes(italicSpan))).toBe(true);
+    for (const card of result.deck?.cards ?? []) {
+      expect(card.markdown.includes('**重点修复')).toBe(card.markdown.includes(boldSpan));
+      expect(card.markdown.includes('_fallback renderer')).toBe(card.markdown.includes(italicSpan));
+      const stats = getMarkdownStats(card.markdown);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    }
+  });
+
   it('keeps Chinese closing quote marks attached when splitting long mixed-language paragraphs', () => {
     const quotedSentence =
       '这段中文说明先铺垫上下文，确保段落会被拆成多张卡。“导出没有坏。”她说，“只是链接和中文标点要一起留下。”';
