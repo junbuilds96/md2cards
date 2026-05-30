@@ -239,6 +239,35 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('does not split inline Markdown links when oversized mixed-language sentences have no spaces', () => {
+    const setupText = '中文发布说明需要连续铺垫上下文'.repeat(6);
+    const completeLink =
+      '[完整复盘](https://example.com/reports/2026/05/30/md2cards-capacity-regression-check?owner=deck&surface=xiaohongshu)';
+    const markdown = [
+      '# 单句链接回归',
+      '',
+      `${setupText}${completeLink}${'需要在同一句里保留链接和中文标点'.repeat(80)}。`,
+    ].join('\n');
+
+    const preset = platformPresets[0];
+    const limits = getMarkdownFitLimits(preset);
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const linkCards =
+      result.deck?.cards.filter((card) => card.markdown.includes('完整复盘') || card.markdown.includes('example.com')) ??
+      [];
+
+    expect(result.deck?.cards.length).toBeGreaterThan(1);
+    expect(linkCards).toHaveLength(1);
+    expect(linkCards[0].markdown).toContain(completeLink);
+    for (const card of result.deck?.cards ?? []) {
+      expect(card.markdown).not.toMatch(/\[[^\]]+\]\([^)]*$/);
+      expect(card.markdown.includes('example.com')).toBe(card.markdown.includes(completeLink));
+      const stats = getMarkdownStats(card.markdown);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    }
+  });
+
   it('keeps Chinese closing quote marks attached when splitting long mixed-language paragraphs', () => {
     const quotedSentence =
       '这段中文说明先铺垫上下文，确保段落会被拆成多张卡。“导出没有坏。”她说，“只是链接和中文标点要一起留下。”';

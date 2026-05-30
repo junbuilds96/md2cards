@@ -538,7 +538,8 @@ function splitParagraphIntoSegments(markdown: string, characterLimit: number): s
     while (rest.length > characterLimit) {
       const clipped = rest.slice(0, characterLimit);
       const boundary = clipped.lastIndexOf(' ');
-      const cutIndex = boundary > characterLimit * 0.55 ? boundary : clipped.length;
+      const preferredCutIndex = boundary > characterLimit * 0.55 ? boundary : clipped.length;
+      const cutIndex = getInlineSafeCutIndex(rest, preferredCutIndex);
       pieces.push(rest.slice(0, cutIndex).trim());
       rest = rest.slice(cutIndex).trim();
     }
@@ -549,6 +550,26 @@ function splitParagraphIntoSegments(markdown: string, characterLimit: number): s
 
     return pieces;
   });
+}
+
+function getInlineSafeCutIndex(text: string, cutIndex: number): number {
+  const linkPattern = /!?\[[^\]]+\]\((?:\\.|[^)])*\)/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = linkPattern.exec(text)) !== null) {
+    const start = match.index;
+    const end = start + match[0].length;
+
+    if (start < cutIndex && cutIndex < end) {
+      if (start > 0) {
+        return start;
+      }
+
+      return end;
+    }
+  }
+
+  return cutIndex;
 }
 
 function splitOversizedListItem(item: string, lineLimit: number): string[] {
