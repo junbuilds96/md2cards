@@ -288,6 +288,40 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(joinedCards).not.toContain('--------------');
   });
 
+  it('uses Markdown thematic breaks as deck card boundaries across platform presets', () => {
+    const markdown = [
+      '# Platform launch notes',
+      '',
+      'First card keeps the setup visible before the separator.',
+      '',
+      '***',
+      '',
+      'Second card keeps the proof point after a star break.',
+      '',
+      '_ _ _',
+      '',
+      'Third card keeps the CTA after a spaced underscore break.',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(result.deck?.cards).toHaveLength(3);
+      expect(joinedCards).toContain('First card keeps the setup');
+      expect(joinedCards).toContain('Second card keeps the proof point');
+      expect(joinedCards).toContain('Third card keeps the CTA');
+      expect(joinedCards).not.toContain('***');
+      expect(joinedCards).not.toContain('_ _ _');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('groups continuous bullet lists by the preset bulletLimit', () => {
     const preset = platformPresets[0];
     const limits = getMarkdownFitLimits(preset);

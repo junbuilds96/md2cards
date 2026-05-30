@@ -59,6 +59,9 @@ type SourceBlock =
       markdown: string;
     }
   | {
+      type: 'break';
+    }
+  | {
       type: 'list';
       items: string[];
     };
@@ -72,6 +75,7 @@ type CardSegment = {
   markdown: string;
   note?: string;
   forceCard?: boolean;
+  breakBefore?: boolean;
 };
 
 type StorySegment = {
@@ -177,7 +181,9 @@ function isListContinuationLine(line: string): boolean {
 }
 
 function isHorizontalRuleLine(line: string): boolean {
-  return /^-{3,}\s*$/.test(line.trim());
+  const compactLine = line.trim().replace(/[ \t]+/g, '');
+
+  return /^(?:-{3,}|\*{3,}|_{3,})$/.test(compactLine);
 }
 
 function isMarkdownQuoteLine(line: string): boolean {
@@ -245,6 +251,12 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       }
 
       blocks.push({ type: 'code', markdown: codeLines.join('\n') });
+      continue;
+    }
+
+    if (isHorizontalRuleLine(line)) {
+      blocks.push({ type: 'break' });
+      index += 1;
       continue;
     }
 
@@ -368,6 +380,10 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
 
 function titleFromBlocks(blocks: SourceBlock[]): string {
   const firstBlock = blocks.find((block) => {
+    if (block.type === 'break') {
+      return false;
+    }
+
     if (block.type === 'list') {
       return block.items.length > 0;
     }
@@ -381,6 +397,10 @@ function titleFromBlocks(blocks: SourceBlock[]): string {
 
   if (firstBlock.type === 'list') {
     return shortenPlainText(stripMarkdownText(firstBlock.items[0]), 68) || 'Untitled deck';
+  }
+
+  if (firstBlock.type === 'break') {
+    return 'Untitled deck';
   }
 
   return shortenPlainText(stripMarkdownText(firstBlock.markdown), 68) || 'Untitled deck';
@@ -551,6 +571,10 @@ function splitOversizedListItem(item: string, lineLimit: number): string[] {
 function expandBlock(block: SourceBlock, preset: PlatformPreset): CardSegment[] {
   const limits = getMarkdownFitLimits(preset);
 
+  if (block.type === 'break') {
+    return [{ markdown: '', breakBefore: true }];
+  }
+
   if (block.type === 'list') {
     const chunks: CardSegment[] = [];
     const maxListLines = Math.max(1, limits.lineLimit - 1);
@@ -704,6 +728,14 @@ function cardsFromSection(section: Section, preset: PlatformPreset, deckNotes: s
   let currentSegments: CardSegment[] = [];
 
   for (const segment of segments) {
+    if (segment.breakBefore) {
+      if (currentSegments.length > 0) {
+        cards.push(makeCard(section.title, currentSegments, preset, deckNotes));
+        currentSegments = [];
+      }
+      continue;
+    }
+
     if (segment.forceCard && currentSegments.length > 0) {
       cards.push(makeCard(section.title, currentSegments, preset, deckNotes));
       currentSegments = [];
