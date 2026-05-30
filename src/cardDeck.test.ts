@@ -268,6 +268,31 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('does not split inline code spans in oversized mixed-language sentences without spaces', () => {
+    const setupText = '中文排查说明需要连续上下文'.repeat(7);
+    const codeSpan = '`npm run build -- --mode=production && npm test -- --runInBand`';
+    const markdown = [
+      '# 内联代码回归',
+      '',
+      `${setupText}${codeSpan}${'之后继续补充发布校验和英文context'.repeat(90)}。`,
+    ].join('\n');
+
+    const preset = platformPresets[0];
+    const limits = getMarkdownFitLimits(preset);
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const codeCards = result.deck?.cards.filter((card) => card.markdown.includes('npm run build')) ?? [];
+
+    expect(result.deck?.cards.length).toBeGreaterThan(1);
+    expect(codeCards).toHaveLength(1);
+    expect(codeCards[0].markdown).toContain(codeSpan);
+    for (const card of result.deck?.cards ?? []) {
+      expect(card.markdown.includes('`npm run build')).toBe(card.markdown.includes(codeSpan));
+      const stats = getMarkdownStats(card.markdown);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    }
+  });
+
   it('keeps Chinese closing quote marks attached when splitting long mixed-language paragraphs', () => {
     const quotedSentence =
       '这段中文说明先铺垫上下文，确保段落会被拆成多张卡。“导出没有坏。”她说，“只是链接和中文标点要一起留下。”';
