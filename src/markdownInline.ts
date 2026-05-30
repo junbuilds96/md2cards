@@ -68,6 +68,62 @@ function getMarkdownLinkEnd(text: string, linkStart: number): number | null {
   return null;
 }
 
+function getMarkdownReferenceLinkEnd(text: string, linkStart: number): number | null {
+  const labelStart = text.indexOf('[', linkStart + (text[linkStart] === '!' ? 1 : 0));
+
+  if (labelStart < 0) {
+    return null;
+  }
+
+  let escaped = false;
+  let labelEnd = -1;
+
+  for (let index = labelStart + 1; index < text.length; index += 1) {
+    const character = text[index];
+
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+
+    if (character === '\\') {
+      escaped = true;
+      continue;
+    }
+
+    if (character === ']') {
+      labelEnd = index;
+      break;
+    }
+  }
+
+  if (labelEnd < 0 || text[labelEnd + 1] !== '[') {
+    return null;
+  }
+
+  escaped = false;
+
+  for (let index = labelEnd + 2; index < text.length; index += 1) {
+    const character = text[index];
+
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+
+    if (character === '\\') {
+      escaped = true;
+      continue;
+    }
+
+    if (character === ']') {
+      return index + 1;
+    }
+  }
+
+  return null;
+}
+
 function getMarkdownLinkRanges(text: string): ProtectedInlineRange[] {
   const ranges: ProtectedInlineRange[] = [];
 
@@ -79,7 +135,7 @@ function getMarkdownLinkRanges(text: string): ProtectedInlineRange[] {
       continue;
     }
 
-    const end = getMarkdownLinkEnd(text, index);
+    const end = getMarkdownLinkEnd(text, index) ?? getMarkdownReferenceLinkEnd(text, index);
 
     if (end !== null) {
       ranges.push({ start: index, end });

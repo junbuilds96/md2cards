@@ -91,7 +91,9 @@ function addUnique(items: string[], item: string) {
 
 function stripMarkdownText(markdown: string): string {
   return markdown
+    .replace(/^\s{0,3}\[[^\]]+\]:\s+\S.*$/gm, '')
     .replace(/!?\[([^\]]*)\]\((?:\\.|[^)])*\)/g, '$1')
+    .replace(/!?\[([^\]]*)\]\[[^\]]*\]/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/^\s*(?:[-*+]|\d+[.)])\s+/gm, '')
     .replace(/[`*_~>|[\]()]/g, '')
@@ -195,6 +197,10 @@ function isHorizontalRuleLine(line: string): boolean {
   return /^(?:-{3,}|\*{3,}|_{3,})$/.test(compactLine);
 }
 
+function isMarkdownReferenceDefinitionLine(line: string): boolean {
+  return /^\s{0,3}\[[^\]\n]+\]:\s+\S/.test(line);
+}
+
 function isMarkdownQuoteLine(line: string): boolean {
   return line.trim().startsWith('>');
 }
@@ -243,6 +249,11 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
     const line = lines[index];
 
     if (line.trim().length === 0) {
+      index += 1;
+      continue;
+    }
+
+    if (isMarkdownReferenceDefinitionLine(line)) {
       index += 1;
       continue;
     }
@@ -376,6 +387,7 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
       !isMarkdownQuoteLine(lines[index]) &&
       !isMarkdownCodeFenceLine(lines[index]) &&
       !isHorizontalRuleLine(lines[index]) &&
+      !isMarkdownReferenceDefinitionLine(lines[index]) &&
       !isMarkdownTableStart(lines, index)
     ) {
       paragraphLines.push(lines[index].trim());
@@ -823,6 +835,11 @@ function parseStorySegments(markdown: string): { title: string | null; segments:
       continue;
     }
 
+    if (isMarkdownReferenceDefinitionLine(line)) {
+      index += 1;
+      continue;
+    }
+
     const heading = getHeadingText(line);
     if (heading?.depth === 1) {
       if (!title) {
@@ -909,6 +926,7 @@ function parseStorySegments(markdown: string): { title: string | null; segments:
       lines[index].trim().length > 0 &&
       !isHorizontalRuleLine(lines[index]) &&
       !isMarkdownCodeFenceLine(lines[index]) &&
+      !isMarkdownReferenceDefinitionLine(lines[index]) &&
       !lines[index].trim().startsWith('>') &&
       !isMarkdownTableStart(lines, index) &&
       !isListLine(lines[index]) &&

@@ -325,6 +325,51 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('does not split reference-style links or leak reference definitions into captions', () => {
+    const setupText = '中文发布说明需要连续铺垫上下文'.repeat(7);
+    const headingReferenceLink = '[release audit][audit-link]';
+    const paragraphReferenceLink = '[capacity proof][capacity-link]';
+    const referenceDefinition =
+      '[audit-link]: https://example.com/reports/2026/05/30/md2cards-reference-link-regression?owner=deck&surface=xiaohongshu';
+    const capacityReferenceDefinition =
+      '[capacity-link]: https://example.com/reports/2026/05/30/md2cards-capacity-proof?owner=deck&surface=xiaohongshu';
+    const markdown = [
+      '# Reference link regression',
+      '',
+      `## ${headingReferenceLink}`,
+      '',
+      `${setupText}${paragraphReferenceLink}${'继续补充导出稳定性和 English context'.repeat(85)}。`,
+      '',
+      referenceDefinition,
+      capacityReferenceDefinition,
+    ].join('\n');
+
+    const preset = platformPresets[0];
+    const limits = getMarkdownFitLimits(preset);
+    const result = splitMarkdownIntoCardDeck(markdown, preset);
+    const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+    const referenceCards =
+      result.deck?.cards.filter((card) => card.markdown.includes('capacity proof') || card.markdown.includes('capacity-link')) ??
+      [];
+    const captionText = result.deck?.captions.map((caption) => caption.text).join('\n\n') ?? '';
+
+    expect(result.deck?.cards.length).toBeGreaterThan(1);
+    expect(result.deck?.cards.every((card) => card.title === 'release audit')).toBe(true);
+    expect(joinedCards).toContain(paragraphReferenceLink);
+    expect(joinedCards).not.toContain(referenceDefinition);
+    expect(joinedCards).not.toContain(capacityReferenceDefinition);
+    expect(referenceCards.some((card) => card.markdown.includes(paragraphReferenceLink))).toBe(true);
+    for (const card of result.deck?.cards ?? []) {
+      expect(card.markdown.includes('[capacity proof]')).toBe(card.markdown.includes(paragraphReferenceLink));
+      const stats = getMarkdownStats(card.markdown);
+      expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+      expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+    }
+    expect(captionText).toContain('release audit');
+    expect(captionText).not.toContain('[audit-link]');
+    expect(captionText).not.toContain('https://example.com');
+  });
+
   it('does not split inline code spans in oversized mixed-language sentences without spaces', () => {
     const setupText = '中文排查说明需要连续上下文'.repeat(7);
     const codeSpan = '`npm run build -- --mode=production && npm test -- --runInBand`';
