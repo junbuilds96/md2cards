@@ -19,30 +19,28 @@ type SizedExportNode = {
   cleanup: () => void;
 };
 
+function slugifyExportTitle(title: string): string {
+  return Array.from(
+    title
+      .replace(/^#+\s*/, '')
+      .trim()
+      .normalize('NFKC')
+      .toLowerCase()
+      .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
+      .replace(/^-+|-+$/g, ''),
+  )
+    .slice(0, 64)
+    .join('');
+}
+
 export function getExportFileName(
   preset: PlatformPreset,
   title: string,
   format: ExportFileFormat = 'png',
 ): string {
-  const baseName = title
-    .replace(/^#+\s*/, '')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 64);
+  const baseName = slugifyExportTitle(title);
 
   return `${baseName || 'md2cards'}-${preset.id}.${format}`;
-}
-
-function slugifyExportTitle(title: string): string {
-  return title
-    .replace(/^#+\s*/, '')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 64);
 }
 
 export function getDeckExportFileName(title: string, index: number, format: ExportFileFormat = 'svg'): string {

@@ -4,6 +4,7 @@ import {
   createSvgDeckZip,
   createSizedExportNode,
   getDeckExportFileName,
+  getDeckZipFileName,
   getExportFileName,
   getExportHostStyle,
   getExportOptions,
@@ -67,6 +68,12 @@ describe('getExportFileName', () => {
   it('falls back when the title has no usable characters', () => {
     expect(getExportFileName(platformPresets[2], '### ✨')).toBe('md2cards-launch.png');
   });
+
+  it('keeps non-English title text in export filenames instead of falling back to generic names', () => {
+    expect(getExportFileName(platformPresets[1], '# 发布复盘：Markdown 卡片 v2')).toBe(
+      '发布复盘-markdown-卡片-v2-xiaohongshu.png',
+    );
+  });
 });
 
 describe('deck SVG export helpers', () => {
@@ -75,6 +82,13 @@ describe('deck SVG export helpers', () => {
       'launch-md2cards-v0-1-01.svg',
     );
     expect(getDeckExportFileName('### ✨', 11, 'png')).toBe('md2cards-12.png');
+  });
+
+  it('keeps non-English title text in deck entry and zip filenames', () => {
+    expect(getDeckExportFileName('# 发布复盘：Markdown 卡片 v2', 0, 'svg')).toBe(
+      '发布复盘-markdown-卡片-v2-01.svg',
+    );
+    expect(getDeckZipFileName('# 发布复盘：Markdown 卡片 v2')).toBe('发布复盘-markdown-卡片-v2-deck.zip');
   });
 
   it('creates a zip blob with every SVG entry', async () => {
