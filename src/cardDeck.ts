@@ -114,15 +114,23 @@ function shortenPlainText(text: string, limit: number): string {
 }
 
 function getHeadingText(line: string): { depth: number; title: string } | null {
-  const match = line.trim().match(/^(#{1,6})\s+(.+)$/);
+  const match = line.trim().match(/^(#{1,6})(\s+|(?=[\u4e00-\u9fff])|(?=\S))(.+)$/u);
 
   if (!match) {
     return null;
   }
 
+  const depth = match[1].length;
+  const hasRequiredSpace = /\s/.test(match[2]);
+  const startsWithCjk = /^[\u4e00-\u9fff]/u.test(match[3]);
+
+  if (depth === 1 && !hasRequiredSpace && !startsWithCjk) {
+    return null;
+  }
+
   return {
-    depth: match[1].length,
-    title: stripMarkdownText(match[2]) || 'Untitled',
+    depth,
+    title: stripMarkdownText(match[3]) || 'Untitled',
   };
 }
 

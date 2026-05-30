@@ -429,6 +429,36 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(joinedCards).not.toContain('--------------');
   });
 
+  it('uses CJK no-space ATX headings as deck title and section boundaries across platform presets', () => {
+    const markdown = [
+      '#发布复盘',
+      '',
+      '##背景',
+      '中文长文从手机备忘录粘贴时，经常省略 heading 后面的空格，但仍然应该作为章节处理。',
+      '',
+      '##Action Plan',
+      'Mixed Chinese/English notes should keep the section title and stay inside each platform capacity.',
+      '',
+      '#launch is a hashtag-style prose line, not a heading.',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(result.deck?.title).toBe('发布复盘');
+      expect(result.deck?.cards.map((card) => card.title)).toEqual(['背景', 'Action Plan']);
+      expect(joinedCards).toContain('#launch is a hashtag-style prose line');
+      expect(joinedCards).not.toContain('#发布复盘');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('uses Markdown thematic breaks as deck card boundaries across platform presets', () => {
     const markdown = [
       '# Platform launch notes',
