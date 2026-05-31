@@ -1430,6 +1430,7 @@ textarea:focus {
   --card-table-font-size: clamp(11px, 1.28cqw, 22px);
   --card-table-line-height: 1.18;
   --card-table-max-height: 30cqh;
+  --card-image-max-height: 30cqh;
   --card-blockquote-margin: 20px 0;
   --card-blockquote-padding-block: 14px;
   --card-blockquote-padding-left: 24px;
@@ -1795,6 +1796,7 @@ textarea:focus {
   --card-chrome-padding-inline: 10cqw;
   --card-body-block-padding: 8cqh;
   --card-body-inline-padding: 10cqw;
+  --card-image-max-height: 26cqh;
   --card-h1-font-size: clamp(26px, 6.3cqw, 100px);
   --card-h1-margin-bottom: clamp(16px, 2.2cqh, 22px);
   --card-body-font-size: clamp(15px, 2.35cqw, 37px);
@@ -1802,6 +1804,14 @@ textarea:focus {
   --card-list-margin: clamp(6px, 1.1cqh, 10px) 0 clamp(7px, 1.2cqh, 12px);
   --card-li-gap: clamp(4px, 0.75cqh, 7px);
   --card-list-item-padding-block: 0.3em;
+}
+
+.social-card.preset-xiaohongshu {
+  --card-image-max-height: 36cqh;
+}
+
+.social-card.preset-launch {
+  --card-image-max-height: 32cqh;
 }
 
 .social-card.preset-twitter.composition-standard {
@@ -2237,6 +2247,20 @@ textarea:focus {
 .markdown-table-scroll::-webkit-scrollbar-thumb {
   background: var(--card-accent);
   border-radius: 999px;
+}
+
+.markdown-card-image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: var(--card-image-max-height);
+  margin: var(--card-p-margin-bottom) auto;
+  object-fit: contain;
+  background: var(--card-surface-bg);
+  border: 1px solid var(--card-surface-border);
+  border-radius: var(--card-surface-radius);
+  box-shadow: var(--card-surface-shadow);
 }
 
 .markdown-card-body th,

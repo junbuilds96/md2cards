@@ -195,6 +195,11 @@ export const markdownComponents: Components = {
       </code>
     );
   },
+  img({ className, node, ...props }) {
+    void node;
+
+    return <img {...props} className={['markdown-card-image', className].filter(Boolean).join(' ')} />;
+  },
 };
 
 function firstMarkdownHeading(markdown: string): string {

@@ -321,8 +321,11 @@ describe('social card CSS', () => {
     expect(codeFrameRule).toContain('border-radius: var(--card-surface-radius)');
   });
 
-  it('gives Markdown code, tables, lists, and quotes designed constrained surfaces', () => {
+  it('gives Markdown code, tables, images, lists, and quotes designed constrained surfaces', () => {
     const cardRule = getRule('.social-card');
+    const twitterRule = getRule('.social-card.preset-twitter');
+    const xiaohongshuRule = getRule('.social-card.preset-xiaohongshu');
+    const launchRule = getRule('.social-card.preset-launch');
     const bodyChildRule = getRule('.markdown-card-body > *');
     const textRule = getRule(
       '.markdown-card-body p,\n.markdown-card-body li,\n.markdown-card-body td,\n.markdown-card-body th',
@@ -345,6 +348,7 @@ describe('social card CSS', () => {
     const tableMetricRule = getRule('.markdown-card-body th,\n.markdown-card-body td');
     const tableHeaderRule = getRuleContaining('.markdown-card-body th', 'background: var(--card-table-header-bg)');
     const tableCellRule = getRuleContaining('.markdown-card-body td', 'background: var(--card-table-row-bg)');
+    const imageRule = getRule('.markdown-card-image');
     const quoteRule = getRule('.markdown-card-body blockquote');
     const quoteAccentRule = getRule('.markdown-card-body blockquote::before');
     const quoteParagraphRule = getRule('.markdown-card-body blockquote p');
@@ -363,6 +367,10 @@ describe('social card CSS', () => {
     expect(cardRule).toContain('--card-code-label-bg: color-mix(in srgb, var(--card-accent) 14%, var(--card-surface-bg))');
     expect(cardRule).toContain('--card-table-font-size: clamp(11px, 1.28cqw, 22px)');
     expect(cardRule).toContain('--card-table-max-height: 30cqh');
+    expect(cardRule).toContain('--card-image-max-height: 30cqh');
+    expect(twitterRule).toContain('--card-image-max-height: 26cqh');
+    expect(xiaohongshuRule).toContain('--card-image-max-height: 36cqh');
+    expect(launchRule).toContain('--card-image-max-height: 32cqh');
     expect(bodyChildRule).toContain('flex-shrink: 0');
     expect(textRule).toContain('overflow-wrap: anywhere');
     expect(listRule).toContain('display: grid');
@@ -407,6 +415,11 @@ describe('social card CSS', () => {
     expect(tableMetricRule).toContain('line-height: var(--card-table-line-height)');
     expect(tableHeaderRule).toContain('background: var(--card-table-header-bg)');
     expect(tableCellRule).toContain('background: var(--card-table-row-bg)');
+    expect(imageRule).toContain('max-width: 100%');
+    expect(imageRule).toContain('max-height: var(--card-image-max-height)');
+    expect(imageRule).toContain('object-fit: contain');
+    expect(imageRule).toContain('border: 1px solid var(--card-surface-border)');
+    expect(imageRule).toContain('border-radius: var(--card-surface-radius)');
     expect(quoteRule).toContain('border-left: var(--card-blockquote-border-width) solid var(--card-accent)');
     expect(quoteRule).toContain('max-height: 32cqh');
     expect(quoteRule).toContain('background:');

@@ -47,4 +47,16 @@ describe('markdownComponents', () => {
     expect(html).toContain('data-language="CODE"');
     expect(html).toContain('npm run build');
   });
+
+  it('renders Markdown images with the card image class and preserves alt text', () => {
+    const html = renderToStaticMarkup(
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+        {'![Launch screenshot](https://cdn.example.com/md2cards/launch.png)'}
+      </ReactMarkdown>,
+    );
+
+    expect(html).toContain('class="markdown-card-image"');
+    expect(html).toContain('alt="Launch screenshot"');
+    expect(html).toContain('src="https://cdn.example.com/md2cards/launch.png"');
+  });
 });
