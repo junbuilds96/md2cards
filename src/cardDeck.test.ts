@@ -381,6 +381,49 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('keeps Markdown images intact and uses alt text in captions without leaking asset URLs', () => {
+    const imageMarkdown =
+      '![发布截图 launch timeline](https://cdn.example.com/assets/2026/05/31/md2cards-launch-timeline.png?width=2400&caption=平台容量回归#card)';
+    const detailSentence =
+      '中文说明 keeps the screenshot context readable while English release notes explain why exported cards should not split image syntax or leak a long CDN URL into generated captions. ';
+    const markdown = [
+      '# Visual launch recap',
+      '',
+      '## Evidence',
+      '',
+      imageMarkdown,
+      '',
+      detailSentence.repeat(10).trim(),
+      '',
+      'Follow-up: the source Markdown keeps the original asset reference for editors, while the social caption should only name the screenshot.',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const limits = getMarkdownFitLimits(preset);
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const imageCards =
+        result.deck?.cards.filter(
+          (card) => card.markdown.includes('发布截图 launch timeline') || card.markdown.includes('cdn.example.com'),
+        ) ?? [];
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+      const captionText = result.deck?.captions.map((caption) => caption.text).join('\n\n') ?? '';
+
+      expect(result.deck?.cards.length).toBeGreaterThan(1);
+      expect(imageCards).toHaveLength(1);
+      expect(imageCards[0].markdown).toContain(imageMarkdown);
+      expect(joinedCards).toContain('中文说明 keeps the screenshot context readable');
+      expect(captionText).toContain('发布截图 launch timeline');
+      expect(captionText).not.toContain('https://cdn.example.com');
+      expect(captionText).not.toContain('md2cards-launch-timeline.png');
+      for (const card of result.deck?.cards ?? []) {
+        expect(card.markdown.includes('cdn.example.com')).toBe(card.markdown.includes(imageMarkdown));
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('does not split reference-style links or leak reference definitions into captions', () => {
     const setupText = '中文发布说明需要连续铺垫上下文'.repeat(7);
     const headingReferenceLink = '[release audit][audit-link]';
