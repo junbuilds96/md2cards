@@ -1111,6 +1111,43 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(joinedCards).not.toContain('卡片。 > 第二行');
   });
 
+  it('keeps lazy blockquote continuations quoted in mixed-language deck cards', () => {
+    const markdown = [
+      '# Lazy quote audit',
+      '',
+      '## 用户原话',
+      '',
+      'Context: pasted Markdown from docs may omit the quote marker after the first quoted line.',
+      '',
+      '> 第一行：这个导出卡片已经能覆盖 launch notes, tables, and code.',
+      '第二行继续补充：但 mixed Chinese/English feedback still belongs in the same quote.',
+      '> 第三行：否则 caption 里的语气会变得像普通说明。',
+      '',
+      'Action: keep quote styling stable before exporting the deck.',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(joinedCards).toContain(
+        [
+          '> 第一行：这个导出卡片已经能覆盖 launch notes, tables, and code.',
+          '> 第二行继续补充：但 mixed Chinese/English feedback still belongs in the same quote.',
+          '> 第三行：否则 caption 里的语气会变得像普通说明。',
+        ].join('\n'),
+      );
+      expect(joinedCards).not.toContain('code. 第二行继续补充');
+      expect(joinedCards).toContain('Action: keep quote styling stable before exporting the deck.');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('keeps tightly pasted paragraph-to-quote transitions quoted in deck cards', () => {
     const markdown = [
       '# 客户反馈复盘',
@@ -1242,6 +1279,47 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(joinedCards).toContain('> 第一行：不是所有故事都需要答案。 第二行：有些人留下的');
     expect(joinedCards).not.toContain('> 第一行：我以为告别只是把门关上。 > 第二行');
     expect(joinedCards).not.toContain('> 第一行：不是所有故事都需要答案。 > 第二行');
+  });
+
+  it('keeps lazy quote continuations readable in Chinese story decks', () => {
+    const markdown = [
+      '# 雨夜引用',
+      '',
+      '雨从傍晚一直下到深夜，林夏把发布复盘贴进 Markdown。',
+      '',
+      '“这段客户原话不要被拆散。”她说。',
+      '',
+      '> 第一行：我知道这个工具能把 Markdown 变成卡片，',
+      '第二行：but the exported deck should keep the quote voice intact.',
+      '> 第三行：尤其是中英文混排和 caption 语气。',
+      '',
+      '陈屿点头，把最后一条 checklist 收进 source。',
+      '',
+      '---',
+      '',
+      '第二天清晨，测试通过了。',
+      '',
+      '“现在可以发了吗？”他问。',
+      '',
+      '“可以，但引用不要变成普通段落。”',
+    ].join('\n');
+
+    expect(detectNarrativeMarkdown(markdown)).toBe(true);
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+      const maxLineLimit = preset.id === 'twitter' ? 7 : 8;
+
+      expect(joinedCards).toContain('> 第一行：我知道这个工具能把 Markdown 变成卡片， 第二行：but the exported deck');
+      expect(joinedCards).toContain('第三行：尤其是中英文混排和 caption 语气。');
+      expect(joinedCards).not.toContain('intact.\n\n第三行');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(420);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(maxLineLimit);
+      }
+    }
   });
 
   it('preserves list and table shapes inside realistic mixed-language story decks across platforms', () => {

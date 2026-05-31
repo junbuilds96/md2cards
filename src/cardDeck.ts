@@ -219,6 +219,33 @@ function isMarkdownQuoteLine(line: string): boolean {
   return line.trim().startsWith('>');
 }
 
+function getMarkdownQuoteContent(line: string): string {
+  return line.trim().replace(/^>\s?/, '').trimEnd();
+}
+
+function isMarkdownQuoteContinuationLine(lines: string[], index: number, previousQuoteLine: string): boolean {
+  const line = lines[index];
+
+  if (
+    line.trim().length === 0 ||
+    isMarkdownQuoteLine(line) ||
+    getHeadingText(line) ||
+    isListLine(line) ||
+    isMarkdownCodeFenceLine(line) ||
+    isHorizontalRuleLine(line) ||
+    isMarkdownReferenceDefinitionLine(line) ||
+    isMarkdownTableStart(lines, index)
+  ) {
+    return false;
+  }
+
+  const previousContent = getMarkdownQuoteContent(previousQuoteLine);
+  const nextNonEmptyIndex = getNextNonEmptyLineIndex(lines, index + 1);
+  const resumesQuote = nextNonEmptyIndex !== null && isMarkdownQuoteLine(lines[nextNonEmptyIndex]);
+
+  return previousContent.length > 0 && (resumesQuote || !/[。！？.!?]$/.test(previousContent));
+}
+
 export function detectNarrativeMarkdown(markdown: string): boolean {
   const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
   const nonEmptyLines = lines.map((line) => line.trim()).filter(Boolean);
@@ -389,8 +416,12 @@ function parseSourceBlocks(markdown: string): { title: string | null; blocks: So
     if (isMarkdownQuoteLine(line)) {
       const quoteLines: string[] = [];
 
-      while (index < lines.length && isMarkdownQuoteLine(lines[index])) {
-        quoteLines.push(lines[index].trimEnd());
+      while (
+        index < lines.length &&
+        (isMarkdownQuoteLine(lines[index]) ||
+          (quoteLines.length > 0 && isMarkdownQuoteContinuationLine(lines, index, quoteLines[quoteLines.length - 1])))
+      ) {
+        quoteLines.push(isMarkdownQuoteLine(lines[index]) ? lines[index].trimEnd() : `> ${lines[index].trim()}`);
         index += 1;
       }
 
@@ -962,8 +993,12 @@ function parseStorySegments(markdown: string): { title: string | null; segments:
     if (trimmed.startsWith('>')) {
       const quoteLines: string[] = [];
 
-      while (index < lines.length && lines[index].trim().startsWith('>')) {
-        quoteLines.push(lines[index].trimEnd());
+      while (
+        index < lines.length &&
+        (isMarkdownQuoteLine(lines[index]) ||
+          (quoteLines.length > 0 && isMarkdownQuoteContinuationLine(lines, index, quoteLines[quoteLines.length - 1])))
+      ) {
+        quoteLines.push(isMarkdownQuoteLine(lines[index]) ? lines[index].trimEnd() : `> ${lines[index].trim()}`);
         index += 1;
       }
 
