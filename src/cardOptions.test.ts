@@ -671,6 +671,28 @@ More detail belongs in the caption.`;
     expect(result.note).toContain('kept the first 2 table rows');
   });
 
+  it('strips parenthesized Markdown link URLs when compacting wide table cells', () => {
+    const parenthesizedLink =
+      '[发布复盘](https://example.com/wiki/Card_(deck)_table-fit?owner=platform&surface=xiaohongshu)';
+    const markdown = [
+      '# Table URL check',
+      '',
+      '| 阶段 | Evidence |',
+      '| --- | --- |',
+      `| 导出 | ${`${parenthesizedLink} explains why 中文 table cells and English owner notes need compact export-safe text. `.repeat(3)} |`,
+      '| Caption | Keep the caption readable without URL tails. |',
+      '| Source | Keep source Markdown editable after export. |',
+    ].join('\n');
+    const result = fitMarkdownToPreset(markdown, platformPresets[0]);
+
+    expect(result.changed).toBe(true);
+    expect(result.markdown).toContain('| 导出 | 发布复盘 explains why 中文 table cells');
+    expect(result.markdown).not.toContain('https://example.com');
+    expect(result.markdown).not.toContain('Card_(deck)_table-fit');
+    expect(result.markdown).not.toContain('?owner=platform');
+    expect(result.note).toContain('shortened wide table cells');
+  });
+
   it('caps tilde-fenced code blocks without flattening them into prose', () => {
     const markdown = [
       '# Code check',

@@ -4,7 +4,7 @@ import {
   isMarkdownCodeFenceLine,
   normalizeMarkdownCodeFenceBlock,
 } from './markdownCodeFences';
-import { getInlineSafeCutIndex } from './markdownInline';
+import { getInlineSafeCutIndex, replaceMarkdownLinksWithText } from './markdownInline';
 import {
   isMarkdownTableDelimiterLine,
   isMarkdownTableRowLine,
@@ -1289,9 +1289,7 @@ function compactListBlock(items: string[], limits: MarkdownFitLimits): { block: 
 }
 
 function simplifyTableCellLinks(cell: string): string {
-  return cell
-    .replace(/!\[([^\]]*)\]\((?:\\.|[^)])*\)/g, '$1')
-    .replace(/\[([^\]]+)\]\((?:\\.|[^)])*\)/g, '$1');
+  return replaceMarkdownLinksWithText(cell);
 }
 
 function getTableCellCharacterLimit(lines: string[], limits: MarkdownFitLimits): number {

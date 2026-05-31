@@ -973,6 +973,42 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('removes parenthesized Markdown link URLs when fitting wide table cells in deck cards', () => {
+    const longEvidence =
+      '[发布复盘](https://example.com/wiki/Card_(deck)_table-capacity?owner=platform&surface=xiaohongshu) explains why 中文 table cells, English owner notes, and caption hints need compact export-safe text. ';
+    const markdown = [
+      '# Table URL deck',
+      '',
+      '## 发布证据',
+      '',
+      '| 阶段 | Evidence |',
+      '| --- | --- |',
+      `| 导出 | ${longEvidence.repeat(4)} |`,
+      '| Caption | Keep the generated caption readable without URL tails. |',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+      const captionText = result.deck?.captions.map((caption) => caption.text).join('\n\n') ?? '';
+
+      expect(joinedCards).toContain('| 导出 | 发布复盘 explains why 中文 table cells');
+      expect(joinedCards).not.toContain('https://example.com');
+      expect(joinedCards).not.toContain('Card_(deck)_table-capacity');
+      expect(joinedCards).not.toContain('?owner=platform');
+      expect(captionText).toContain('Table URL deck');
+      expect(captionText).not.toContain('https://example.com');
+      expect(captionText).not.toContain('Card_(deck)_table-capacity');
+      expect(result.deck?.cards.some((card) => card.note.includes('shortened wide table cells'))).toBe(true);
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('keeps inline code pipes inside GFM table cells when creating deck cards', () => {
     const markdown = [
       '# Table code deck',
@@ -1587,6 +1623,7 @@ describe('splitMarkdownIntoCardDeck', () => {
       expect(joinedCards).toContain('| 导出 | 夜间导出复盘');
       expect(joinedCards).toContain('...');
       expect(joinedCards).not.toContain('https://example.com/reports/2026/05/31');
+      expect(joinedCards).not.toContain('story-table-capacity-regression');
       expect(joinedCards).toContain('| 结论 | 用户不会丢失草稿，caption 也不会误导读者。 |');
       for (const card of result.deck?.cards ?? []) {
         const stats = getMarkdownStats(card.markdown);

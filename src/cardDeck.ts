@@ -1111,9 +1111,7 @@ function getStoryCardLimits(preset: PlatformPreset): { characterLimit: number; t
 }
 
 function simplifyStoryTableCellLinks(cell: string): string {
-  return cell
-    .replace(/!\[([^\]]*)\]\((?:\\.|[^)])*\)/g, '$1')
-    .replace(/\[([^\]]+)\]\((?:\\.|[^)])*\)/g, '$1');
+  return replaceMarkdownLinksWithText(cell);
 }
 
 function shortenStoryTableCell(cell: string, characterLimit: number): { text: string; changed: boolean } {
