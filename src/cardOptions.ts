@@ -1257,7 +1257,25 @@ function compactListBlock(items: string[], limits: MarkdownFitLimits): { block: 
       addChange(changes, 'shortened long list items');
     }
 
-    return [`${listMatch[1]}${shortened.text}`, ...continuationLines].join('\n');
+    const compactedContinuationLines = continuationLines.map((line) => {
+      const continuationMatch = line.match(/^(\s+)(.+)$/);
+
+      if (!continuationMatch) {
+        return line;
+      }
+
+      const shortenedContinuation = shortenText(
+        continuationMatch[2],
+        Math.min(130, limits.paragraphCharacterLimit),
+      );
+      if (shortenedContinuation.changed) {
+        addChange(changes, 'shortened long list item continuations');
+      }
+
+      return `${continuationMatch[1]}${shortenedContinuation.text}`;
+    });
+
+    return [`${listMatch[1]}${shortened.text}`, ...compactedContinuationLines].join('\n');
   });
 
   if (items.length > keptItems.length) {

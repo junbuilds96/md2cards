@@ -786,6 +786,39 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('shortens very long indented list continuations before rendering deck cards', () => {
+    const longContinuation =
+      '  中文背景说明 keeps a realistic pasted continuation attached to the parent item while repeating enough context to exceed card capacity. '.repeat(
+        18,
+      );
+    const markdown = [
+      '# Continuation capacity',
+      '',
+      '## 发布检查',
+      '',
+      '- 用户反馈：中文长段先给背景，再给动作。',
+      longContinuation.trimEnd(),
+      '- Follow-up keeps the next item visible after the long continuation.',
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const limits = getMarkdownFitLimits(preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+
+      expect(result.deck?.notes).toContain('some cards were tightened to stay inside platform limits');
+      expect(joinedCards).toContain('- 用户反馈：中文长段先给背景，再给动作。');
+      expect(joinedCards).toContain('中文背景说明 keeps a realistic pasted continuation');
+      expect(joinedCards).toContain('- Follow-up keeps the next item visible after the long continuation.');
+      expect(joinedCards).toContain('...');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('does not lose mixed-language prose that uses pipe separators instead of a table', () => {
     const preset = platformPresets[0];
     const markdown = [
