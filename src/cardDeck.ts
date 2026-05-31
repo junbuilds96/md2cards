@@ -1038,6 +1038,27 @@ function fitStorySegmentToLimits(
     ];
   }
 
+  if (isMarkdownTableStart(lines, 0)) {
+    const headerRows = lines.slice(0, 2);
+    const dataRows = lines.slice(2);
+    const maxDataRows = Math.max(1, limits.maxLineLimit - headerRows.length);
+
+    if (dataRows.length <= maxDataRows) {
+      return [segment];
+    }
+
+    const segments: StorySegment[] = [];
+
+    for (let index = 0; index < dataRows.length; index += maxDataRows) {
+      segments.push({
+        markdown: [...headerRows, ...dataRows.slice(index, index + maxDataRows)].join('\n'),
+        note: [segment.note, 'split story table rows across cards'].filter(Boolean).join('; '),
+      });
+    }
+
+    return segments;
+  }
+
   return [segment];
 }
 
