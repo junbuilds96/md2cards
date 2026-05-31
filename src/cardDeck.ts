@@ -555,6 +555,42 @@ function splitTextIntoSentences(text: string): string[] {
   return sentences;
 }
 
+function getParagraphPunctuationCutIndex(text: string, characterLimit: number): number | null {
+  const maxIndex = Math.min(characterLimit - 1, text.length - 1);
+  const minIndex = Math.max(0, Math.floor(characterLimit * 0.55));
+
+  for (let index = maxIndex; index >= minIndex; index -= 1) {
+    if (!/[。！？；;，,、：:]/u.test(text[index])) {
+      continue;
+    }
+
+    let boundaryEnd = index;
+
+    while (/["')\]”’」』）】》]/.test(text[boundaryEnd + 1] ?? '')) {
+      boundaryEnd += 1;
+    }
+
+    if (boundaryEnd + 1 <= characterLimit) {
+      return boundaryEnd + 1;
+    }
+  }
+
+  return null;
+}
+
+function getParagraphCutIndex(text: string, characterLimit: number): number {
+  const clipped = text.slice(0, characterLimit);
+  const punctuationCutIndex = getParagraphPunctuationCutIndex(text, characterLimit);
+
+  if (punctuationCutIndex !== null) {
+    return punctuationCutIndex;
+  }
+
+  const boundary = clipped.lastIndexOf(' ');
+
+  return boundary > characterLimit * 0.55 ? boundary : clipped.length;
+}
+
 function splitParagraphIntoSegments(markdown: string, characterLimit: number): string[] {
   const text = markdown.replace(/\s+/g, ' ').trim();
 
@@ -591,9 +627,7 @@ function splitParagraphIntoSegments(markdown: string, characterLimit: number): s
     let rest = chunk;
 
     while (rest.length > characterLimit) {
-      const clipped = rest.slice(0, characterLimit);
-      const boundary = clipped.lastIndexOf(' ');
-      const preferredCutIndex = boundary > characterLimit * 0.55 ? boundary : clipped.length;
+      const preferredCutIndex = getParagraphCutIndex(rest, characterLimit);
       const cutIndex = getInlineSafeCutIndex(rest, preferredCutIndex);
       pieces.push(rest.slice(0, cutIndex).trim());
       rest = rest.slice(cutIndex).trim();

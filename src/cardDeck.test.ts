@@ -202,6 +202,34 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('prefers Chinese punctuation boundaries when splitting long no-space paragraphs across platform capacities', () => {
+    const paragraph = [
+      '中文长文会连续铺垫背景，mixed English context 夹在中间；再补充导出校验、caption 复用、链接留存和平台容量差异，确保读者翻到下一张卡时不会先看到一个孤立标点，',
+      '第二段事实继续说明，Markdown 卡片需要保留阅读节奏、中文标点、English terms and realistic export pressure，避免在逗号前后生硬切开。',
+    ].join('');
+    const markdown = ['# 中文长段容量', '', paragraph.repeat(14)].join('\n');
+
+    for (const preset of platformPresets) {
+      const limits = getMarkdownFitLimits(preset);
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const bodyCards = result.deck?.cards.map((card) => card.markdown.replace(/^# .+\n\n/, '')) ?? [];
+      const joinedCards = bodyCards.join('\n\n');
+
+      expect(result.deck?.cards.length).toBeGreaterThan(1);
+      expect(bodyCards.every((card) => !/^[，,、；;：:。！？]/u.test(card))).toBe(true);
+      expect(joinedCards).not.toMatch(/台\n\n容量差异/u);
+      expect(joinedCards).not.toMatch(/cap\n\ntion/u);
+      expect(joinedCards).not.toMatch(/capt\n\nion/u);
+      expect(joinedCards).not.toMatch(/Eng\n\nlish/u);
+
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('does not split Markdown links across cards when long paragraphs contain URL punctuation', () => {
     const setupSentence =
       'This release note keeps enough setup context to move the next source sentence near a platform split point today.';
