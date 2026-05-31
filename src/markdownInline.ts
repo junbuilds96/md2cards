@@ -3,7 +3,7 @@ type ProtectedInlineRange = {
   end: number;
 };
 
-function getMarkdownLinkEnd(text: string, linkStart: number): number | null {
+function getMarkdownLabel(text: string, linkStart: number): { start: number; end: number; text: string } | null {
   const labelStart = text.indexOf('[', linkStart + (text[linkStart] === '!' ? 1 : 0));
 
   if (labelStart < 0) {
@@ -11,7 +11,6 @@ function getMarkdownLinkEnd(text: string, linkStart: number): number | null {
   }
 
   let escaped = false;
-  let labelEnd = -1;
 
   for (let index = labelStart + 1; index < text.length; index += 1) {
     const character = text[index];
@@ -27,19 +26,28 @@ function getMarkdownLinkEnd(text: string, linkStart: number): number | null {
     }
 
     if (character === ']') {
-      labelEnd = index;
-      break;
+      return {
+        start: labelStart,
+        end: index,
+        text: text.slice(labelStart + 1, index),
+      };
     }
   }
 
-  if (labelEnd < 0 || text[labelEnd + 1] !== '(') {
+  return null;
+}
+
+function getMarkdownLinkEnd(text: string, linkStart: number): number | null {
+  const label = getMarkdownLabel(text, linkStart);
+
+  if (!label || text[label.end + 1] !== '(') {
     return null;
   }
 
+  let escaped = false;
   let depth = 1;
-  escaped = false;
 
-  for (let index = labelEnd + 2; index < text.length; index += 1) {
+  for (let index = label.end + 2; index < text.length; index += 1) {
     const character = text[index];
 
     if (escaped) {
@@ -69,41 +77,15 @@ function getMarkdownLinkEnd(text: string, linkStart: number): number | null {
 }
 
 function getMarkdownReferenceLinkEnd(text: string, linkStart: number): number | null {
-  const labelStart = text.indexOf('[', linkStart + (text[linkStart] === '!' ? 1 : 0));
+  const label = getMarkdownLabel(text, linkStart);
 
-  if (labelStart < 0) {
+  if (!label || text[label.end + 1] !== '[') {
     return null;
   }
 
   let escaped = false;
-  let labelEnd = -1;
 
-  for (let index = labelStart + 1; index < text.length; index += 1) {
-    const character = text[index];
-
-    if (escaped) {
-      escaped = false;
-      continue;
-    }
-
-    if (character === '\\') {
-      escaped = true;
-      continue;
-    }
-
-    if (character === ']') {
-      labelEnd = index;
-      break;
-    }
-  }
-
-  if (labelEnd < 0 || text[labelEnd + 1] !== '[') {
-    return null;
-  }
-
-  escaped = false;
-
-  for (let index = labelEnd + 2; index < text.length; index += 1) {
+  for (let index = label.end + 2; index < text.length; index += 1) {
     const character = text[index];
 
     if (escaped) {
@@ -122,6 +104,31 @@ function getMarkdownReferenceLinkEnd(text: string, linkStart: number): number | 
   }
 
   return null;
+}
+
+export function replaceMarkdownLinksWithText(text: string): string {
+  let result = '';
+  let cursor = 0;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const isImageLink = text[index] === '!' && text[index + 1] === '[';
+    const isTextLink = text[index] === '[';
+
+    if (!isImageLink && !isTextLink) {
+      continue;
+    }
+
+    const label = getMarkdownLabel(text, index);
+    const end = getMarkdownLinkEnd(text, index) ?? getMarkdownReferenceLinkEnd(text, index);
+
+    if (label && end !== null) {
+      result += text.slice(cursor, index) + label.text;
+      cursor = end;
+      index = end - 1;
+    }
+  }
+
+  return result + text.slice(cursor);
 }
 
 function getMarkdownLinkRanges(text: string): ProtectedInlineRange[] {

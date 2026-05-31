@@ -1100,7 +1100,7 @@ describe('splitMarkdownIntoCardDeck', () => {
       '',
       '## 社交短帖',
       '',
-      '中文长段：[路线图 Roadmap](https://example.com/roadmap) explains why **Markdown 卡片** and _English notes_ stay readable while export checks stay strict.',
+      '中文长段：[路线图 Roadmap](https://example.com/wiki/Card_(deck)_caption-tail-regression?view=caption) explains why **Markdown 卡片** and _English notes_ stay readable while export checks stay strict.',
       '',
       'Short post: ship the fix, keep the source, export safely.',
     ].join('\n');
@@ -1109,11 +1109,14 @@ describe('splitMarkdownIntoCardDeck', () => {
     const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
     const captionText = result.deck?.captions.map((caption) => caption.text).join('\n\n') ?? '';
 
-    expect(joinedCards).toContain('[路线图 Roadmap](https://example.com/roadmap)');
+    expect(joinedCards).toContain(
+      '[路线图 Roadmap](https://example.com/wiki/Card_(deck)_caption-tail-regression?view=caption)',
+    );
     expect(captionText).toContain('路线图 Roadmap');
     expect(captionText).toContain('Markdown 卡片');
     expect(captionText).toContain('English notes');
     expect(captionText).not.toContain('https://example.com');
+    expect(captionText).not.toContain('caption-tail-regression');
     expect(captionText).not.toContain('路线图 Roadmaphttps');
     expect(captionText).not.toContain('**');
     expect(captionText).not.toContain('_English');

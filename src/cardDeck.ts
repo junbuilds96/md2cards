@@ -11,7 +11,7 @@ import {
   isMarkdownCodeFenceLine,
   normalizeMarkdownCodeFenceBlock,
 } from './markdownCodeFences';
-import { getInlineSafeCutIndex } from './markdownInline';
+import { getInlineSafeCutIndex, replaceMarkdownLinksWithText } from './markdownInline';
 import {
   isMarkdownTableDelimiterLine,
   isMarkdownTableRowLine,
@@ -96,10 +96,8 @@ function addUnique(items: string[], item: string) {
 }
 
 function stripMarkdownText(markdown: string): string {
-  return markdown
+  return replaceMarkdownLinksWithText(markdown)
     .replace(/^\s{0,3}\[[^\]]+\]:\s+\S.*$/gm, '')
-    .replace(/!?\[([^\]]*)\]\((?:\\.|[^)])*\)/g, '$1')
-    .replace(/!?\[([^\]]*)\]\[[^\]]*\]/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/^\s*(?:[-*+]|\d+[.)])\s+/gm, '')
     .replace(/[`*_~>|[\]()]/g, '')
