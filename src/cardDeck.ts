@@ -957,12 +957,45 @@ function parseStorySegments(markdown: string): { title: string | null; segments:
           break;
         }
 
+        const baseIndent = markerIndent;
         const itemLines = [lines[index].trimEnd()];
         index += 1;
 
-        while (index < lines.length && isListContinuationLine(lines[index])) {
-          itemLines.push(lines[index].trimEnd());
-          index += 1;
+        while (index < lines.length) {
+          if (lines[index].trim().length === 0) {
+            const nextNonEmptyIndex = getNextNonEmptyLineIndex(lines, index + 1);
+            const nextLine = nextNonEmptyIndex === null ? null : lines[nextNonEmptyIndex];
+            const nextMarkerIndent = nextLine === null ? null : getListMarkerIndent(nextLine);
+            const continuesLooseItem =
+              nextLine !== null &&
+              (isListContinuationLine(nextLine) || (nextMarkerIndent !== null && nextMarkerIndent > baseIndent));
+
+            if (!continuesLooseItem) {
+              break;
+            }
+
+            if (nextMarkerIndent === null) {
+              itemLines.push(lines[index].trimEnd());
+            }
+            index += 1;
+            continue;
+          }
+
+          const continuationMarkerIndent = getListMarkerIndent(lines[index]);
+
+          if (continuationMarkerIndent !== null && continuationMarkerIndent > baseIndent) {
+            itemLines.push(lines[index].trimEnd());
+            index += 1;
+            continue;
+          }
+
+          if (isListContinuationLine(lines[index])) {
+            itemLines.push(lines[index].trimEnd());
+            index += 1;
+            continue;
+          }
+
+          break;
         }
 
         segments.push({ markdown: itemLines.join('\n') });

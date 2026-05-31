@@ -1249,6 +1249,61 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('keeps loose ordered-list continuations attached in Chinese story decks', () => {
+    const markdown = [
+      '# 雨夜验收',
+      '',
+      '凌晨的会议室只剩投影仪的光，林夏把发布验收写成一张卡。',
+      '',
+      '“先别急着庆祝。”陈屿说。',
+      '',
+      '> 她后来记得，稳定不是没有意外，而是意外没有带走用户的文字。',
+      '',
+      '他们把最后三件事列出来，避免故事只剩情绪。',
+      '',
+      '1. 先看导出卡片。',
+      '',
+      '   这行来自飞书粘贴，should stay attached after a blank line.',
+      '   1. Nested proof keeps [ticket 42](https://example.com/tickets/42) close.',
+      '2. 再检查 caption。',
+      '3. 最后保留 source Markdown。',
+      '',
+      '---',
+      '',
+      '天亮前，测试通过了。',
+      '',
+      '“现在可以发了吗？”他问。',
+      '',
+      '“可以，但别让清单丢行。”',
+    ].join('\n');
+
+    expect(detectNarrativeMarkdown(markdown)).toBe(true);
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+      const maxLineLimit = preset.id === 'twitter' ? 7 : 8;
+
+      expect(joinedCards).toContain(
+        [
+          '1. 先看导出卡片。',
+          '',
+          '   这行来自飞书粘贴，should stay attached after a blank line.',
+          '   1. Nested proof keeps [ticket 42](https://example.com/tickets/42) close.',
+        ].join('\n'),
+      );
+      expect(joinedCards).toContain('2. 再检查 caption。');
+      expect(joinedCards).toContain('3. 最后保留 source Markdown。');
+      expect(joinedCards).not.toContain('卡片。 这行来自飞书粘贴');
+      expect(joinedCards).not.toContain('blank line. 1. Nested proof');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(420);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(maxLineLimit);
+      }
+    }
+  });
+
   it('splits long status tables in Chinese story decks without overflowing platform cards', () => {
     const rows = [
       '| 发现 | 中文摘要 keeps the context visible. |',
