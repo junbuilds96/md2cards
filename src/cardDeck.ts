@@ -922,7 +922,25 @@ function summarizeCard(card: CardDeckCard): string {
 }
 
 function trimCaption(text: string): string {
-  return shortenPlainText(text, 900);
+  const captionLimit = 900;
+  const normalized = text
+    .replace(/\r\n?/g, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .split('\n')
+    .map((line) => line.trim())
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  if (normalized.length <= captionLimit) {
+    return normalized;
+  }
+
+  const clipped = normalized.slice(0, Math.max(0, captionLimit - 3));
+  const boundary = Math.max(clipped.lastIndexOf(' '), clipped.lastIndexOf('\n'));
+  const cutIndex = boundary > captionLimit * 0.55 ? boundary : clipped.length;
+
+  return `${clipped.slice(0, cutIndex).trimEnd()}...`;
 }
 
 function splitStoryText(markdown: string, characterLimit: number): string[] {

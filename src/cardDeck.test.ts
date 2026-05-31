@@ -1266,6 +1266,18 @@ describe('splitMarkdownIntoCardDeck', () => {
     expect(new Set([twitter, xiaohongshu, launch]).size).toBe(3);
   });
 
+  it('keeps generated captions structured for platform copy/paste', () => {
+    const twitter = splitMarkdownIntoCardDeck(longEssay, platformPresets[0]).deck?.captionText ?? '';
+    const xiaohongshu = splitMarkdownIntoCardDeck(longEssay, platformPresets[1]).deck?.captionText ?? '';
+    const launch = splitMarkdownIntoCardDeck(longEssay, platformPresets[2]).deck?.captionText ?? '';
+
+    expect(twitter).toMatch(/^Thread: Long-form launch notes\n\n1\. /);
+    expect(twitter).toContain('\n2. ');
+    expect(twitter).toContain('\n\nFull notes in source');
+    expect(xiaohongshu).toMatch(/^Long-form launch notes\n\n要点：\n- /);
+    expect(launch).toMatch(/^Long-form launch notes\n\nHighlights:\n- /);
+  });
+
   it('keeps mixed-language inline Markdown readable in generated captions', () => {
     const markdown = [
       '# 发布复盘',
