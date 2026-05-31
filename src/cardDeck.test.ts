@@ -353,6 +353,34 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('does not split scheme-less bare URLs in realistic mixed-language long text', () => {
+    const setupText = '中文发布说明需要连续铺垫上下文'.repeat(7);
+    const bareUrl =
+      'www.example.com/reports/2026/05/31/md2cards-platform-capacity-check?owner=deck&surface=xiaohongshu#caption';
+    const markdown = [
+      '# 无协议链接回归',
+      '',
+      `${setupText}${bareUrl}${'继续补充导出稳定性、Twitter landscape、小红书 portrait、GitHub square and caption context'.repeat(52)}。`,
+    ].join('\n');
+
+    for (const preset of platformPresets) {
+      const limits = getMarkdownFitLimits(preset);
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const urlCards = result.deck?.cards.filter((card) => card.markdown.includes('example.com')) ?? [];
+
+      expect(result.deck?.cards.length).toBeGreaterThan(1);
+      expect(urlCards).toHaveLength(1);
+      expect(urlCards[0].markdown).toContain(bareUrl);
+      for (const card of result.deck?.cards ?? []) {
+        expect(card.markdown.includes('www.')).toBe(card.markdown.includes(bareUrl));
+        expect(card.markdown.includes('example.com')).toBe(card.markdown.includes(bareUrl));
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(limits.characterLimit);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(limits.lineLimit);
+      }
+    }
+  });
+
   it('does not split reference-style links or leak reference definitions into captions', () => {
     const setupText = '中文发布说明需要连续铺垫上下文'.repeat(7);
     const headingReferenceLink = '[release audit][audit-link]';

@@ -172,10 +172,14 @@ function getRegexRanges(text: string, patterns: RegExp[]): ProtectedInlineRange[
 
 function getAutolinkRanges(text: string): ProtectedInlineRange[] {
   const ranges: ProtectedInlineRange[] = [];
-  const autolinkPattern = /https?:\/\/[^\s<>"']+/g;
+  const autolinkPattern = /(?:https?:\/\/|www\.)[^\s<>"']+/g;
   let match: RegExpExecArray | null;
 
   while ((match = autolinkPattern.exec(text)) !== null) {
+    if (match[0].startsWith('www.') && /[\w@]/.test(text[match.index - 1] ?? '')) {
+      continue;
+    }
+
     const previousCloseBracket = text.lastIndexOf(']', match.index - 1);
     const previousOpenBracket = text.lastIndexOf('[', match.index - 1);
 
