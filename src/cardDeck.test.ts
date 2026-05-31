@@ -1364,6 +1364,58 @@ describe('splitMarkdownIntoCardDeck', () => {
     }
   });
 
+  it('shortens wide mixed-language table rows in Chinese story decks without overflowing cards', () => {
+    const longEvidence =
+      '[夜间导出复盘](https://example.com/reports/2026/05/31/story-table-capacity-regression?owner=platform&surface=xiaohongshu) 说明中文叙事、English owner note、caption hint 和 source Markdown 都要留在同一行证据里，避免读者翻到下一张时丢掉上下文。 ';
+    const markdown = [
+      '# 雨夜证据表',
+      '',
+      '凌晨的办公室只剩一盏灯，林夏把最后一版发布说明贴进 Markdown。',
+      '',
+      '“这不像故事。”陈屿说。',
+      '',
+      '“可用户读到的每一次故障，都是一个有开头和结尾的夜晚。”她回答。',
+      '',
+      '> 她后来记得，那天最安静的不是走廊，而是所有人等测试结果的三分钟。',
+      '',
+      '他们把最容易丢字的证据放进表格，避免长链接撑爆卡片。',
+      '',
+      '| 阶段 | Evidence |',
+      '| --- | --- |',
+      `| 导出 | ${longEvidence.repeat(4)} |`,
+      '| 结论 | 用户不会丢失草稿，caption 也不会误导读者。 |',
+      '',
+      '---',
+      '',
+      '天快亮时，窗外的雨停了。',
+      '',
+      '“现在像故事了吗？”他问。',
+      '',
+      '“像一次没有惊动用户的修复。”',
+    ].join('\n');
+
+    expect(detectNarrativeMarkdown(markdown)).toBe(true);
+
+    for (const preset of platformPresets) {
+      const result = splitMarkdownIntoCardDeck(markdown, preset);
+      const joinedCards = result.deck?.cards.map((card) => card.markdown).join('\n\n') ?? '';
+      const tableCards = result.deck?.cards.filter((card) => card.markdown.includes('| 阶段 | Evidence |')) ?? [];
+      const maxLineLimit = preset.id === 'twitter' ? 7 : 8;
+
+      expect(tableCards.length).toBeGreaterThanOrEqual(1);
+      expect(result.deck?.notes).toContain('shortened wide story table cells');
+      expect(joinedCards).toContain('| 导出 | 夜间导出复盘');
+      expect(joinedCards).toContain('...');
+      expect(joinedCards).not.toContain('https://example.com/reports/2026/05/31');
+      expect(joinedCards).toContain('| 结论 | 用户不会丢失草稿，caption 也不会误导读者。 |');
+      for (const card of result.deck?.cards ?? []) {
+        const stats = getMarkdownStats(card.markdown);
+        expect(stats.characterCount).toBeLessThanOrEqual(420);
+        expect(stats.nonEmptyLineCount).toBeLessThanOrEqual(maxLineLimit);
+      }
+    }
+  });
+
   it('keeps oversized code segments in Chinese story decks inside platform capacity', () => {
     const longPayload = `TRACE_${'0123456789abcdef'.repeat(72)}`;
     const markdown = [

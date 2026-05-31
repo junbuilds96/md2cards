@@ -12,7 +12,12 @@ import {
   normalizeMarkdownCodeFenceBlock,
 } from './markdownCodeFences';
 import { getInlineSafeCutIndex } from './markdownInline';
-import { isMarkdownTableRowLine, isMarkdownTableStart } from './markdownTables';
+import {
+  isMarkdownTableDelimiterLine,
+  isMarkdownTableRowLine,
+  isMarkdownTableStart,
+  splitMarkdownTableCells,
+} from './markdownTables';
 
 export type CardDeckCard = {
   id: string;
@@ -1038,6 +1043,81 @@ function getStoryCardLimits(preset: PlatformPreset): { characterLimit: number; t
   };
 }
 
+function simplifyStoryTableCellLinks(cell: string): string {
+  return cell
+    .replace(/!\[([^\]]*)\]\((?:\\.|[^)])*\)/g, '$1')
+    .replace(/\[([^\]]+)\]\((?:\\.|[^)])*\)/g, '$1');
+}
+
+function shortenStoryTableCell(cell: string, characterLimit: number): { text: string; changed: boolean } {
+  const normalized = cell.replace(/\s+/g, ' ').trim();
+  const linkSimplified = normalized.length > characterLimit ? simplifyStoryTableCellLinks(normalized) : normalized;
+
+  if (linkSimplified.length <= characterLimit) {
+    return {
+      text: linkSimplified,
+      changed: linkSimplified !== cell,
+    };
+  }
+
+  const clipped = linkSimplified.slice(0, Math.max(0, characterLimit - 3));
+  const boundary = clipped.lastIndexOf(' ');
+  const preferredCutIndex = boundary > characterLimit * 0.55 ? boundary : clipped.length;
+  const cutIndex = getInlineSafeCutIndex(linkSimplified, preferredCutIndex, characterLimit - 3);
+
+  return {
+    text: `${linkSimplified.slice(0, cutIndex).trimEnd()}...`,
+    changed: true,
+  };
+}
+
+function compactStoryTableLine(line: string, cellCharacterLimit: number): { line: string; changed: boolean } {
+  const cells = splitMarkdownTableCells(line);
+
+  if (cells.length < 2 || isMarkdownTableDelimiterLine(line)) {
+    return { line, changed: false };
+  }
+
+  let changed = false;
+  const compactedCells = cells.map((cell) => {
+    const shortened = shortenStoryTableCell(cell, cellCharacterLimit);
+
+    if (shortened.changed) {
+      changed = true;
+    }
+
+    return shortened.text;
+  });
+
+  return {
+    line: changed ? `| ${compactedCells.join(' | ')} |` : line,
+    changed,
+  };
+}
+
+function compactStoryTableSegment(
+  lines: string[],
+  limits: ReturnType<typeof getStoryCardLimits>,
+): { markdown: string; changed: boolean } {
+  let compactedLines = [...lines];
+  let changed = false;
+
+  for (const cellCharacterLimit of [96, 72, 56, 44, 32, 24]) {
+    const nextLines = lines.map((line) => compactStoryTableLine(line, cellCharacterLimit));
+    compactedLines = nextLines.map((line) => line.line);
+    changed = nextLines.some((line) => line.changed);
+
+    if (getMarkdownStats(compactedLines.join('\n')).characterCount <= limits.characterLimit) {
+      break;
+    }
+  }
+
+  return {
+    markdown: compactedLines.join('\n'),
+    changed,
+  };
+}
+
 function fitStorySegmentToLimits(
   segment: StorySegment,
   limits: ReturnType<typeof getStoryCardLimits>,
@@ -1075,17 +1155,27 @@ function fitStorySegmentToLimits(
     const headerRows = lines.slice(0, 2);
     const dataRows = lines.slice(2);
     const maxDataRows = Math.max(1, limits.maxLineLimit - headerRows.length);
-
-    if (dataRows.length <= maxDataRows) {
-      return [segment];
-    }
+    const rowChunks =
+      dataRows.length > 0
+        ? Array.from({ length: Math.ceil(dataRows.length / maxDataRows) }, (_, chunkIndex) =>
+            dataRows.slice(chunkIndex * maxDataRows, (chunkIndex + 1) * maxDataRows),
+          )
+        : [[]];
 
     const segments: StorySegment[] = [];
 
-    for (let index = 0; index < dataRows.length; index += maxDataRows) {
+    for (const rowChunk of rowChunks) {
+      const hasMoreRows = dataRows.length > maxDataRows;
+      const compacted = compactStoryTableSegment([...headerRows, ...rowChunk], limits);
       segments.push({
-        markdown: [...headerRows, ...dataRows.slice(index, index + maxDataRows)].join('\n'),
-        note: [segment.note, 'split story table rows across cards'].filter(Boolean).join('; '),
+        markdown: compacted.markdown,
+        note: [
+          segment.note,
+          hasMoreRows ? 'split story table rows across cards' : '',
+          compacted.changed ? 'shortened wide story table cells' : '',
+        ]
+          .filter(Boolean)
+          .join('; '),
       });
     }
 
